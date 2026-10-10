@@ -1047,7 +1047,7 @@ class Main(QMainWindow):
         lv.setContentsMargins(0, 0, 0, 0)
         head = QHBoxLayout()
         head.addWidget(QLabel(tr('Saves')), 1)
-        refresh = QPushButton(tr('Refresh'))
+        refresh = QPushButton(QIcon.fromTheme('view-refresh'), tr('Refresh'))
         refresh.setToolTip(tr('Reload the save list (F5). The list also updates by itself when the game saves.'))
         refresh.clicked.connect(self.refresh_list)
         head.addWidget(refresh)
