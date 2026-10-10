@@ -149,7 +149,8 @@ def cached_details(folder):
     try:
         with open(os.path.join(gamedata.CACHE, 'savedetails.json')) as fh:
             hit = json.load(fh).get(folder)
-        if hit and hit['mtime'] == os.path.getmtime(os.path.join(folder, 'global.dat')):
+        if hit and hit['mtime'] == os.path.getmtime(os.path.join(folder, 'global.dat')) \
+                and hit.get('v') == us.DETAILS_VERSION:
             return hit['details']
     except (OSError, ValueError, KeyError):
         pass
@@ -310,7 +311,10 @@ class SaveCard(QWidget):
         if d.get('xp') is not None:
             parts.append(f"XP {d['xp']:,}")
         self.stats.setText('   '.join(parts))
-        self.money.setText(f"{d.get('stygian', 0):,} {tr('Stygian')} · {d.get('sgs', 0):,} SGS")
+        money = [f'{v:,} {tr(k)}' for k, v in (d.get('money') or {}).items()]
+        # two currencies per line keeps the card narrow
+        self.money.setText('\n'.join(' · '.join(money[i:i + 2]) for i in range(0, len(money), 2))
+                           or tr('no money'))
         unspent = {k: v for k, v in (d.get('unspent') or {}).items() if v}
         if unspent:
             labels = {'PC1:BAPC': tr('attr.'), 'PC1:SPC': tr('skill'), 'PC1:FC': tr('feat'), 'PC1:SP': tr('spec')}
@@ -1147,6 +1151,7 @@ class Main(QMainWindow):
             self.saves.addItem(it)
             self.saves.setItemWidget(it, card)
             self.cards[folder] = card
+            card.item = it
             if folder == current:
                 self.saves.setCurrentItem(it)
         self.saves.blockSignals(False)
@@ -1198,6 +1203,7 @@ class Main(QMainWindow):
             return
         if kind == 'details':
             card.set_details(cached_details(folder))
+            card.item.setSizeHint(card.sizeHint())  # details can add lines
         elif kind == 'thumb':
             card.set_thumb()
 

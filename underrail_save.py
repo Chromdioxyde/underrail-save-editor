@@ -719,7 +719,10 @@ def save_info(folder):
         return None
 
 
-CURRENCIES = {'currency\\sgscredits': 'sgs', 'currency\\stygiancoin': 'stygian'}
+# short labels for the save list; any other item in data/rules/items/currency is shown by its name
+CURRENCY_LABELS = {'currency\\stygiancoin': 'Stygian', 'currency\\sgscredits': 'SGS',
+                   'currency\\usd': 'USD', 'currency\\zlatortiya': 'Zlatortiya'}
+DETAILS_VERSION = 2  # bump when save_details() gains fields, so cached entries are rebuilt
 
 
 def save_details(folder):
@@ -733,19 +736,22 @@ def save_details(folder):
         data = {}
     mtime = os.path.getmtime(os.path.join(folder, 'global.dat'))
     hit = data.get(folder)
-    if hit and hit.get('mtime') == mtime:
+    if hit and hit.get('mtime') == mtime and hit.get('v') == DETAILS_VERSION:
         return hit['details']
     s = Save(folder)
     hp = s.obj(s.obj(s.m['C1:D2']).get('CD1:H'))
-    money = {'sgs': 0, 'stygian': 0}
+    money = {}
     for it in s.inventory():
-        key = CURRENCIES.get((it.path or '').lower())
-        if key:
-            money[key] += it.fields()[0].value
+        if it.category == 'currency':
+            label = CURRENCY_LABELS.get((it.path or '').lower(), it.name)
+            money[label] = money.get(label, 0) + it.fields()[0].value
+    # fixed order: main currencies first
+    order = list(CURRENCY_LABELS.values())
+    money = dict(sorted(money.items(), key=lambda kv: order.index(kv[0]) if kv[0] in order else len(order)))
     details = {'hp': s.val(hp.get('BV:V')) if hp else None, 'hp_max': s.val(hp.get('BV:MX')) if hp else None,
-               'xp': s.val(s.m.get('PC1:E')), **money,
+               'xp': s.val(s.m.get('PC1:E')), 'money': money,
                'unspent': {k: s.val(s.m.get(k)) for k, _ in POINT_FIELDS[1:] if k in s.m}}
-    data[folder] = {'mtime': mtime, 'details': details}
+    data[folder] = {'mtime': mtime, 'v': DETAILS_VERSION, 'details': details}
     os.makedirs(gamedata.CACHE, exist_ok=True)
     with open(cache, 'w') as fh:
         json.dump(data, fh)

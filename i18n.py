@@ -120,6 +120,7 @@ DE = {
         'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
+    'no money': 'kein Geld',
     'Component quality. The game has no upper limit; above {n} the quality bonus curve stops rising, but higher values still scale the stats linearly.':
         'Komponenten-Qualität. Das Spiel hat keine Obergrenze; über {n} steigt die Bonuskurve nicht weiter, '
         'höhere Werte skalieren die Werte aber weiterhin linear.',
