@@ -18,8 +18,9 @@ DE = {
     '{name} — level {level}': '{name} — Level {level}',
     '(unreadable info)': '(Info nicht lesbar)',
     'Underrail is running': 'Underrail läuft',
-    'Underrail seems to be running. It may overwrite this save.\nWrite anyway?':
-        'Underrail scheint zu laufen und könnte diesen Spielstand überschreiben.\nTrotzdem speichern?',
+    'Underrail is running and replaces quicksaves/autosaves on its own, which would discard these edits.\nWrite anyway?':
+        'Underrail läuft und ersetzt Quick- und Autosaves selbstständig, wodurch diese Änderungen verloren gingen.\n'
+        'Trotzdem speichern?',
     'Save failed': 'Speichern fehlgeschlagen',
     'Saved. Backup: {path}': 'Gespeichert. Backup: {path}',
     'Language': 'Sprache',

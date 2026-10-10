@@ -1293,9 +1293,12 @@ class Main(QMainWindow):
         repaired = self.save and (self.save.g.repaired or (self.save.info and self.save.info.repaired))
         if not self.save or not (self.dirty or repaired):
             return
-        if us.game_running():
+        # the game never rewrites a named save after creating it; only quick-/autosaves get replaced
+        rolling = os.path.basename(self.save.folder).lower().startswith(('quicksave', 'autosave'))
+        if rolling and us.game_running():
             if QMessageBox.warning(self, tr('Underrail is running'),
-                                   tr('Underrail seems to be running. It may overwrite this save.\nWrite anyway?'),
+                                   tr('Underrail is running and replaces quicksaves/autosaves on its own, '
+                                      'which would discard these edits.\nWrite anyway?'),
                                    QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
                 return
         try:
