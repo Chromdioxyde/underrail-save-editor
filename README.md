@@ -52,7 +52,8 @@ always appear as the game names them.
 - **Feats:** all feats with descriptions, add/remove via checkbox; feats whose requirements your
   character doesn't meet (or that can't be picked when leveling up) are marked with the reasons, and
   *Only available* hides them
-- **Specializations:** edit values, add/remove specializations
+- **Specializations:** edit values (up to the game's maximum per specialization), add/remove; only
+  specializations of feats the character has are offered, like in the game
 - **Inventory:** item icons, sortable (click a column header) and filterable by category; stack size, component
   quality, durability (with maximum, *Repair* / *Repair all*), battery; add items from all ~1460 game
   items, duplicate (crafted items too), remove; edit equipped items
@@ -138,4 +139,5 @@ pyinstaller --noconfirm --distpath build/dist --workpath build/work packaging/un
 (needs `pip install dnfile dncil`; re-run after game updates). The tool reads each feat class's
 requirement method: attribute and skill minimums (compared against base values like the game does),
 required and excluded feats, character level, any psi skill, known psi abilities, and whether the
-level-up screen offers the feat at all.
+level-up screen offers the feat at all. It also reads every specialization class: the feat it belongs
+to and its maximum points.

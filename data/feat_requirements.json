@@ -4087,5 +4087,1082 @@
    ],
    "selectable": true
   }
+ },
+ "specs": {
+  "AimedShotCritDamage": {
+   "feat": "as",
+   "name": "Aimed Shot",
+   "max": 10
+  },
+  "AmbushCritChance": {
+   "feat": "ambush",
+   "name": "Ambush",
+   "max": 10
+  },
+  "ArmorSloping": {
+   "feat": "armorsloping",
+   "name": "Armor Sloping",
+   "max": 2
+  },
+  "Ballistics": {
+   "feat": "ballistics",
+   "name": "Ballistics",
+   "max": 3
+  },
+  "BarrelStareDamage": {
+   "feat": "barrelstare",
+   "name": "Barrel Stare",
+   "max": 10
+  },
+  "BeastOfBurdenCarryCapacity": {
+   "feat": "beastofburden",
+   "name": "Beast of Burden",
+   "max": 5
+  },
+  "BlindsidingDamage": {
+   "feat": "blindsiding",
+   "name": "Blindsiding",
+   "max": 10
+  },
+  "BlitzCooldown": {
+   "feat": "blitz",
+   "name": "Blitz: Cooldown",
+   "max": 5
+  },
+  "BlitzMaxAp": {
+   "feat": "blitz",
+   "name": "Blitz: Max Action Points",
+   "max": 3
+  },
+  "BoardingUp": {
+   "feat": "boardingup",
+   "name": "Boarding Up",
+   "max": 10
+  },
+  "BoneBreakerDamage": {
+   "feat": "bonebreaker",
+   "name": "Bone Breaker",
+   "max": 5
+  },
+  "BowyerCritDamage": {
+   "feat": "bowyer",
+   "name": "Bowyer",
+   "max": 10
+  },
+  "BrutalityFearChance": {
+   "feat": "brutality",
+   "name": "Brutality",
+   "max": 10
+  },
+  "BulletTime": {
+   "feat": "bullettime",
+   "name": "Bullet Time",
+   "max": 5
+  },
+  "BulletTranceDamage": {
+   "feat": "bullettrance",
+   "name": "Bullet Trance: Damage",
+   "max": 5
+  },
+  "BulletTranceDuration": {
+   "feat": "bullettrance",
+   "name": "Bullet Trance: Duration",
+   "max": 2
+  },
+  "BulletTranceMaxStacks": {
+   "feat": "bullettrance",
+   "name": "Bullet Trance: Max Stacks",
+   "max": 5
+  },
+  "BurglarSpeed": {
+   "feat": "burglar",
+   "name": "Burglar: Speed",
+   "max": 2
+  },
+  "BurglarStealth": {
+   "feat": "burglar",
+   "name": "Burglar: Stealth",
+   "max": 3
+  },
+  "CerebralTraumaDamage": {
+   "feat": "ct",
+   "name": "Cerebral Trauma: Damage",
+   "max": 10
+  },
+  "CerebralTraumaPsiBurn": {
+   "feat": "ct",
+   "name": "Cerebral Trauma: Psi Reduction",
+   "max": 4
+  },
+  "CheapShotsCritDamage": {
+   "feat": "cheapshots",
+   "name": "Cheap Shots: Damage",
+   "max": 10
+  },
+  "CheapShotsIncapacitationChance": {
+   "feat": "cheapshots",
+   "name": "Cheap Shots: Incapacitation",
+   "max": 5
+  },
+  "Clothier": {
+   "feat": "clothier",
+   "name": "Clothier",
+   "max": 5
+  },
+  "ComboDamage": {
+   "feat": "combo",
+   "name": "Combo: Damage",
+   "max": 10
+  },
+  "ComboStunChance": {
+   "feat": "combo",
+   "name": "Combo: Stun Chance",
+   "max": 5
+  },
+  "CommandoApGain": {
+   "feat": "commando",
+   "name": "Commando",
+   "max": 3
+  },
+  "ConcentratedFireDamage": {
+   "feat": "concentratedfire",
+   "name": "Concentrated Fire",
+   "max": 10
+  },
+  "ConcussiveShotsDazeChance": {
+   "feat": "concussiveshots",
+   "name": "Concussive Shots",
+   "max": 5
+  },
+  "Conditioning": {
+   "feat": "co",
+   "name": "Conditioning",
+   "max": 5
+  },
+  "ContinuumRippleJumpChance": {
+   "feat": "continuumripple",
+   "name": "Continuum Ripple",
+   "max": 10
+  },
+  "CookedShotApCostReduction": {
+   "feat": "cookedshot",
+   "name": "Cooked Shot: Action Point Cost",
+   "max": 5
+  },
+  "CookedShotDamage": {
+   "feat": "cookedshot",
+   "name": "Cooked Shot: Damage",
+   "max": 10
+  },
+  "CorporealProjectionDamage": {
+   "feat": "corporealprojection",
+   "name": "Corporeal Projection",
+   "max": 6
+  },
+  "CripplingStrikeDamage": {
+   "feat": "cripplingstrike",
+   "name": "Crippling Strike",
+   "max": 10
+  },
+  "CriticalPowerCritDamage": {
+   "feat": "criticalpower",
+   "name": "Critical Power",
+   "max": 10
+  },
+  "CryogenicInductionBarrierHealth": {
+   "feat": "ci",
+   "name": "Cryogenic Induction: Barrier Health",
+   "max": 5
+  },
+  "CryogenicInductionThreshold": {
+   "feat": "ci",
+   "name": "Cryogenic Induction",
+   "max": 4
+  },
+  "CutthroatCooldown": {
+   "feat": "cutthroat",
+   "name": "Cut-throat: Cooldown",
+   "max": 3
+  },
+  "CutthroatDamage": {
+   "feat": "cutthroat",
+   "name": "Cut-throat: Damage",
+   "max": 10
+  },
+  "DeadlySnaresCritDamage": {
+   "feat": "deadlysnares",
+   "name": "Deadly Snares",
+   "max": 10
+  },
+  "DecapitateDamage": {
+   "feat": "decapitate",
+   "name": "Decapitate: Damage",
+   "max": 5
+  },
+  "DecapitateThreshold": {
+   "feat": "decapitate",
+   "name": "Decapitate: Threshold",
+   "max": 5
+  },
+  "DeflectionDodge": {
+   "feat": "deflection",
+   "name": "Deflection",
+   "max": 5
+  },
+  "DemolitionManDamageBonus": {
+   "feat": "demolitionman",
+   "name": "Demolition Man: Damage Bonus",
+   "max": 5
+  },
+  "DemolitionManDuration": {
+   "feat": "demolitionman",
+   "name": "Demolition Man: Duration",
+   "max": 4
+  },
+  "DemolitionManMaxStacks": {
+   "feat": "demolitionman",
+   "name": "Demolition Man: Max Stacks",
+   "max": 3
+  },
+  "DirtyKickDamage": {
+   "feat": "dirtykick",
+   "name": "Dirty Kick",
+   "max": 5
+  },
+  "DisassembleQuality": {
+   "feat": "disassemble",
+   "name": "Disassemble",
+   "max": 5
+  },
+  "DoctorHealingBonus": {
+   "feat": "doctor",
+   "name": "Doctor",
+   "max": 10
+  },
+  "ElementalBoltsDamage": {
+   "feat": "elementalbolts",
+   "name": "Elemental Bolts",
+   "max": 10
+  },
+  "EscapeBondsMpGain": {
+   "feat": "escapeartist",
+   "name": "Escape Artist",
+   "max": 3
+  },
+  "EvasiveManeuversConversion": {
+   "feat": "evasivemaneuvers",
+   "name": "Evasive Maneuvers",
+   "max": 2
+  },
+  "EviscerateDamage": {
+   "feat": "eviscerate",
+   "name": "Eviscerate",
+   "max": 10
+  },
+  "ExecuteCooldown": {
+   "feat": "im",
+   "name": "Execute: Cooldown",
+   "max": 2
+  },
+  "ExecuteDamage": {
+   "feat": "im",
+   "name": "Execute: Damage",
+   "max": 10
+  },
+  "ExpandedPsiCapacitance": {
+   "feat": "expandedpsicapacitance",
+   "name": "Expanded Psi Capacitance",
+   "max": 2
+  },
+  "ExpertiseMaxBonus": {
+   "feat": "expertise",
+   "name": "Expertise",
+   "max": 5
+  },
+  "ExposeWeaknessDuration": {
+   "feat": "exposeweakness",
+   "name": "Expose Weakness: Duration",
+   "max": 1
+  },
+  "ExposeWeaknessResistReduction": {
+   "feat": "exposeweakness",
+   "name": "Expose Weakness: Resistance Reduction",
+   "max": 5
+  },
+  "FancyFootworkMovementPoints": {
+   "feat": "fancyfootwork",
+   "name": "Fancy Footwork",
+   "max": 4
+  },
+  "FastMetabolismHealing": {
+   "feat": "fastmetabolism",
+   "name": "Fast Metabolism: Healing",
+   "max": 10
+  },
+  "FastMetabolismPsi": {
+   "feat": "fastmetabolism",
+   "name": "Fast Metabolism: Psi",
+   "max": 10
+  },
+  "FatalThrowActionPoints": {
+   "feat": "fatalthrow",
+   "name": "Fatal Throw: Action Points",
+   "max": 3
+  },
+  "FatalThrowHealthThreshold": {
+   "feat": "fatalthrow",
+   "name": "Fatal Throw: Health Threshold",
+   "max": 5
+  },
+  "FendApCost": {
+   "feat": "fend",
+   "name": "Fend: Action Point Cost",
+   "max": 5
+  },
+  "FendBlockAmount": {
+   "feat": "fend",
+   "name": "Fend: Block Amount",
+   "max": 10
+  },
+  "FlurryApCost": {
+   "feat": "flurry",
+   "name": "Flurry: Action Point Cost",
+   "max": 5
+  },
+  "FlurryCooldown": {
+   "feat": "flurry",
+   "name": "Flurry: Cooldown",
+   "max": 2
+  },
+  "ForceUserDamage": {
+   "feat": "forceuser",
+   "name": "Force User: Damage",
+   "max": 10
+  },
+  "ForceUserForcefieldHealth": {
+   "feat": "forceuser",
+   "name": "Force User: Forcefield Health",
+   "max": 5
+  },
+  "FragmentedChaosCritDamage": {
+   "feat": "fragmentedchaos",
+   "name": "Fragmented Chaos",
+   "max": 10
+  },
+  "FullAutoDamage": {
+   "feat": "fullauto",
+   "name": "Full-Auto: Burst Damage",
+   "max": 5
+  },
+  "FullAutoShotgunDamage": {
+   "feat": "fullauto",
+   "name": "Full-Auto: Shotgun Burst Damage",
+   "max": 5
+  },
+  "FutureOrientationAp": {
+   "feat": "futureorientation",
+   "name": "Future Orientation",
+   "max": 5
+  },
+  "GuardBlockAmount": {
+   "feat": "guard",
+   "name": "Guard: Block Amount",
+   "max": 5
+  },
+  "GuardBlockChance": {
+   "feat": "guard",
+   "name": "Guard: Block Chance",
+   "max": 10
+  },
+  "GunFu": {
+   "feat": "gunfu",
+   "name": "Gun-Fu",
+   "max": 4
+  },
+  "GunNutDamage": {
+   "feat": "gunnut",
+   "name": "Gun Nut",
+   "max": 10
+  },
+  "GunnersHighDuration": {
+   "feat": "gunnershigh",
+   "name": "Gunner's High: Duration",
+   "max": 10
+  },
+  "GunnersHighMaxStacks": {
+   "feat": "gunnershigh",
+   "name": "Gunner's High: Max Stacks",
+   "max": 10
+  },
+  "GunnersHighThreshold": {
+   "feat": "gunnershigh",
+   "name": "Gunner's High: Threshold",
+   "max": 5
+  },
+  "GunslingerInitiative": {
+   "feat": "g",
+   "name": "Gunslinger",
+   "max": 5
+  },
+  "HeavyMetalDamageBonus": {
+   "feat": "heavymetal",
+   "name": "Heavy Metal: Damage Bonus",
+   "max": 5
+  },
+  "HeavyMetalDamageReduction": {
+   "feat": "heavymetal",
+   "name": "Heavy Metal: Damage Reduction",
+   "max": 5
+  },
+  "HeavyPunchActionPoints": {
+   "feat": "heavypunch",
+   "name": "Heavy Punch: Action Point Cost",
+   "max": 5
+  },
+  "HeavyPunchCritDamage": {
+   "feat": "heavypunch",
+   "name": "Heavy Punch: Critical Damage",
+   "max": 10
+  },
+  "HeavyPunchDamage": {
+   "feat": "heavypunch",
+   "name": "Heavy Punch: Damage",
+   "max": 10
+  },
+  "HeavyweightCritDamage": {
+   "feat": "heavyweight",
+   "name": "Heavyweight",
+   "max": 5
+  },
+  "HemopsychosisCooldown": {
+   "feat": "hemopsychosis",
+   "name": "Hemopsychosis: Cooldown",
+   "max": 4
+  },
+  "HemopsychosisHealthCost": {
+   "feat": "hemopsychosis",
+   "name": "Hemopsychosis: Health Cost",
+   "max": 5
+  },
+  "HighTechnicalitiesDamage": {
+   "feat": "hightechnicalities",
+   "name": "High-Technicalities",
+   "max": 5
+  },
+  "HitAndRunMaxMp": {
+   "feat": "hitandrun",
+   "name": "Hit and Run",
+   "max": 5
+  },
+  "HypertoxicityDamage": {
+   "feat": "hypertoxicity",
+   "name": "Hypertoxicity",
+   "max": 10
+  },
+  "HypothermiaMaxStacks": {
+   "feat": "h",
+   "name": "Hypothermia",
+   "max": 2
+  },
+  "ImpaleCritDamage": {
+   "feat": "impale",
+   "name": "Impale",
+   "max": 10
+  },
+  "ImprovedUnarmedCombatDamage": {
+   "feat": "improvedunarmedcombat",
+   "name": "Improved Unarmed Combat: Damage",
+   "max": 5
+  },
+  "ImprovedUnarmedCombatDazeChance": {
+   "feat": "improvedunarmedcombat",
+   "name": "Improved Unarmed Combat: Daze Chance",
+   "max": 3
+  },
+  "InterloperMovement": {
+   "feat": "i",
+   "name": "Interloper",
+   "max": 10
+  },
+  "IronGrip": {
+   "feat": "irongrip",
+   "name": "Iron Grip",
+   "max": 5
+  },
+  "JuggernautHealth": {
+   "feat": "juggernaut",
+   "name": "Juggernaut",
+   "max": 10
+  },
+  "KneecapShotCooldown": {
+   "feat": "kcs",
+   "name": "Kneecap Shot: Cooldown",
+   "max": 4
+  },
+  "KneecapShotDamage": {
+   "feat": "kcs",
+   "name": "Kneecap Shot: Damage",
+   "max": 5
+  },
+  "LastStandCooldown": {
+   "feat": "laststand",
+   "name": "Last Stand: Cooldown",
+   "max": 4
+  },
+  "LastStandDuration": {
+   "feat": "laststand",
+   "name": "Last Stand: Duration",
+   "max": 4
+  },
+  "LeadingShot": {
+   "feat": "leadingshot",
+   "name": "Leading Shot",
+   "max": 5
+  },
+  "LightningPunchesThreshold": {
+   "feat": "lightningpunches",
+   "name": "Lightning Punches",
+   "max": 5
+  },
+  "LocusOfControlCooldown": {
+   "feat": "locusofcontrol",
+   "name": "Locus of Control: Cooldown",
+   "max": 5
+  },
+  "LocusOfControlDuration": {
+   "feat": "locusofcontrol",
+   "name": "Locus of Control: Duration",
+   "max": 2
+  },
+  "MadChemistOnHit": {
+   "feat": "madchemist",
+   "name": "Mad Chemist",
+   "max": 10
+  },
+  "MagDumpLmg": {
+   "feat": "magdump",
+   "name": "Mag Dump: Extra LMG Burst Rounds",
+   "max": 2
+  },
+  "MagDumpMinigun": {
+   "feat": "magdump",
+   "name": "Mag Dump: Extra Minigun Burst Rounds",
+   "max": 5
+  },
+  "MarksmanPrecision": {
+   "feat": "ds",
+   "name": "Marksman",
+   "max": 5
+  },
+  "MeditationPsiPoints": {
+   "feat": "meditation",
+   "name": "Meditation",
+   "max": 10
+  },
+  "NeuralOverclockingCritDamage": {
+   "feat": "neuraloverclocking",
+   "name": "Neural Overclocking",
+   "max": 10
+  },
+  "NeurologyPsiPoints": {
+   "feat": "neurology",
+   "name": "Neurology",
+   "max": 10
+  },
+  "NimbleDodgeAndEvasion": {
+   "feat": "nimble",
+   "name": "Nimble",
+   "max": 5
+  },
+  "NinjaLooterSpeed": {
+   "feat": "ninjalooter",
+   "name": "Ninja Looter: Speed",
+   "max": 3
+  },
+  "NinjaLooterSuspicion": {
+   "feat": "ninjalooter",
+   "name": "Ninja Looter: Suspicion",
+   "max": 5
+  },
+  "OnslaughtDamage": {
+   "feat": "onslaught",
+   "name": "Onslaught",
+   "max": 10
+  },
+  "OpportunistDisabledTarget": {
+   "feat": "o",
+   "name": "Opportunist: Disabled Target",
+   "max": 3
+  },
+  "OpportunistSlowedTarget": {
+   "feat": "o",
+   "name": "Opportunist: Slowed Target",
+   "max": 3
+  },
+  "PackrathoundCarryCapacity": {
+   "feat": "packrathound",
+   "name": "Pack Rathound",
+   "max": 10
+  },
+  "ParanoiaCritChanceReduction": {
+   "feat": "paranoia",
+   "name": "Paranoia: Critical Chance Reduction",
+   "max": 2
+  },
+  "ParanoiaDamage": {
+   "feat": "paranoia",
+   "name": "Paranoia: Damage",
+   "max": 3
+  },
+  "ParanoiaDetectionBonus": {
+   "feat": "paranoia",
+   "name": "Paranoia: Detection",
+   "max": 5
+  },
+  "ParanoiaInitiative": {
+   "feat": "paranoia",
+   "name": "Paranoia: Initiative",
+   "max": 5
+  },
+  "ParryBlockAmount": {
+   "feat": "parry",
+   "name": "Parry: Block Amount",
+   "max": 10
+  },
+  "ParryChance": {
+   "feat": "parry",
+   "name": "Parry: Chance",
+   "max": 5
+  },
+  "PelletMayhemDamage": {
+   "feat": "pelletmayhem",
+   "name": "Pellet Mayhem",
+   "max": 4
+  },
+  "PerfectScattering": {
+   "feat": "perfectscattering",
+   "name": "Perfect Scattering",
+   "max": 2
+  },
+  "PinningChance": {
+   "feat": "pinning",
+   "name": "Pinning",
+   "max": 10
+  },
+  "PointShotApCost": {
+   "feat": "pointshot",
+   "name": "Point Shot",
+   "max": 10
+  },
+  "PowerManagementCapacity": {
+   "feat": "powermanagement",
+   "name": "Power Management",
+   "max": 5
+  },
+  "PracticalPhysicistCritDamage": {
+   "feat": "practicalphysicist",
+   "name": "Practical Physicist",
+   "max": 10
+  },
+  "PracticedParabola": {
+   "feat": "practicedparabola",
+   "name": "Practiced Parabola",
+   "max": 5
+  },
+  "PremeditationCooldown": {
+   "feat": "premeditation",
+   "name": "Premeditation: Cooldown",
+   "max": 2
+  },
+  "PremeditationPsiCostReduction": {
+   "feat": "premeditation",
+   "name": "Premeditation: Psi Cost",
+   "max": 4
+  },
+  "PsionicManiaCooldown": {
+   "feat": "psionicmania",
+   "name": "Psionic Mania: Cooldown",
+   "max": 2
+  },
+  "PsionicManiaHealthCostReduction": {
+   "feat": "psionicmania",
+   "name": "Psionic Mania: Health Cost",
+   "max": 5
+  },
+  "PsychoNeuralOptimization": {
+   "feat": "psychoneuraloptimization",
+   "name": "Psycho-neural Optimization",
+   "max": 5
+  },
+  "PsychosisCritChance": {
+   "feat": "psychosis",
+   "name": "Psychosis: Critical Chance",
+   "max": 10
+  },
+  "PsychosisPsiCostReduction": {
+   "feat": "psychosis",
+   "name": "Psychosis: Psi Cost",
+   "max": 5
+  },
+  "PsychostaticElectricityCritChance": {
+   "feat": "psychostaticelectricity",
+   "name": "Psychostatic Electricity: Critical Chance",
+   "max": 10
+  },
+  "PsychostaticElectricityDuration": {
+   "feat": "psychostaticelectricity",
+   "name": "Psychostatic Electricity: Duration",
+   "max": 1
+  },
+  "PsychotemporalAccelerationActionPoints": {
+   "feat": "psychotemporalacceleration",
+   "name": "Psychotemporal Acceleration",
+   "max": 4
+  },
+  "PummelActionPoints": {
+   "feat": "pummel",
+   "name": "Pummel: Action Point Cost",
+   "max": 5
+  },
+  "PummelDamage": {
+   "feat": "pummel",
+   "name": "Pummel: Damage",
+   "max": 5
+  },
+  "PyromaniacDamage": {
+   "feat": "pm",
+   "name": "Pyromaniac",
+   "max": 10
+  },
+  "QuickPocketsApCost": {
+   "feat": "quickpockets",
+   "name": "Quick Pockets",
+   "max": 5
+  },
+  "QuickTinkeringAp": {
+   "feat": "quicktinkering",
+   "name": "Quick Tinkering: Action Points",
+   "max": 5
+  },
+  "QuickTinkeringCooldown": {
+   "feat": "quicktinkering",
+   "name": "Quick Tinkering: Cooldown",
+   "max": 2
+  },
+  "RapidFireApCost": {
+   "feat": "rapidfire",
+   "name": "Rapid Fire",
+   "max": 3
+  },
+  "RecklessnessCritChance": {
+   "feat": "recklessness",
+   "name": "Recklessness",
+   "max": 10
+  },
+  "RemoteSurgeon": {
+   "feat": "remotesurgeon",
+   "name": "Remote Surgeon",
+   "max": null
+  },
+  "RiposteCritChance": {
+   "feat": "riposte",
+   "name": "Riposte",
+   "max": 10
+  },
+  "RipperCritDamage": {
+   "feat": "ripper",
+   "name": "Ripper",
+   "max": 10
+  },
+  "Salesman": {
+   "feat": "salesman",
+   "name": "Salesman",
+   "max": 10
+  },
+  "SapCooldown": {
+   "feat": "sap",
+   "name": "Sap: Cooldown",
+   "max": 3
+  },
+  "SapDamage": {
+   "feat": "sap",
+   "name": "Sap: Damage",
+   "max": 5
+  },
+  "SapDuration": {
+   "feat": "sap",
+   "name": "Sap: Duration",
+   "max": 3
+  },
+  "SharpshooterCritDamage": {
+   "feat": "ss",
+   "name": "Sharpshooter",
+   "max": 5
+  },
+  "ShellShockDuration": {
+   "feat": "shellshock",
+   "name": "Shell Shock: Duration",
+   "max": 5
+  },
+  "ShellShockMaxStacks": {
+   "feat": "shellshock",
+   "name": "Shell Shock: Max Stacks",
+   "max": 3
+  },
+  "ShellShockSkillReduction": {
+   "feat": "shellshock",
+   "name": "Shell Shock: Skill Reduction",
+   "max": 4
+  },
+  "ShieldArmBlockAmount": {
+   "feat": "shieldarm",
+   "name": "Shield Arm: Block Amount",
+   "max": 10
+  },
+  "ShieldArmBlockChance": {
+   "feat": "shieldarm",
+   "name": "Shield Arm: Block Chance",
+   "max": 5
+  },
+  "ShieldBashApCost": {
+   "feat": "shieldbash",
+   "name": "Shield Bash: Action Point Cost",
+   "max": 3
+  },
+  "ShieldBashCooldown": {
+   "feat": "shieldbash",
+   "name": "Shield Bash: Cooldown",
+   "max": 2
+  },
+  "ShieldBashDamage": {
+   "feat": "shieldbash",
+   "name": "Shield Bash: Damage",
+   "max": 10
+  },
+  "ShootingSpreeCooldown": {
+   "feat": "shootingspree",
+   "name": "Shooting Spree: Cooldown",
+   "max": 4
+  },
+  "ShootingSpreeShots": {
+   "feat": "shootingspree",
+   "name": "Shooting Spree: Shots",
+   "max": 1
+  },
+  "SixthShellDamage": {
+   "feat": "sixthshell",
+   "name": "Sixth Shell",
+   "max": 5
+  },
+  "Skinner": {
+   "feat": "skinner",
+   "name": "Skinner",
+   "max": 5
+  },
+  "SnipeDamage": {
+   "feat": "s",
+   "name": "Snipe",
+   "max": 10
+  },
+  "SnoopingPerception": {
+   "feat": "snooping",
+   "name": "Snooping",
+   "max": 2
+  },
+  "SpearGuardian": {
+   "feat": "spearguardian",
+   "name": "Spear Guardian",
+   "max": 2
+  },
+  "SpearThrowApCost": {
+   "feat": "spearthrow",
+   "name": "Spear Throw: Action Point Cost",
+   "max": 3
+  },
+  "SpearThrowDamage": {
+   "feat": "spearthrow",
+   "name": "Spear Throw: Damage",
+   "max": 10
+  },
+  "SpearThrowRange": {
+   "feat": "spearthrow",
+   "name": "Spear Throw: Range",
+   "max": 3
+  },
+  "SpecOpsFlashbangCooldown": {
+   "feat": "specops",
+   "name": "Spec Ops",
+   "max": 2
+  },
+  "SpecialTacticsCooldown": {
+   "feat": "specialtactics",
+   "name": "Special Tactics",
+   "max": 2
+  },
+  "SplitSpareDamage": {
+   "feat": "splitspare",
+   "name": "Split Spare",
+   "max": 10
+  },
+  "SprintSpeed": {
+   "feat": "s2",
+   "name": "Sprint",
+   "max": 5
+  },
+  "SteadfastAimCritChance": {
+   "feat": "steadfastaim",
+   "name": "Steadfast Aim",
+   "max": 5
+  },
+  "Stoicism": {
+   "feat": "stoicism",
+   "name": "Stoicism",
+   "max": 5
+  },
+  "Strafe": {
+   "feat": "strafe",
+   "name": "Strafe",
+   "max": 10
+  },
+  "SuperSlamDamage": {
+   "feat": "superslam",
+   "name": "Super Slam",
+   "max": 5
+  },
+  "SuppressiveFireActionPoints": {
+   "feat": "suppressivefire",
+   "name": "Suppressive Fire: Action Points",
+   "max": 5
+  },
+  "SuppressiveFireHitChanceRed": {
+   "feat": "suppressivefire",
+   "name": "Suppressive Fire: Hit Chance",
+   "max": 5
+  },
+  "SuppressiveFireMovementPoints": {
+   "feat": "suppressivefire",
+   "name": "Suppressive Fire: Movement Points",
+   "max": 5
+  },
+  "SureStepBearTrap": {
+   "feat": "surestep",
+   "name": "Sure Step",
+   "max": 3
+  },
+  "SurvivalInstinctsCritChance": {
+   "feat": "survivalinstincts",
+   "name": "Survival Instincts: Critical Chance",
+   "max": 10
+  },
+  "SurvivalInstinctsHealthThreshold": {
+   "feat": "survivalinstincts",
+   "name": "Survival Instincts: Health Threshold",
+   "max": 5
+  },
+  "SweepCooldown": {
+   "feat": "sweep",
+   "name": "Sweep: Cooldown",
+   "max": 2
+  },
+  "SweepDamage": {
+   "feat": "sweep",
+   "name": "Sweep: Damage",
+   "max": 5
+  },
+  "SweepDuration": {
+   "feat": "sweep",
+   "name": "Sweep: Duration",
+   "max": 2
+  },
+  "TasteForBloodDamage": {
+   "feat": "tasteforblood",
+   "name": "Taste for Blood",
+   "max": 5
+  },
+  "TelekineticUndulationDazeChance": {
+   "feat": "telekineticundulation",
+   "name": "Telekinetic Undulation",
+   "max": 5
+  },
+  "ThermodynamicityActionPoints": {
+   "feat": "td",
+   "name": "Thermodynamicity",
+   "max": 5
+  },
+  "ThickSkull": {
+   "feat": "thickskull",
+   "name": "Thick Skull",
+   "max": 3
+  },
+  "ThreePointerCritChance": {
+   "feat": "threepointer",
+   "name": "Three-Pointer",
+   "max": 10
+  },
+  "Tranquility": {
+   "feat": "tranquility",
+   "name": "Tranquility",
+   "max": 10
+  },
+  "TrapExpertDetection": {
+   "feat": "trapexpert",
+   "name": "Trap Expert: Detection",
+   "max": 5
+  },
+  "TrapExpertSpeed": {
+   "feat": "trapexpert",
+   "name": "Trap Expert: Speed",
+   "max": 10
+  },
+  "TrickyTrajectoryDamageBonus": {
+   "feat": "trickytrajectory",
+   "name": "Tricky Trajectory: Damage Bonus",
+   "max": 5
+  },
+  "TrickyTrajectoryEvasionIgnore": {
+   "feat": "trickytrajectory",
+   "name": "Tricky Trajectory: Evasion Mitigation",
+   "max": 10
+  },
+  "TriggerHappy": {
+   "feat": "triggerhappy",
+   "name": "Trigger Happy",
+   "max": 10
+  },
+  "UncannyDodge": {
+   "feat": "uncannydodge",
+   "name": "Uncanny Dodge",
+   "max": 5
+  },
+  "Versatility": {
+   "feat": "versatility",
+   "name": "Versatility",
+   "max": 10
+  },
+  "VileWeaponryDamage": {
+   "feat": "vileweaponry",
+   "name": "Vile Weaponry: Damage",
+   "max": 5
+  },
+  "VileWeaponryHealingReduction": {
+   "feat": "vileweaponry",
+   "name": "Vile Weaponry: Healing Reduction",
+   "max": 2
+  },
+  "WeaponsmithCritChance": {
+   "feat": "weaponsmith",
+   "name": "Weaponsmith",
+   "max": 10
+  },
+  "WrestlingApplyChance": {
+   "feat": "wrestling",
+   "name": "Wrestling",
+   "max": 5
+  },
+  "YellReduction": {
+   "feat": "yell",
+   "name": "Yell",
+   "max": 3
+  }
  }
 }

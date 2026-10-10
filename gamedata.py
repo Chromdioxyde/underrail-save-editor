@@ -213,6 +213,16 @@ def feat_requirements():
     return _feat_reqs
 
 
+def spec_rules():
+    """spec key -> {'feat': feat id it belongs to, 'name', 'max': max points or None}."""
+    feat_requirements()
+    try:
+        with open(os.path.join(DATA_DIR, 'feat_requirements.json')) as f:
+            return json.load(f).get('specs', {})
+    except (OSError, ValueError):
+        return {}
+
+
 def feat_name(fid):
     f = feats().get(fid)
     return f[0] if f else fid

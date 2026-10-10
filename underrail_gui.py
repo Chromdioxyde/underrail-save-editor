@@ -79,7 +79,8 @@ def filter_box(placeholder, slot):
 class FieldTable(QTableWidget):
     """Name | value spinbox | optional info column, one row per Field."""
 
-    def __init__(self, main, fields, lo=0, hi=INT_MAX, info_header=None, info=None, label=None, after=None):
+    def __init__(self, main, fields, lo=0, hi=INT_MAX, info_header=None, info=None, label=None, after=None,
+                 hi_of=None):
         cols = [tr('Name'), tr('Value')] + ([tr(info_header)] if info_header else [])
         super().__init__(len(fields), len(cols))
         self.main, self.fields, self.info, self.after = main, fields, info, after
@@ -92,7 +93,9 @@ class FieldTable(QTableWidget):
             self.setItem(row, 0, QTableWidgetItem(label(f) if label else tr(f.name)))
             if f.info:
                 self.item(row, 0).setToolTip(f.info)
-            self.setCellWidget(row, 1, spin_for(f, self.changed, lo, hi))
+            top = hi_of(f) if hi_of else hi
+            # never clamp a value the save already has above the limit
+            self.setCellWidget(row, 1, spin_for(f, self.changed, lo, max(top, f.value) if top is not None else hi))
             if info:
                 self.setItem(row, 2, QTableWidgetItem(str(info(f))))
         self.setColumnWidth(1, 120)
@@ -836,10 +839,14 @@ def blueprints_tab(main):
 
 
 class SpecsTab(QWidget):
+    """Specializations. Following the game's rules, a spec belongs to a feat and is only available
+    while the character has that feat; each spec has a maximum number of points."""
+
     def __init__(self, main):
         super().__init__()
         self.main = main
         self.db = gamedata.specs()
+        self.rules = gamedata.spec_rules()
         lay = QVBoxLayout(self)
         self.lay = lay
         self.table = None
@@ -857,32 +864,71 @@ class SpecsTab(QWidget):
         add.addWidget(QLabel(tr('Add:'))); add.addWidget(self.combo, 1); add.addWidget(self.value); add.addWidget(btn)
         add.addWidget(rm)
         self.desc = QLabel(wordWrap=True)
+        self.note = QLabel(wordWrap=True)
         self.build()
         lay.addWidget(self.total)
         lay.addLayout(add)
         lay.addWidget(self.desc)
+        lay.addWidget(self.note)
+
+    def spec_max(self, key):
+        return (self.rules.get(key) or {}).get('max')
+
+    def spec_feat(self, key):
+        return (self.rules.get(key) or {}).get('feat')
 
     def build(self):
         s = self.main.save
+        owned = set(s.feats())
         fields = s.specs()
         for f in fields:
             f.info = self.db.get(f.name, (None, None))[1]
-        table = FieldTable(self.main, fields, 0, 100, label=lambda f: gamedata.split_camel(f.name),
-                           after=self.update_total)
+
+        def info(f):
+            feat, mx = self.spec_feat(f.name), self.spec_max(f.name)
+            text = gamedata.feat_name(feat) if feat else '?'
+            if mx is not None:
+                text += f' · max {mx}'
+            if feat and feat not in owned:
+                text = '⚠ ' + text + ' – ' + tr('feat missing')
+            return text
+        table = FieldTable(self.main, fields, 0, 100, tr('Feat · max'), info,
+                           label=lambda f: gamedata.split_camel(f.name), after=self.update_total,
+                           hi_of=lambda f: self.spec_max(f.name) if self.spec_max(f.name) is not None else 100)
         table.setSelectionMode(QTableWidget.SingleSelection)
         table.setSelectionBehavior(QAbstractItemView.SelectRows)
         if self.table is not None:
             self.lay.replaceWidget(self.table, table)
             self.table.deleteLater()
         else:
-            self.lay.addWidget(table, 1)
+            self.lay.insertWidget(0, table, 1)
         self.table = table
         have = {f.name for f in fields}
         self.combo.clear()
+        hidden = 0
         for key, (name, _) in sorted(self.db.items(), key=lambda x: x[1][0].lower()):
-            if key not in have:
-                self.combo.addItem(name, key)
+            if key in have:
+                continue
+            feat = self.spec_feat(key)
+            if feat and feat not in owned:
+                hidden += 1  # the game only unlocks a spec together with its feat
+                continue
+            self.combo.addItem(name, key)
+        self.combo.lineEdit().setPlaceholderText(
+            tr('All specializations of your feats are already present') if not self.combo.count() else '')
+        orphaned = [f.name for f in fields if self.spec_feat(f.name) and self.spec_feat(f.name) not in owned]
+        notes = [tr('{n} specializations are hidden because the character lacks their feat.', n=hidden)] if hidden else []
+        if orphaned:
+            notes.append(tr('Specializations marked ⚠ belong to a feat the character doesn\'t have; the game '
+                            'only uses them together with the feat.'))
+        self.note.setText(' '.join(notes))
         self.update_total()
+        self.describe()
+
+    def showEvent(self, e):
+        # feats may have been added or removed on the feats tab
+        super().showEvent(e)
+        self.build()
 
     def update_total(self):
         fields = self.table.fields
@@ -892,6 +938,8 @@ class SpecsTab(QWidget):
     def describe(self, *_):
         key = self.combo.currentData()
         self.desc.setText(self.db.get(key, ('', ''))[1] if key else '')
+        mx = self.spec_max(key) if key else None
+        self.value.setMaximum(mx if mx is not None else 100)
 
     def add(self):
         key = self.combo.currentData()

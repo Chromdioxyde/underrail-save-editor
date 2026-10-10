@@ -121,6 +121,14 @@ DE = {
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
     'Only available': 'Nur verfügbare',
+    'Feat · max': 'Feat · Max',
+    'feat missing': 'Feat fehlt',
+    'All specializations of your feats are already present': 'Alle Spezialisierungen deiner Feats sind bereits vorhanden',
+    '{n} specializations are hidden because the character lacks their feat.':
+        '{n} Spezialisierungen sind ausgeblendet, weil dem Charakter der zugehörige Feat fehlt.',
+    "Specializations marked ⚠ belong to a feat the character doesn't have; the game only uses them together with the feat.":
+        'Mit ⚠ markierte Spezialisierungen gehören zu einem Feat, den der Charakter nicht hat; das Spiel nutzt sie nur '
+        'zusammen mit dem Feat.',
     'Not available when leveling up (character creation, quests, trainers or events)':
         'Nicht beim Levelaufstieg wählbar (Charaktererstellung, Quests, Trainer oder Ereignisse)',
     'Hide entries whose requirements your character does not meet': 'Einträge ausblenden, deren Voraussetzungen der Charakter nicht erfüllt',

@@ -448,7 +448,39 @@ def main(exe):
         if dynamic:
             out[fid]['dynamic'] = True
     resolve_runtime_parts(out)
-    return out
+    return out, extract_specs(md, tname, types, extends, body, methods, feat_classes, feat_id, resolve_tok, pe)
+
+
+def extract_specs(md, tname, types, extends, body, methods, feat_classes, feat_id, resolve_tok, pe):
+    """Specializations are classes with tiny constant methods: the feat class they belong to
+    (ldtoken), the save key and the display name (ldstr) and the maximum points (ldc.i4)."""
+    import gamedata
+    known_keys = set(gamedata.knowledge('specialization'))
+    feat_set = set(feat_classes)
+    specs = {}
+    for t in types:
+        cls = tname(t)
+        feat = key = name = mx = None
+        for r in methods(cls):
+            b = body(r)
+            ins = list(b.instructions) if b else []
+            ops = [i.opcode.name for i in ins]
+            if ops == ['ldtoken', 'call', 'ret'] and isinstance(ins[0].operand, (Token, InvalidToken)):
+                kind, target = resolve_tok(ins[0].operand.value)
+                if kind == 'type' and target in feat_set:
+                    feat = target
+            elif ops == ['ldstr', 'ret']:
+                v = pe.net.user_strings.get(ins[0].operand.value & 0xFFFFFF).value
+                if v.lower() in known_keys and ' ' not in v:
+                    key = v
+                else:
+                    name = v
+            elif len(ops) == 2 and ops[0].startswith('ldc.i4') and ops[1] == 'ret':
+                o = ins[0]
+                mx = int(o.operand) if o.opcode.name in ('ldc.i4.s', 'ldc.i4') else int(o.opcode.name.split('.')[-1])
+        if feat and key:
+            specs[key] = {'feat': feat_id(feat), 'name': name or key, 'max': mx}
+    return dict(sorted(specs.items()))
 
 
 SCHOOL_SKILLS = {'metathermics': 'Metathermics', 'psychokinesis': 'Psychokinesis',
@@ -476,9 +508,9 @@ def resolve_runtime_parts(feats):
 if __name__ == '__main__':
     import gamedata
     exe = sys.argv[1] if len(sys.argv) > 1 else os.path.join(gamedata.GAME, 'underrail.exe')
-    feats = main(exe)
+    feats, specs = main(exe)
     dst = os.path.join(ROOT, 'data', 'feat_requirements.json')
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     with open(dst, 'w') as f:
-        json.dump({'source': 'underrail.exe', 'feats': dict(sorted(feats.items()))}, f, indent=1)
-    print(f'{len(feats)} feats -> {dst}')
+        json.dump({'source': 'underrail.exe', 'feats': dict(sorted(feats.items())), 'specs': specs}, f, indent=1)
+    print(f'{len(feats)} feats, {len(specs)} specializations -> {dst}')
