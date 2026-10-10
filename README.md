@@ -84,8 +84,9 @@ guns and miniguns (`WI:WT` 9/10) get double. Applies to weapons, armor, helmets,
 emitters; belts don't wear down. Checked against the world data: 99 of 130 items match exactly, almost
 all others are below (worn), two are above (probably templates changed by a game update).
 
-Component quality is `CII:QL` (0 = component without a quality value). The editor caps it at 185, the
-upper quality value in the game's configuration.
+Component quality is `CII:QL` (0 = component without a quality value). The game doesn't cap it: stats
+scale with `Q · (0.77 + 0.35 · min(1, max(0, Q−15)/170)^1.35)`, so the bonus curve flattens at 185 but
+higher values still count. The editor allows up to 999.
 
 ## Save format
 

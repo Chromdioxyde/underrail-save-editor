@@ -41,6 +41,9 @@ INSTANCE_CLASS = {'ABCI': 'CII', 'AI2': 'AI3', 'ASI': 'ASII', 'BI': 'BII', 'BI1'
                   'T5': 'NEII', 'TI': 'NEII', 'VAI': 'VPII', 'VBI': 'VPII', 'VEI': 'VPII', 'VFI': 'VPII',
                   'WI': 'WII'}
 
+# item data classes the player can craft (weapons, armor pieces, shield emitters)
+CRAFTABLE_CLASSES = {'WI', 'ASI', 'HI', 'BI', 'BI1', 'SEI'}
+
 EQUIP_SLOTS = [('CGS:H', 'Head'), ('CGS:A', 'Armor'), ('CGS:B', 'Belt'), ('CGS:B1', 'Boots'),
                ('CGS:SE', 'Shield emitter')]
 
@@ -198,7 +201,11 @@ class Item:
 
     @property
     def crafted(self):
-        return self.data is not None
+        """Crafted gear: embedded item data without a template id. Unique plot items (keys, data
+        chips…) also carry embedded data, but keep their template id or aren't equipment."""
+        if self.data is None or self.data.cls not in CRAFTABLE_CLASSES:
+            return False
+        return not self.save.g.val(self.data.get('I:C'))
 
     @property
     def name(self):

@@ -21,7 +21,10 @@ import underrail_save as us
 from i18n import tr
 
 INT_MAX = 2**31 - 1
-MAX_QUALITY = 185  # upper bound of component quality in the game's config
+# The game doesn't cap component quality: stats scale with Q * f(Q), where f stops growing at 185
+# (constants in its config class). 999 keeps it to three digits.
+MAX_QUALITY = 999
+QUALITY_CURVE_END = 185
 
 
 class _WheelGuard(QObject):
@@ -480,6 +483,9 @@ class AddItemDialog(QDialog):
         self.dur = QDoubleSpinBox(); self.dur.setRange(0, 1e7); self.dur.setDecimals(1)
         self.dur_hint = QLabel()
         self.quality = QSpinBox(); self.quality.setRange(0, MAX_QUALITY)
+        self.quality.setToolTip(tr('Component quality. The game has no upper limit; above {n} the quality bonus '
+                                   'curve stops rising, but higher values still scale the stats linearly.',
+                                   n=QUALITY_CURVE_END))
         self.quality_label = QLabel(tr('Quality'))
         form = QFormLayout()
         form.addRow(self.count_label, self.count)

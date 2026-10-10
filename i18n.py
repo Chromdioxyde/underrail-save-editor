@@ -120,6 +120,9 @@ DE = {
         'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
+    'Component quality. The game has no upper limit; above {n} the quality bonus curve stops rising, but higher values still scale the stats linearly.':
+        'Komponenten-Qualität. Das Spiel hat keine Obergrenze; über {n} steigt die Bonuskurve nicht weiter, '
+        'höhere Werte skalieren die Werte aber weiterhin linear.',
     'This save had {n} broken object id(s) from an older editor version; they were repaired – save to fix the file.':
         'Dieser Spielstand hatte {n} fehlerhafte Objekt-Id(s) aus einer älteren Editor-Version; sie wurden '
         'repariert – zum Beheben speichern.',
