@@ -7,10 +7,21 @@ import zlib
 
 import nrbf
 
-GAME = os.path.expanduser('$UNDERRAIL_GAME_DIR')
-USERDIR = os.path.expanduser('$UNDERRAIL_USER_DIR/'
-                             'Documents/My Games/Underrail')
-CACHE = os.path.expanduser('~/.cache/underrail-save-editor')
+import paths
+
+GAME = USERDIR = ICON_DIR = None
+CACHE = paths.CACHE_DIR
+
+
+def configure():
+    """(Re)reads the game and user folders (detected or chosen by the user). Returns True if both exist."""
+    global GAME, USERDIR, ICON_DIR, _items, _names
+    GAME, USERDIR = paths.resolve()
+    ICON_DIR = os.path.join(GAME, 'data', 'icons') if GAME else None
+    _items = _names = None
+    return GAME is not None and USERDIR is not None
+
+
 HEADER_LEN = 24
 
 
@@ -32,7 +43,8 @@ def _val(p, v):
 
 def _cached(name, sources, build):
     """JSON cache invalidated when any source path's mtime changes."""
-    stamp = [os.path.getmtime(s) for s in sources if os.path.exists(s)]
+    # the source paths are part of the stamp, so switching game folders never reuses old data
+    stamp = [[s, os.path.getmtime(s)] for s in sources if os.path.exists(s)]
     path = os.path.join(CACHE, name)
     try:
         with open(path) as f:
@@ -88,9 +100,6 @@ def _build_items():
     return out
 
 
-_items = None
-
-
 def items():
     """lower-case item path (as referenced by saves, without .item) -> info dict"""
     global _items
@@ -143,9 +152,6 @@ def _build_names():
             pairs.setdefault(a.lower(), b)
     idents = sorted({s.strip() for s in strs + utf16 if re.fullmatch(r'[A-Z][A-Za-z0-9]{3,60}', s.strip())})
     return {'pairs': pairs, 'idents': idents}
-
-
-_names = None
 
 
 def _name_data():
@@ -271,7 +277,6 @@ def import_portrait(image_path, pid):
 # Icons live in sprite sheets (data/icons/*.xnb). icons.iconset maps names to grid cells; item
 # visuals not listed there are "<Sheet>.<n>" = cell n of a 10-column grid. Cells are 33 px on a
 # 34 px pitch (verified visually against the sheets).
-ICON_DIR = os.path.join(GAME, 'data', 'icons')
 ICON_SIZE, ICON_PITCH, ICON_COLS = 33, 34, 10
 
 
@@ -380,3 +385,7 @@ def placeholder_icon(category, cls=None, wtype=None):
     img.putalpha(img.getchannel('A').point(lambda v: int(v * 0.45)))
     img.save(out)
     return out
+
+
+_items = _names = None
+configure()

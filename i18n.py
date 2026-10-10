@@ -119,6 +119,23 @@ DE = {
         'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
+    'Settings': 'Einstellungen',
+    'Game folders…': 'Spielordner…',
+    'Game folders': 'Spielordner',
+    'Game installation': 'Spielinstallation',
+    'User folder': 'Benutzerordner',
+    'Folder containing underrail.exe': 'Ordner mit underrail.exe',
+    'Folder containing "Saves" (Documents/My Games/Underrail)': 'Ordner mit „Saves“ (Dokumente/My Games/Underrail)',
+    'Browse…': 'Durchsuchen…',
+    'Detect automatically': 'Automatisch erkennen',
+    'Steam (also on Steam Deck / SD cards / Flatpak), GOG and Proton/Wine prefixes are searched automatically. Pick the folders yourself if they are somewhere else.':
+        'Steam (auch Steam Deck / SD-Karte / Flatpak), GOG und Proton/Wine-Präfixe werden automatisch durchsucht. '
+        'Liegen die Ordner woanders, hier selbst auswählen.',
+    'found': 'gefunden',
+    'underrail.exe not found here': 'underrail.exe hier nicht gefunden',
+    'no "Saves" folder here': 'kein „Saves“-Ordner hier',
+    'Underrail was not found. Choose its folders under Settings → Game folders…':
+        'Underrail wurde nicht gefunden. Ordner unter Einstellungen → Spielordner… auswählen.',
     'Save changed on disk': 'Spielstand geändert',
     'The game has changed this save since you opened it. Saving overwrites those changes (a backup is made first).\nSave anyway?':
         'Das Spiel hat diesen Spielstand seit dem Öffnen geändert. Speichern überschreibt diese Änderungen '

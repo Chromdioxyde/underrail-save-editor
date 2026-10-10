@@ -11,10 +11,16 @@ import zlib
 import gamedata
 import nrbf
 
-SAVES = os.path.join(gamedata.USERDIR, 'Saves')
+import paths
+
+
+def saves_dir():
+    return os.path.join(gamedata.USERDIR, 'Saves') if gamedata.USERDIR else None
+
+
+
 # backups live in the user's data dir, independent of where the program is installed
-BACKUPS = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'),
-                       'underrail-save-editor', 'backups')
+BACKUPS = paths.BACKUP_DIR
 HEADER_LEN = 24  # GUID + version bytes, kept verbatim
 
 # skill objects carry no name; the save keeps them in the in-game order
@@ -702,20 +708,14 @@ def save_details(folder):
 
 def list_saves():
     out = []
-    for d in os.listdir(SAVES):
-        f = os.path.join(SAVES, d)
+    saves = saves_dir()
+    if not saves or not os.path.isdir(saves):
+        return []
+    for d in os.listdir(saves):
+        f = os.path.join(saves, d)
         if os.path.isfile(os.path.join(f, 'global.dat')):
             out.append((d, f, save_info(f)))
     return sorted(out, key=lambda x: -os.path.getmtime(x[1]))
 
 
-def game_running():
-    for pid in os.listdir('/proc'):
-        if pid.isdigit():
-            try:
-                cmd = open(f'/proc/{pid}/cmdline', 'rb').read().lower()
-            except OSError:
-                continue
-            if b'underrail.exe' in cmd and b'underrail_' not in cmd and b'pgrep' not in cmd:
-                return True
-    return False
+game_running = paths.game_running

@@ -12,14 +12,17 @@ A backup of global.dat is written to ./backups/<save>/ before every change.
 import os
 import sys
 
-from underrail_save import SAVES, Save
+from underrail_save import Save, saves_dir
 
 
 def main(argv):
-    folder = os.path.join(SAVES, 'quicksave')
+    saves = saves_dir()
+    if not saves:
+        sys.exit('Underrail save folder not found; start the GUI once to choose it')
+    folder = os.path.join(saves, 'quicksave')
     if argv and argv[0] not in ('list', 'set', 'unspent'):
         a = argv.pop(0)
-        folder = a if os.path.isdir(a) else os.path.join(SAVES, a)
+        folder = a if os.path.isdir(a) else os.path.join(saves, a)
     if not argv:
         print(__doc__); return 1
     s = Save(folder)

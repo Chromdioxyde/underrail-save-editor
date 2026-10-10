@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComb
 
 import gamedata
 import i18n
+import paths
 import underrail_save as us
 from i18n import tr
 
@@ -386,6 +387,67 @@ class AddItemDialog(QDialog):
         comp = us.INSTANCE_CLASS.get(i['cls']) == 'CII'
         self.quality.setEnabled(comp)
         self.quality_label.setEnabled(comp)
+
+
+class FoldersDialog(QDialog):
+    """Choose the Underrail installation and the user folder (the one containing Saves)."""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setWindowTitle(tr('Game folders'))
+        self.resize(760, 220)
+        game, user = paths.resolve()
+        self.game = QLineEdit(game or '')
+        self.user = QLineEdit(user or '')
+        self.game_ok, self.user_ok = QLabel(), QLabel()
+        form = QFormLayout()
+        for label, edit, ok, title in ((tr('Game installation'), self.game, self.game_ok,
+                                        tr('Folder containing underrail.exe')),
+                                       (tr('User folder'), self.user, self.user_ok,
+                                        tr('Folder containing "Saves" (Documents/My Games/Underrail)'))):
+            row = QHBoxLayout()
+            row.addWidget(edit, 1)
+            browse = QPushButton(tr('Browse…'))
+            browse.clicked.connect(lambda _=False, e=edit, t=title: self.browse(e, t))
+            row.addWidget(browse)
+            form.addRow(label, row)
+            form.addRow('', ok)
+            edit.textChanged.connect(self.validate)
+        auto = QPushButton(tr('Detect automatically'))
+        auto.clicked.connect(self.detect)
+        hint = QLabel(tr('Steam (also on Steam Deck / SD cards / Flatpak), GOG and Proton/Wine prefixes are '
+                         'searched automatically. Pick the folders yourself if they are somewhere else.'))
+        hint.setWordWrap(True)
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
+        lay = QVBoxLayout(self)
+        lay.addWidget(hint); lay.addLayout(form); lay.addWidget(auto); lay.addWidget(self.buttons)
+        self.validate()
+
+    def browse(self, edit, title):
+        d = QFileDialog.getExistingDirectory(self, title, edit.text() or os.path.expanduser('~'))
+        if d:
+            edit.setText(d)
+
+    def detect(self):
+        g, u = paths.detect()
+        if g:
+            self.game.setText(g)
+        if u:
+            self.user.setText(u)
+        self.validate()
+
+    def validate(self, *_):
+        g_ok, u_ok = paths.is_game_dir(self.game.text()), paths.is_user_dir(self.user.text())
+        self.game_ok.setText('✓ ' + tr('found') if g_ok else '✗ ' + tr('underrail.exe not found here'))
+        self.user_ok.setText('✓ ' + tr('found') if u_ok else '✗ ' + tr('no "Saves" folder here'))
+        self.buttons.button(QDialogButtonBox.Ok).setEnabled(g_ok and u_ok)
+
+    def accept(self):
+        paths.set_dirs(self.game.text(), self.user.text())
+        gamedata.configure()
+        super().accept()
 
 
 # --- tabs ---------------------------------------------------------------------------------
@@ -875,6 +937,11 @@ class Main(QMainWindow):
         split.setSizes([400, 900])
         self.setCentralWidget(split)
 
+        settings = self.menuBar().addMenu(tr('Settings'))
+        folders = QAction(tr('Game folders…'), self)
+        folders.triggered.connect(self.choose_folders)
+        settings.addAction(folders)
+
         menu = self.menuBar().addMenu(tr('Language'))
         current = i18n.chosen()
         for code, label in [('auto', tr('System default'))] + list(i18n.LANGUAGES.items()):
@@ -894,7 +961,22 @@ class Main(QMainWindow):
 
         self.addAction(QAction(self, shortcut=QKeySequence.Save, triggered=self.write))
         self.addAction(QAction(self, shortcut=QKeySequence.Refresh, triggered=self.refresh_list))
-        self.refresh_list()
+        if gamedata.GAME and gamedata.USERDIR:
+            self.refresh_list()
+        else:
+            # nothing detected: ask once the window is up
+            QTimer.singleShot(0, self.choose_folders)
+
+    def choose_folders(self):
+        if self.dirty and not self.confirm_discard():
+            return
+        if FoldersDialog(self).exec():
+            self.save = None
+            self.dirty = False
+            self.tabs.clear()
+            self.refresh_list()
+        elif not (gamedata.GAME and gamedata.USERDIR):
+            self.status.setText(tr('Underrail was not found. Choose its folders under Settings → Game folders…'))
 
     def refresh_list(self):
         current = self.save.folder if self.save else None
@@ -924,7 +1006,8 @@ class Main(QMainWindow):
             QThreadPool.globalInstance().start(DetailsJob(pending, portrait_signals()))
 
     def watch_saves(self):
-        paths = [us.SAVES] + [f for _, f, _ in us.list_saves()]
+        saves = us.saves_dir()
+        paths = ([saves] if saves else []) + [f for _, f, _ in us.list_saves()]
         paths += [os.path.join(f, 'global.dat') for f in paths[1:]]
         old = self.watcher.directories() + self.watcher.files()
         if old:
