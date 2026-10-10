@@ -104,6 +104,8 @@ DE = {
         'Haltbarkeit der ausgewählten Items (Inventar und Ausrüstung) auf voll setzen',
     'all categories': 'alle Kategorien',
     'crafted item': 'gecraftetes Item',
+    '(placeholder icon – the game has no icon for this item)':
+        '(Platzhalter-Icon – das Spiel hat für dieses Item kein Icon)',
     'Remove items': 'Items entfernen',
     'Remove {names}?': '{names} entfernen?',
     'Repaired {n} item(s)': '{n} Item(s) repariert',

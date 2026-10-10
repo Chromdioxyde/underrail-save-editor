@@ -119,9 +119,16 @@ class IconJob(QRunnable):
             pass  # app is shutting down
 
 
-def item_icon(vm):
+def item_icon(vm, category=None, cls=None, wtype=None):
+    """(QIcon or None, is_placeholder) for a visual id, falling back to a category placeholder."""
     path = gamedata.icon_path(vm)
-    return QIcon(path) if path else None
+    if path:
+        return QIcon(path), False
+    if category:
+        ph = gamedata.placeholder_icon(category, cls, wtype)
+        if ph:
+            return QIcon(ph), True
+    return None, False
 
 
 class PortraitJob(QRunnable):
@@ -260,9 +267,11 @@ class AddItemDialog(QDialog):
         self.table.verticalHeader().setDefaultSectionSize(36)
         for row, i in enumerate(self.db):
             cell = QTableWidgetItem(i['name'])
-            icon = item_icon(i.get('vm'))
+            icon, placeholder = item_icon(i.get('vm'), i['category'], i['cls'], i.get('wtype'))
             if icon:
                 cell.setIcon(icon)
+                if placeholder:
+                    cell.setToolTip(tr('(placeholder icon – the game has no icon for this item)'))
             self.table.setItem(row, 0, cell)
             self.table.setItem(row, 1, QTableWidgetItem(i['category']))
             self.table.setItem(row, 2, QTableWidgetItem(i['path']))
@@ -598,10 +607,13 @@ class ItemTable(QTableWidget):
                     cell = SortItem(cells[name], key)
                     if name == 'Name':
                         cell.setData(Qt.UserRole, row)
-                        cell.setToolTip(it.path or tr('crafted item'))
-                        icon = item_icon(it.visual)
-                        if icon:
-                            cell.setIcon(icon)
+                        path, placeholder = it.icon()
+                        tip = it.path or tr('crafted item')
+                        if path:
+                            cell.setIcon(QIcon(path))
+                            if placeholder:
+                                tip += '\n' + tr('(placeholder icon – the game has no icon for this item)')
+                        cell.setToolTip(tip)
                     self.setItem(row, col, cell)
                     continue
                 f = fields.get(name)

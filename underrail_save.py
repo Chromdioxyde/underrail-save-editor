@@ -199,6 +199,21 @@ class Item:
         return self.info.get('vm') if self.info else None
 
     @property
+    def weapon_type(self):
+        if self.data is not None:
+            return self.save.g.val(self.data.get('WI:WT')) if 'WI:WT' in self.data else None
+        return self.info.get('wtype') if self.info else None
+
+    def icon(self):
+        """(png path, is_placeholder) — own icon, else a category placeholder, else (None, False)."""
+        own = gamedata.icon_path(self.visual)
+        if own:
+            return own, False
+        cls = self.data.cls if self.data is not None else (self.info['cls'] if self.info else None)
+        ph = gamedata.placeholder_icon(self.category, cls, self.weapon_type)
+        return ph, ph is not None
+
+    @property
     def max_battery(self):
         """Battery capacity (I:MB), or None for items without a battery."""
         if self.data is not None:

@@ -349,3 +349,34 @@ def extract_icons(vms=None, progress=None):
             continue
     if progress:
         progress(len(vms), len(vms))
+
+
+def placeholder_icon(category, cls=None, wtype=None):
+    """Faded icon of a typical item of the same category – narrowed to the same item class (helmet,
+    suit, boots…) and weapon type where possible – for items whose own visual has no icon.
+    Returns a cached PNG path or None."""
+    key = '_'.join(str(k) for k in (category, cls, wtype) if k is not None)
+    out = os.path.join(CACHE, 'icons', f'placeholder_{re.sub(r"[^A-Za-z0-9_]", "_", key)}.png')
+    if os.path.exists(out):
+        return out
+    pool = [i for i in items().values() if i['category'] == category and icon_path(i.get('vm'))]
+    if cls is not None:
+        pool = [i for i in pool if i['cls'] == cls] or pool
+    src = None
+    if wtype is not None:
+        same = [i for i in pool if i.get('wtype') == wtype]
+        if not same:
+            # weapon type without a library weapon (e.g. heavy energy weapons): generic weapon icon
+            extract_icons({'Overview.Weapon'})
+            src = icon_path('Overview.Weapon')
+        pool = same or pool
+    if src is None:
+        if not pool:
+            return None
+        # lowest-level, then alphabetical: tends to be the plain base version of the item type
+        src = icon_path(min(pool, key=lambda i: (i.get('level') or 0, i['name']))['vm'])
+    from PIL import Image
+    img = Image.open(src).convert('RGBA')
+    img.putalpha(img.getchannel('A').point(lambda v: int(v * 0.45)))
+    img.save(out)
+    return out

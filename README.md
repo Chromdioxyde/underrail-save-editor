@@ -48,7 +48,9 @@ Icons are cut out of the game's sprite sheets (`data/icons/*.xnb`) on first star
 cached in `~/.cache/underrail-save-editor/icons/`). An item's visual id (`I:VM`) is either a name from
 `icons.iconset` (grid cell(s) per sheet; multi-part icons are layers with their own opacity) or
 `<Sheet>.<n>` = cell n of a 10-column grid. Cells are 33 px on a 34 px pitch. About 95 % of the items
-get an icon; crafted weapons with composite visuals (`sniper.4.frame` …) don't.
+have their own icon. The rest (crafted weapons with composite visuals such as `sniper.4.frame`, some
+ammo) get a faded placeholder: the icon of a typical item of the same category, item class and weapon
+type, or the game's generic weapon icon.
 
 ## Durability and quality
 
