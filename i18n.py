@@ -119,6 +119,9 @@ DE = {
         'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
+    'This save had {n} broken object id(s) from an older editor version; they were repaired – save to fix the file.':
+        'Dieser Spielstand hatte {n} fehlerhafte Objekt-Id(s) aus einer älteren Editor-Version; sie wurden '
+        'repariert – zum Beheben speichern.',
     'loading…': 'lädt…',
     'Portrait imported': 'Portrait importiert',
     'Saved as "{pid}" in the CustomPortraits folder. Underrail reads custom portraits when it starts, so restart the game after saving.':

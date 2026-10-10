@@ -73,17 +73,46 @@ class File:
         if self.compressed:
             body = zlib.decompressobj(47).decompress(body)
         self.p = nrbf.Parser(body).parse()
-        ids = [i for i in self.p.objects]
-        self._next_pos = max([i for i in ids if i > 0] + [0]) + 1
-        self._next_neg = min([i for i in ids if i < 0] + [0]) - 1
+        # .NET hands out object ids (negative for value types) and library ids from ONE counter, so
+        # every absolute value is unique; Mono relies on that ("An object cannot be registered twice")
+        used = [abs(i) for i in self.p.objects] + list(self.p.libs)
+        self._next_id = max(used + [0]) + 1
         self.dirty = False
+        self.repaired = self.repair_ids()
+
+    def repair_ids(self):
+        """Renumbers objects whose id clashes by absolute value with another object or library (written
+        by editor versions before the fix). Returns how many were renumbered."""
+        seen = {abs(i): ('lib', i) for i in self.p.libs}
+        clashes = []
+        for i in sorted(self.p.objects, key=abs):
+            if abs(i) in seen:
+                clashes.append(i)
+            else:
+                seen[abs(i)] = ('obj', i)
+        for old in clashes:
+            self.renumber(old, self.new_id(old < 0))
+        if clashes:
+            self.dirty = True
+        return len(clashes)
+
+    def renumber(self, old, new):
+        objs = self.p.objects
+        o = objs.pop(old)
+        o.id = new
+        objs[new] = o
+        if self.p.root == old:
+            self.p.root = new
+        for x in objs.values():
+            vals = x.values if isinstance(x, nrbf.Obj) else (x.items if isinstance(x, nrbf.Arr) and isinstance(x.items, list) else [])
+            for k, v in enumerate(vals):
+                if isinstance(v, nrbf.Ref) and v.id == old:
+                    vals[k] = nrbf.Ref(new)
 
     def new_id(self, negative=False):
-        if negative:
-            self._next_neg -= 1
-            return self._next_neg + 1
-        self._next_pos += 1
-        return self._next_pos - 1
+        i = self._next_id
+        self._next_id += 1
+        return -i if negative else i
 
     def obj(self, v):
         return nrbf.resolve(self.p, v)

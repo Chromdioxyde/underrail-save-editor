@@ -432,8 +432,14 @@ def serialize(parser):
 
 
 def check(data):
-    """Parses serialized data and rejects things .NET can't load (references to value types)."""
+    """Parses serialized data and rejects things .NET/Mono can't load: references to value types and
+    ids whose absolute value is used twice (objects and libraries share one id counter)."""
     p = Parser(data).parse()
+    seen = {}
+    for i in list(p.objects) + list(p.libs):
+        if abs(i) in seen and seen[abs(i)] != i:
+            raise ValueError(f'id {i} clashes with {seen[abs(i)]}')
+        seen[abs(i)] = i
     for o in p.objects.values():
         vals = o.values if isinstance(o, Obj) else (o.items if isinstance(o, Arr) and isinstance(o.items, list) else [])
         for v in vals:

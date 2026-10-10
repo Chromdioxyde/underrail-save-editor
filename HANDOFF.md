@@ -40,6 +40,10 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 - Item instance class depends on the template class (`INSTANCE_CLASS` in underrail_save.py).
   Unequipped weapons have an empty `WII:A` list.
 - Feat abbreviations without a confirmed name: qr, st. `im` = Execute, `ds` = Marksman (inferred).
+- Object ids: .NET uses ONE counter for objects (negative = value types) and libraries, so every
+  absolute value is unique; Mono fails with "An object cannot be registered twice" otherwise. New ids
+  come from a single counter over abs values; `File.repair_ids()` fixes saves from older versions.
+  Value types must be written inline, never referenced. Both found via in-game tests.
 - Blueprint list (`PC1:B`) is a SortedList read via binary search; insertion order matters.
 
 ## exe analysis

@@ -1219,6 +1219,12 @@ class Main(QMainWindow):
             self.tabs.setCurrentIndex(tab)
         self.dirty = False
         self.update_status()
+        fixed = s.g.repaired + (s.info.repaired if s.info else 0)
+        if fixed:
+            self.dirty = True
+            self.update_status()
+            self.status.setText(tr('This save had {n} broken object id(s) from an older editor version; '
+                                   'they were repaired – save to fix the file.', n=fixed))
         self.fetch_icons()
 
     def fetch_icons(self):
