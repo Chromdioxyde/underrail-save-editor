@@ -24,6 +24,21 @@ INT_MAX = 2**31 - 1
 MAX_QUALITY = 185  # upper bound of component quality in the game's config
 
 
+class _WheelGuard(QObject):
+    """Lets the mouse wheel scroll the surrounding table instead of changing an unfocused spinbox,
+    so values can't change by accident while scrolling."""
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent
+        if event.type() == QEvent.Wheel and not obj.hasFocus():
+            event.ignore()
+            return True
+        return False
+
+
+_wheel_guard = None
+
+
 def spin_for(field, on_change, lo=0, hi=INT_MAX):
     """Spinbox bound to a Field; bold while it differs from the loaded value."""
     if field.is_float:
@@ -35,6 +50,11 @@ def spin_for(field, on_change, lo=0, hi=INT_MAX):
         sb.setRange(lo, hi)
     sb.setValue(field.value)
     sb.setFrame(False)
+    global _wheel_guard
+    if _wheel_guard is None:
+        _wheel_guard = _WheelGuard()
+    sb.setFocusPolicy(Qt.StrongFocus)  # no focus (and no value change) just by hovering + scrolling
+    sb.installEventFilter(_wheel_guard)
 
     def changed(v):
         on_change(field, v)
@@ -1221,8 +1241,8 @@ class Main(QMainWindow):
         self.update_status()
         fixed = s.g.repaired + (s.info.repaired if s.info else 0)
         if fixed:
-            self.dirty = True
-            self.update_status()
+            # not a user edit: no "discard changes?" prompt, but saving is possible and recommended
+            self.btn_save.setEnabled(True)
             self.status.setText(tr('This save had {n} broken object id(s) from an older editor version; '
                                    'they were repaired – save to fix the file.', n=fixed))
         self.fetch_icons()
@@ -1260,7 +1280,8 @@ class Main(QMainWindow):
         self.update_status()
 
     def update_status(self):
-        self.btn_save.setEnabled(self.dirty)
+        repaired = bool(self.save and (self.save.g.repaired or (self.save.info and self.save.info.repaired)))
+        self.btn_save.setEnabled(self.dirty or repaired)
         self.btn_revert.setEnabled(self.dirty)
         self.status.setText(tr('Unsaved changes') if self.dirty else tr('No changes'))
 
@@ -1269,7 +1290,8 @@ class Main(QMainWindow):
             self.load(self.save.folder)
 
     def write(self):
-        if not self.save or not self.dirty:
+        repaired = self.save and (self.save.g.repaired or (self.save.info and self.save.info.repaired))
+        if not self.save or not (self.dirty or repaired):
             return
         if us.game_running():
             if QMessageBox.warning(self, tr('Underrail is running'),
