@@ -49,7 +49,9 @@ always appear as the game names them.
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
   XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)
-- **Feats:** all feats with descriptions, add/remove via checkbox
+- **Feats:** all feats with descriptions, add/remove via checkbox; feats whose requirements your
+  character doesn't meet (or that can't be picked when leveling up) are marked with the reasons, and
+  *Only available* hides them
 - **Specializations:** edit values, add/remove specializations
 - **Inventory:** item icons, sortable (click a column header) and filterable by category; stack size, component
   quality, durability (with maximum, *Repair* / *Repair all*), battery; add items from all ~1460 game
@@ -129,3 +131,11 @@ pyinstaller --noconfirm --distpath build/dist --workpath build/work packaging/un
 
 `.github/workflows/build.yml` builds both on every push and attaches them to a GitHub release for
 `v*` tags.
+
+## Feat requirements
+
+`data/feat_requirements.json` is generated from `underrail.exe` by `tools/extract_feat_requirements.py`
+(needs `pip install dnfile dncil`; re-run after game updates). The tool reads each feat class's
+requirement method: attribute and skill minimums (compared against base values like the game does),
+required and excluded feats, character level, any psi skill, known psi abilities, and whether the
+level-up screen offers the feat at all.

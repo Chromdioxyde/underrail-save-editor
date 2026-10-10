@@ -179,7 +179,38 @@ def feats():
                 or (split_camel(idents[key]) if key in idents else key.upper() if len(key) <= 3
                     else key.replace('_', ' ').title()))
         out[key] = (name, desc.replace('\r\n', '\n'))
+    # the feat classes in the game code are authoritative: they drop outdated description entries
+    # and give the official names (descriptions still come from feats.k, also for DLC variants)
+    code = feat_requirements()
+    if code:
+        merged = {}
+        for fid, info in code.items():
+            desc = out.get(fid, (None, ''))[1] or next(
+                (v.replace('\r\n', '\n') for kk, v in k.items() if kk.startswith(fid + '-')), '')
+            # per-attribute / per-school variants share one generic description
+            for prefix, shared in (('increased', 'increasedbaseability'), ('empoweredinvocation', 'empoweredinvocation')):
+                if not desc and fid.startswith(prefix) and shared in k:
+                    desc = k[shared].replace('\r\n', '\n')
+            merged[fid] = (info.get('name') or out.get(fid, (fid,))[0], desc)
+        return merged
     return out
+
+
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+_feat_reqs = None
+
+
+def feat_requirements():
+    """feat id -> {'name', 'requires': [...]}, extracted from underrail.exe by
+    tools/extract_feat_requirements.py and shipped as data/feat_requirements.json."""
+    global _feat_reqs
+    if _feat_reqs is None:
+        try:
+            with open(os.path.join(DATA_DIR, 'feat_requirements.json')) as f:
+                _feat_reqs = json.load(f)['feats']
+        except (OSError, ValueError, KeyError):
+            _feat_reqs = {}
+    return _feat_reqs
 
 
 def feat_name(fid):

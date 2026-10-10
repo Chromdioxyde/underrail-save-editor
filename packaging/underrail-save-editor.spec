@@ -10,7 +10,8 @@ ICON = os.path.join(ROOT, 'build', 'underrail-save-editor.ico')
 a = Analysis(
     [os.path.join(ROOT, 'underrail_gui.py')],
     pathex=[ROOT],
-    datas=[(os.path.join(ROOT, 'assets', 'underrail-save-editor.svg'), 'assets')],
+    datas=[(os.path.join(ROOT, 'assets', 'underrail-save-editor.svg'), 'assets'),
+           (os.path.join(ROOT, 'data', 'feat_requirements.json'), 'data')],
     hiddenimports=['PySide6.QtSvg'],  # SVG icon rendering
     excludes=['tkinter', 'unittest', 'PySide6.QtWebEngineCore', 'PySide6.QtQml', 'PySide6.QtQuick'],
 )

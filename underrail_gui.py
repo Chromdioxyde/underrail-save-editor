@@ -657,19 +657,64 @@ class CharacterTab(QWidget):
             self.show_portrait()
 
 
-class ChecklistTab(QWidget):
-    """Checkable list of everything in a game database; checked = present in the save."""
+def requirement_text(kind, d):
+    """Human-readable form of one feat requirement (game terms stay as the game names them)."""
+    feat = lambda f: gamedata.feat_name(f)
+    if kind == 'attribute':
+        return f"{d['attribute']} {d['min']}" + (f" ({tr('modified')})" if d.get('modified') else '')
+    if kind == 'skill':
+        return f"{(' ' + tr('or') + ' ').join(d['skills'])} {d['min']}" + \
+            (f" ({tr('modified')})" if d.get('modified') else '')
+    if kind == 'any_psi':
+        return tr('Any psi skill {n}', n=d['min'])
+    if kind == 'level':
+        return tr('Level {n}', n=d['min'])
+    if kind == 'feat':
+        return tr('Feat: {names}', names=f" {tr('or')} ".join(feat(f) for f in d['feats']))
+    if kind == 'not_feat':
+        return tr('Not together with: {names}', names=', '.join(feat(f) for f in d['feats']))
+    if kind == 'psi':
+        return tr('Psi ability: {names}', names=f" {tr('or')} ".join(gamedata.split_camel(a) for a in d['abilities']))
+    if kind == 'only_one_increased_base_ability':
+        return tr('Only one "Increased <attribute>" feat')
+    if kind == 'outside_leveling':
+        return tr('Not available when leveling up (character creation, quests, trainers or events)')
+    if kind == 'only_one_empowered_invocation':
+        return tr('Only one "Empowered" invocation feat')
+    return kind
 
-    def __init__(self, main, db, owned, add, remove, note, learn_all=False):
+
+def requirement_line(met, kind, d):
+    text = requirement_text(kind, d)
+    if not met and 'have' in d:
+        text += ' – ' + tr('you have {n}', n=d['have'])
+    if not met and d.get('clash'):
+        text += ' – ' + tr('you have {names}', names=', '.join(gamedata.feat_name(f) for f in d['clash']))
+    return ('✓ ' if met else '✗ ') + text
+
+
+class ChecklistTab(QWidget):
+    """Checkable list of everything in a game database; checked = present in the save. With `check`,
+    entries whose requirements aren't met are marked and explained."""
+
+    def __init__(self, main, db, owned, add, remove, note, learn_all=False, check=None):
         super().__init__()
         self.main, self.db, self.owned, self.add, self.remove = main, db, owned, add, remove
+        self.check = check
         have = set(owned())
         self.count = QLabel()
         self.only = QCheckBox(tr('Only owned'))
         self.only.toggled.connect(self.refilter)
+        self.available = QCheckBox(tr('Only available'))
+        self.available.setToolTip(tr('Hide entries whose requirements your character does not meet'))
+        self.available.toggled.connect(self.refilter)
         self.search = filter_box(tr('Filter…'), self.refilter)
         top = QHBoxLayout()
         top.addWidget(self.search, 1); top.addWidget(self.only)
+        if check:
+            top.addWidget(self.available)
+        else:
+            self.available.hide()
         if learn_all:
             btn = QPushButton(tr('Learn all'))
             btn.clicked.connect(self.learn_all)
@@ -686,7 +731,8 @@ class ChecklistTab(QWidget):
         self.list.itemChanged.connect(self.toggled)
         self.list.currentItemChanged.connect(self.describe)
         self.desc = QTextBrowser()
-        self.desc.setMaximumHeight(140)
+        self.desc.setMaximumHeight(170)
+        self.unmet = {}
         lay = QVBoxLayout(self)
         lay.addLayout(top); lay.addWidget(self.list, 1); lay.addWidget(self.desc)
         if note:
@@ -694,20 +740,62 @@ class ChecklistTab(QWidget):
             lab.setWordWrap(True)
             lay.addWidget(lab)
         self.update_count()
+        self.update_marks()
+
+    def update_marks(self):
+        """Grey out entries whose requirements aren't met and explain why in the tooltip."""
+        if not self.check:
+            return
+        self.list.blockSignals(True)
+        grey = self.palette().color(self.palette().ColorGroup.Disabled, self.palette().ColorRole.Text)
+        normal = self.palette().color(self.palette().ColorRole.Text)
+        self.unmet = {}
+        for i in range(self.list.count()):
+            it = self.list.item(i)
+            key = it.data(Qt.UserRole)
+            res = self.check(key)
+            missing = [requirement_line(*r) for r in res if not r[0]]
+            name = self.db[key][0] if key in self.db else key
+            if missing:
+                self.unmet[key] = missing
+                it.setText(f'⚠ {name}   ({key})')
+                it.setForeground(grey)
+                it.setToolTip(tr('Requirements not met:') + '\n' + '\n'.join(missing))
+            else:
+                it.setText(f'{name}   ({key})')
+                it.setForeground(normal)
+                it.setToolTip('\n'.join(requirement_line(*r) for r in res) if res else tr('No requirements'))
+        self.list.blockSignals(False)
+        self.refilter()
+        cur = self.list.currentItem()
+        if cur is not None:
+            self.describe(cur, None)
+
+    def showEvent(self, e):
+        # attributes, skills or level may have changed on other tabs
+        super().showEvent(e)
+        self.update_marks()
 
     def update_count(self):
         self.count.setText(tr('{n} of {total} owned', n=len(self.owned()), total=len(self.db)))
 
     def refilter(self, *_):
-        q, only = self.search.text().lower(), self.only.isChecked()
+        q, only, avail = self.search.text().lower(), self.only.isChecked(), self.available.isChecked()
         for i in range(self.list.count()):
             it = self.list.item(i)
-            it.setHidden(bool((only and it.checkState() != Qt.Checked) or (q and q not in it.text().lower())))
+            unavailable = it.data(Qt.UserRole) in self.unmet and it.checkState() != Qt.Checked
+            it.setHidden(bool((only and it.checkState() != Qt.Checked) or (avail and unavailable)
+                              or (q and q not in it.text().lower())))
 
     def describe(self, it, _):
         if it is not None:
             key = it.data(Qt.UserRole)
-            self.desc.setPlainText(self.db.get(key, (key, ''))[1] or tr('(no description)'))
+            text = self.db.get(key, (key, ''))[1] or tr('(no description)')
+            if self.check:
+                res = self.check(key)
+                lines = [requirement_line(*r) for r in res]
+                text += '\n\n' + tr('Requirements:') + ('\n' + '\n'.join(lines) if lines else ' ' + tr('none'))
+            self.desc.setPlainText(text)
 
     def toggled(self, it):
         key = it.data(Qt.UserRole)
@@ -724,6 +812,7 @@ class ChecklistTab(QWidget):
             return
         self.update_count()
         self.main.on_change()
+        self.update_marks()  # feat prerequisites / exclusions depend on the owned feats
 
     def learn_all(self):
         # checking each item triggers toggled(), which adds the missing entries
@@ -734,8 +823,9 @@ class ChecklistTab(QWidget):
 def feats_tab(main):
     s = main.save
     return ChecklistTab(main, gamedata.feats(), s.feats, s.add_feat, s.remove_feat,
-                        'Adding a feat only records it as learned. Feats that grant abilities may need '
-                        'other changes too – test on a copy of the save first.')
+                        'Feats marked ⚠ don\'t meet the game\'s requirements (checked against base values, '
+                        'as the game does); they can still be added. Adding a feat only records it as learned.',
+                        check=s.feat_check)
 
 
 def blueprints_tab(main):
@@ -1111,6 +1201,7 @@ class Main(QMainWindow):
         self.refresh_timer = QTimer(self, singleShot=True, interval=2000, timeout=self.refresh_list)
         self.loaded_mtime = None
         portrait_signals().done.connect(self.details_done)
+        portrait_signals().done.connect(self.icons_done)
 
         self.addAction(QAction(self, shortcut=QKeySequence.Save, triggered=self.write))
         self.addAction(QAction(self, shortcut=QKeySequence.Refresh, triggered=self.refresh_list))
@@ -1267,14 +1358,11 @@ class Main(QMainWindow):
         if not missing:
             return
         self.icons_tried = getattr(self, 'icons_tried', set()) | missing
-        sig = portrait_signals()
-        sig.done.connect(self.icons_done)
-        QThreadPool.globalInstance().start(IconJob(missing, sig))
+        QThreadPool.globalInstance().start(IconJob(missing, portrait_signals()))
 
     def icons_done(self, kind, _):
         if kind != 'icons':
             return
-        portrait_signals().done.disconnect(self.icons_done)
         inv = next((self.tabs.widget(i) for i in range(self.tabs.count())
                     if isinstance(self.tabs.widget(i), InventoryTab)), None)
         if inv is not None:

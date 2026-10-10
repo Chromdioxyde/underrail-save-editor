@@ -1,0 +1,4091 @@
+{
+ "source": "underrail.exe",
+ "feats": {
+  "a": {
+   "name": "Assassinate",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 9,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 45,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Crossbows"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "s"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "advancedpsiempathy": {
+   "name": "Advanced Psi Empathy",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 100,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ambush": {
+   "name": "Ambush",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Stealth"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "armorsloping": {
+   "name": "Armor Sloping",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Mechanics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "as": {
+   "name": "Aimed Shot",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 10,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ballistics": {
+   "name": "Ballistics",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Tailoring"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "barrelstare": {
+   "name": "Barrel Stare",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "beastofburden": {
+   "name": "Beast of Burden",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 10,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "beyondcold": {
+   "name": "Beyond Cold",
+   "requires": [],
+   "selectable": false
+  },
+  "blindsiding": {
+   "name": "Blindsiding",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 80,
+     "modified": false,
+     "skills": [
+      "Stealth"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "blitz": {
+   "name": "Blitz",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 10,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "boardingup": {
+   "name": "Boarding Up",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "bodybuilding": {
+   "name": "Bodybuilding",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 12,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "bodyhorror": {
+   "name": "Body Horror",
+   "requires": [],
+   "selectable": false
+  },
+  "bodyweighttraining": {
+   "name": "Body Weight Training",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 10,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "bonebreaker": {
+   "name": "Bone Breaker",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 45,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "bowyer": {
+   "name": "Bowyer",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Mechanics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "brutality": {
+   "name": "Brutality",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Intimidation"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "bruteaim": {
+   "name": "Brute Aim",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 11,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "bullettime": {
+   "name": "Bullet Time",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 9,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 70,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "g"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "bullettrance": {
+   "name": "Bullet Trance",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "burglar": {
+   "name": "Burglar",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Lockpicking",
+      "Hacking"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "capacitor": {
+   "name": "Capacitor",
+   "requires": [],
+   "selectable": false
+  },
+  "cheapshots": {
+   "name": "Cheap Shots",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ci": {
+   "name": "Cryogenic Induction",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Metathermics"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "Cryostasis",
+      "CryogenicBarrier"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "clothier": {
+   "name": "Clothier",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Tailoring"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "co": {
+   "name": "Conditioning",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 5,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "cohesivemucusglands": {
+   "name": "Cohesive Mucus Glands",
+   "requires": [],
+   "selectable": false
+  },
+  "combo": {
+   "name": "Combo",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 65,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 8,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "commando": {
+   "name": "Commando",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 80,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "concentratedfire": {
+   "name": "Concentrated Fire",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "concussiveshots": {
+   "name": "Concussive Shots",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "continuumripple": {
+   "name": "Continuum Ripple",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Temporal Manipulation"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "TemporalDistorsion"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "cookedshot": {
+   "name": "Cooked Shot",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Chemistry"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "corporealprojection": {
+   "name": "Corporeal Projection",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "TelekineticPunch",
+      "ForceEmission"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "cripplingstrike": {
+   "name": "Crippling Strike",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "criticalpower": {
+   "name": "Critical Power",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Melee",
+      "Guns",
+      "Heavy Guns",
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ct": {
+   "name": "Cerebral Trauma",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Thought Control"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "NeuralOverload"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "cutthroat": {
+   "name": "Cut-throat",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 55,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 45,
+     "modified": false,
+     "skills": [
+      "Stealth"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "deadlysnares": {
+   "name": "Deadly Snares",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Crossbows"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Traps"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "decapitate": {
+   "name": "Decapitate",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "decommissioner": {
+   "name": "Decommissioner",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "serialkiller",
+      "monsterslayer"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "deflection": {
+   "name": "Deflection",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "demolitionman": {
+   "name": "Demolition Man",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "dirtykick": {
+   "name": "Dirty Kick",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "disassemble": {
+   "name": "Disassemble",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Electronics",
+      "Mechanics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "doctor": {
+   "name": "Doctor",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Biology"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ds": {
+   "name": "Marksman",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "echoingsoliloquy": {
+   "name": "Echoing Soliloquy",
+   "requires": [],
+   "selectable": false
+  },
+  "elementalbolts": {
+   "name": "Elemental Bolts",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "empoweredinvocationmetathermics": {
+   "name": "Empowered Metathermics",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Metathermics"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "only_one_empowered_invocation"
+    }
+   ],
+   "selectable": true
+  },
+  "empoweredinvocationpsychokinesis": {
+   "name": "Empowered Psychokinesis",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Psychokinesis"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "only_one_empowered_invocation"
+    }
+   ],
+   "selectable": true
+  },
+  "empoweredinvocationtemporalmanipulation": {
+   "name": "Empowered Temporal Manipulation",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Temporal Manipulation"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "only_one_empowered_invocation"
+    }
+   ],
+   "selectable": true
+  },
+  "empoweredinvocationthoughtcontrol": {
+   "name": "Empowered Thought Control",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Thought Control"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "only_one_empowered_invocation"
+    }
+   ],
+   "selectable": true
+  },
+  "escapeartist": {
+   "name": "Escape Artist",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Dodge"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "evasivemaneuvers": {
+   "name": "Evasive Maneuvers",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Evasion"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "eviscerate": {
+   "name": "Eviscerate",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 80,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "expandedpsicapacitance": {
+   "name": "Expanded Psi Capacitance",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 25,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "expertise": {
+   "name": "Expertise",
+   "requires": [],
+   "selectable": true
+  },
+  "expertsprint": {
+   "name": "Expert Sprint",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 13,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "s2"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "expertunarmedcombat": {
+   "name": "Expert Unarmed Combat",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "improvedunarmedcombat"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "exposeweakness": {
+   "name": "Expose Weakness",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "fancyfootwork": {
+   "name": "Fancy Footwork",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Dodge"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "fastmetabolism": {
+   "name": "Fast Metabolism",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 6,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "fatalthrow": {
+   "name": "Fatal Throw",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "fend": {
+   "name": "Fend",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "fightresponse": {
+   "name": "Fight Response",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "flightresponse"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "finetuned": {
+   "name": "Fine Tuned",
+   "requires": [],
+   "selectable": false
+  },
+  "firebranded": {
+   "name": "Firebranded",
+   "requires": [],
+   "selectable": false
+  },
+  "fisherman": {
+   "name": "Fisherman",
+   "requires": [],
+   "selectable": false
+  },
+  "flightresponse": {
+   "name": "Flight Response",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "fightresponse"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "flurry": {
+   "name": "Flurry",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "forcefullinnervation": {
+   "name": "Forceful Innervation",
+   "requires": [],
+   "selectable": false
+  },
+  "forceuser": {
+   "name": "Force User",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Psychokinesis"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "TelekineticPunch",
+      "Forcefield"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "fragmentedchaos": {
+   "name": "Fragmented Chaos",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 9,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 70,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "fullauto": {
+   "name": "Full-Auto",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "futureorientation": {
+   "name": "Future Orientation",
+   "requires": [
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Temporal Manipulation"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "g": {
+   "name": "Gunslinger",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "grenadier": {
+   "name": "Grenadier",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "guard": {
+   "name": "Guard",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "gunfu": {
+   "name": "Gun-Fu",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "gunnershigh": {
+   "name": "Gunner's High",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 70,
+     "modified": false,
+     "skills": [
+      "Heavy Guns"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "fastmetabolism"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "gunnut": {
+   "name": "Gun Nut",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Mechanics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "h": {
+   "name": "Hypothermia",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Metathermics"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "Cryokinesis",
+      "Cryostasis",
+      "CryokineticOrb"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "heavymetal": {
+   "name": "Heavy Metal",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "heavypunch": {
+   "name": "Heavy Punch",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "heavyweight": {
+   "name": "Heavyweight",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "hemopsychosis": {
+   "name": "Hemopsychosis",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 9,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 75,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "hightechnicalities": {
+   "name": "High-Technicalities",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "hitandrun": {
+   "name": "Hit and Run",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 7,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "hunter": {
+   "name": "Hunter",
+   "requires": [],
+   "selectable": false
+  },
+  "hypertoxicity": {
+   "name": "Hypertoxicity",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Biology"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "i": {
+   "name": "Interloper",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Stealth"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "im": {
+   "name": "Execute",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 70,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "o"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "impale": {
+   "name": "Impale",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "improveddodging": {
+   "name": "Expert Dodging",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 12,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 120,
+     "modified": false,
+     "skills": [
+      "Dodge"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "improvedevasion": {
+   "name": "Expert Evasion",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 12,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 120,
+     "modified": false,
+     "skills": [
+      "Evasion"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "improvednavalcombat": {
+   "name": "Improved Naval Combat",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "navalcombat"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "improvedthrowing": {
+   "name": "Expert Throwing",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 100,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "improvedunarmedcombat": {
+   "name": "Improved Unarmed Combat",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "increasedagility": {
+   "name": "Increased Agility",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "increasedconstitution": {
+   "name": "Increased Constitution",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "increaseddexterity": {
+   "name": "Increased Dexterity",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "increasedintelligence": {
+   "name": "Increased Intelligence",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "increasedperception": {
+   "name": "Increased Perception",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "increasedstrength": {
+   "name": "Increased Strength",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "increasedwill": {
+   "name": "Increased Will",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "only_one_increased_base_ability"
+    }
+   ],
+   "selectable": true
+  },
+  "irongrip": {
+   "name": "Iron Grip",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 11,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "ironwill": {
+   "name": "Iron Will",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 7,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "jetandjab": {
+   "name": "Jet 'n' Jab",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "navalcombat"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "juggernaut": {
+   "name": "Juggernaut",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "kcs": {
+   "name": "Kneecap Shot",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Crossbows"
+     ]
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 7,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "laststand": {
+   "name": "Last Stand",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 9,
+     "modified": false
+    },
+    {
+     "kind": "level",
+     "min": 5,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "leadingshot": {
+   "name": "Leading Shot",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "lightningpunches": {
+   "name": "Lightning Punches",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "locusofcontrol": {
+   "name": "Locus of Control",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Thought Control"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "madchemist": {
+   "name": "Mad Chemist",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Chemistry"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "magdump": {
+   "name": "Mag Dump",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 80,
+     "modified": false,
+     "skills": [
+      "Heavy Guns"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "fullauto"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "majorsupplier": {
+   "name": "Major Supplier",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Mercantile"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "mantra": {
+   "name": "Mantra",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 100,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "meditation": {
+   "name": "Meditation",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 50,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "tranquility"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "monsterslayer": {
+   "name": "Monster Slayer",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "serialkiller",
+      "decommissioner"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "monstrousyell": {
+   "name": "Monstrous Yell",
+   "requires": [
+    {
+     "kind": "feat",
+     "feats": [
+      "yell"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "motioner": {
+   "name": "Motioner",
+   "requires": [],
+   "selectable": false
+  },
+  "ms": {
+   "name": "Mental Subversion",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Thought Control"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "NeuralOverload",
+      "Frighten"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "navalcombat": {
+   "name": "Naval Combat",
+   "requires": [],
+   "selectable": false
+  },
+  "navaljousting": {
+   "name": "Naval Jousting",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 70,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "navalcombat"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "neuraloverclocking": {
+   "name": "Neural Overclocking",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 65,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "neurology": {
+   "name": "Neurology",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Biology"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "nimble": {
+   "name": "Nimble",
+   "requires": [],
+   "selectable": true
+  },
+  "ninjalooter": {
+   "name": "Ninja Looter",
+   "requires": [],
+   "selectable": true
+  },
+  "o": {
+   "name": "Opportunist",
+   "requires": [],
+   "selectable": true
+  },
+  "onslaught": {
+   "name": "Onslaught",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "outervisions": {
+   "name": "Outer Visions",
+   "requires": [],
+   "selectable": false
+  },
+  "packrathound": {
+   "name": "Pack Rathound",
+   "requires": [],
+   "selectable": true
+  },
+  "paranoia": {
+   "name": "Paranoia",
+   "requires": [],
+   "selectable": true
+  },
+  "parry": {
+   "name": "Parry",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "pe": {
+   "name": "Psi Empathy",
+   "requires": [],
+   "selectable": false
+  },
+  "pelletmayhem": {
+   "name": "Pellet Mayhem",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "perfectscattering": {
+   "name": "Perfect Scattering",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 65,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "philosophy1": {
+   "name": "Philosophy",
+   "requires": [],
+   "selectable": false
+  },
+  "philosophy2": {
+   "name": "Philosophy II",
+   "requires": [],
+   "selectable": false
+  },
+  "philosophy3": {
+   "name": "Philosophy III",
+   "requires": [],
+   "selectable": false
+  },
+  "pinning": {
+   "name": "Pinning",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "pm": {
+   "name": "Pyromaniac",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Metathermics"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "Pyrokinesis"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "pointshot": {
+   "name": "Point Shot",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "polymath": {
+   "name": "Polymath",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 8,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "powermanagement": {
+   "name": "Power Management",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Electronics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "practicalphysicist": {
+   "name": "Practical Physicist",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Electronics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "practicedparabola": {
+   "name": "Practiced Parabola",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "premeditation": {
+   "name": "Premeditation",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 40,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psionicmania": {
+   "name": "Psionic Mania",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 50,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "psychosis"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psychokineticelasticity": {
+   "name": "Psychokinetic Elasticity",
+   "requires": [
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 80,
+     "modified": false,
+     "skills": [
+      "Psychokinesis"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psychoneuralflexibility": {
+   "name": "Psycho-neural Flexibility",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 55,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "psychoneuraloptimization"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psychoneuraloptimization": {
+   "name": "Psycho-neural Optimization",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "any_psi",
+     "min": 55,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "psychoneuralflexibility"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psychosis": {
+   "name": "Psychosis",
+   "requires": [
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "tranquility"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psychostaticelectricity": {
+   "name": "Psychostatic Electricity",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Psychokinesis"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "Electrokinesis",
+      "ElectrokineticImprint"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "psychotemporalacceleration": {
+   "name": "Psycho-temporal Acceleration",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 45,
+     "modified": false,
+     "skills": [
+      "Temporal Manipulation"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "PsychotemporalContraction",
+      "PsychotemporalDilation"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "pummel": {
+   "name": "Pummel",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "quickpockets": {
+   "name": "Quick Pockets",
+   "requires": [],
+   "selectable": true
+  },
+  "quicktinkering": {
+   "name": "Quick Tinkering",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Traps"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "rapidfire": {
+   "name": "Rapid Fire",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "recklessness": {
+   "name": "Recklessness",
+   "requires": [],
+   "selectable": true
+  },
+  "remotesurgeon": {
+   "name": "Remote Surgeon",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Biology"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "riposte": {
+   "name": "Riposte",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "parry"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ripper": {
+   "name": "Ripper",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Melee",
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "s": {
+   "name": "Snipe",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Crossbows"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Stealth"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "as"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "s2": {
+   "name": "Sprint",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 6,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "salesman": {
+   "name": "Salesman",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 35,
+     "modified": false,
+     "skills": [
+      "Mercantile"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "sap": {
+   "name": "Sap",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Stealth"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "scrutinous": {
+   "name": "Scrutinous",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 11,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 120,
+     "modified": false,
+     "skills": [
+      "Melee",
+      "Guns",
+      "Heavy Guns",
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "seadog": {
+   "name": "Sea Dog",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "improvednavalcombat"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "serialkiller": {
+   "name": "Serial Killer",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "monsterslayer",
+      "decommissioner"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "shellshock": {
+   "name": "Shell Shock",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Heavy Guns"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Intimidation"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "shieldarm": {
+   "name": "Shield Arm",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 8,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "shieldbash": {
+   "name": "Shield Bash",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "shoemaker": {
+   "name": "Shoemaker",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Tailoring"
+     ]
+    }
+   ],
+   "selectable": false
+  },
+  "shootingspree": {
+   "name": "Shooting Spree",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 55,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "as"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "shroomhead": {
+   "name": "Shroomhead",
+   "requires": [
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "sixthshell": {
+   "name": "Sixth Shell",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "skinner": {
+   "name": "Skinner",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 15,
+     "modified": false,
+     "skills": [
+      "Tailoring"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "snooping": {
+   "name": "Snooping",
+   "requires": [],
+   "selectable": true
+  },
+  "spearguardian": {
+   "name": "Spear Guardian",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 55,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "spearthrow": {
+   "name": "Spear Throw",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "specialist": {
+   "name": "Specialist",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 16,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 10,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "specialtactics": {
+   "name": "Special Tactics",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Crossbows"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "specops": {
+   "name": "Spec Ops",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "splitspare": {
+   "name": "Split Spare",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 80,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "ss": {
+   "name": "Sharpshooter",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 60,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Crossbows"
+     ]
+    },
+    {
+     "kind": "feat",
+     "feats": [
+      "as"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "steadfastaim": {
+   "name": "Steadfast Aim",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "stoicism": {
+   "name": "Stoicism",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 7,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "strafe": {
+   "name": "Strafe",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 5,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "strider": {
+   "name": "Strider",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 10,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "stuntman": {
+   "name": "Stuntman",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 12,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "superslam": {
+   "name": "Super Slam",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 10,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 75,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "suppressivefire": {
+   "name": "Suppressive Fire",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 10,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "surestep": {
+   "name": "Sure Step",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 5,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "survivalinstincts": {
+   "name": "Survival Instincts",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 9,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "sweep": {
+   "name": "Sweep",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 55,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "tasteforblood": {
+   "name": "Taste for Blood",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "tattooabomination": {
+   "name": "Tattoo: Abomination",
+   "requires": [],
+   "selectable": false
+  },
+  "tattooaegisincorporated": {
+   "name": "Tattoo: Aegis Incorporated",
+   "requires": [],
+   "selectable": false
+  },
+  "tattooanarchy": {
+   "name": "Tattoo: Anarchy",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoobalorseye": {
+   "name": "Tattoo: Balor's Eye",
+   "requires": [],
+   "selectable": false
+  },
+  "tattooblackcrawler": {
+   "name": "Tattoo: Black Crawler",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoocoretech": {
+   "name": "Tattoo: Coretech",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoodrifter": {
+   "name": "Tattoo: Drifter",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoofatso": {
+   "name": "Tattoo: Fatso",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoojeteater": {
+   "name": "Tattoo: Jet Eater",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoojkk": {
+   "name": "Tattoo: JKK",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoomagnarghost": {
+   "name": "Tattoo: Magnar's Ghost",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoopirate": {
+   "name": "Tattoo: The Pirate",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoopraetoriansecurity": {
+   "name": "Tattoo: Praetorian Security",
+   "requires": [],
+   "selectable": false
+  },
+  "tattooprotectorate": {
+   "name": "Tattoo: Protectorate",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoosgs": {
+   "name": "Tattoo: South Gate Station",
+   "requires": [],
+   "selectable": false
+  },
+  "tattooshadowlith": {
+   "name": "Tattoo: Shadowlith",
+   "requires": [],
+   "selectable": false
+  },
+  "tattooskulljacked": {
+   "name": "Tattoo: Skulljacked",
+   "requires": [],
+   "selectable": false
+  },
+  "tattootchort": {
+   "name": "Tattoo: Tchort",
+   "requires": [],
+   "selectable": false
+  },
+  "tattootchortinstitute": {
+   "name": "Tattoo: The Institute of Tchort",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoothebeast": {
+   "name": "Tattoo: The Beast",
+   "requires": [],
+   "selectable": false
+  },
+  "tattoovoidbattle": {
+   "name": "Tattoo: Void Battle",
+   "requires": [],
+   "selectable": false
+  },
+  "td": {
+   "name": "Thermodynamicity",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Metathermics"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "Pyrokinesis"
+     ]
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "Cryokinesis"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "telekineticundulation": {
+   "name": "Telekinetic Undulation",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Will",
+     "min": 5,
+     "modified": false
+    },
+    {
+     "kind": "psi",
+     "abilities": [
+      "TelekineticProxy"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "temperedacid": {
+   "name": "Tempered: Acid",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 12,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "temperedcold",
+      "temperedelectricity",
+      "temperedheat"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "temperedcold": {
+   "name": "Tempered: Cold",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 12,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "temperedacid",
+      "temperedelectricity",
+      "temperedheat"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "temperedelectricity": {
+   "name": "Tempered: Electricity",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 12,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "temperedacid",
+      "temperedcold",
+      "temperedheat"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "temperedheat": {
+   "name": "Tempered: Heat",
+   "requires": [
+    {
+     "kind": "level",
+     "min": 26,
+     "modified": false
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 12,
+     "modified": false
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "temperedacid",
+      "temperedcold",
+      "temperedelectricity"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "thickskull": {
+   "name": "Thick Skull",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Constitution",
+     "min": 10,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "threepointer": {
+   "name": "Three-Pointer",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 50,
+     "modified": false,
+     "skills": [
+      "Throwing"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "tranquility": {
+   "name": "Tranquility",
+   "requires": [
+    {
+     "kind": "feat",
+     "feats": [
+      "pe"
+     ]
+    },
+    {
+     "kind": "not_feat",
+     "feats": [
+      "psychosis"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "trapexpert": {
+   "name": "Trap Expert",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 30,
+     "modified": false,
+     "skills": [
+      "Traps"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "trickytrajectory": {
+   "name": "Tricky Trajectory",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Perception",
+     "min": 8,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 90,
+     "modified": false,
+     "skills": [
+      "Guns",
+      "Heavy Guns"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "triggerhappy": {
+   "name": "Trigger Happy",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Dexterity",
+     "min": 6,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "uncannydodge": {
+   "name": "Uncanny Dodge",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Dodge"
+     ]
+    },
+    {
+     "kind": "attribute",
+     "attribute": "Agility",
+     "min": 8,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "versatility": {
+   "name": "Versatility",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 5,
+     "modified": false
+    }
+   ],
+   "selectable": true
+  },
+  "vileweaponry": {
+   "name": "Vile Weaponry",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 10,
+     "modified": false,
+     "skills": [
+      "Biology"
+     ]
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Crossbows",
+      "Melee",
+      "Traps"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "weaponsmith": {
+   "name": "Weaponsmith",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Intelligence",
+     "min": 6,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 25,
+     "modified": false,
+     "skills": [
+      "Mechanics"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "wrestling": {
+   "name": "Wrestling",
+   "requires": [
+    {
+     "kind": "attribute",
+     "attribute": "Strength",
+     "min": 7,
+     "modified": false
+    },
+    {
+     "kind": "skill",
+     "min": 40,
+     "modified": false,
+     "skills": [
+      "Melee"
+     ]
+    }
+   ],
+   "selectable": true
+  },
+  "yell": {
+   "name": "Yell",
+   "requires": [
+    {
+     "kind": "skill",
+     "min": 20,
+     "modified": false,
+     "skills": [
+      "Intimidation"
+     ]
+    }
+   ],
+   "selectable": true
+  }
+ }
+}

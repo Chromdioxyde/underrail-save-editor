@@ -53,6 +53,7 @@ rm -rf "$SP/PySide6/Qt/translations" "$SP/PySide6/Qt/qml" "$SP/PySide6/include" 
 mkdir -p "$APPDIR/usr/app/assets"
 cp ./*.py "$APPDIR/usr/app/"
 cp assets/underrail-save-editor.svg "$APPDIR/usr/app/assets/"
+cp -r data "$APPDIR/usr/app/"
 cp assets/underrail-save-editor.svg "$APPDIR/underrail-save-editor.svg"
 cp packaging/underrail-save-editor.desktop "$APPDIR/"
 

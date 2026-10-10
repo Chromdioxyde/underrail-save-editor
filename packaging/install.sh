@@ -31,6 +31,8 @@ rm -f "$APP_DIR"/*.py
 install -m 644 ./*.py "$APP_DIR/"
 chmod 755 "$APP_DIR/underrail_gui.py" "$APP_DIR/underrail_spec.py"
 install -m 644 assets/underrail-save-editor.svg "$APP_DIR/assets/"
+mkdir -p "$APP_DIR/data"
+install -m 644 data/*.json "$APP_DIR/data/"
 
 # backups made while running from the repo checkout (copied, never overwritten)
 if [ -d backups ]; then

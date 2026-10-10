@@ -471,6 +471,64 @@ class Save:
         entries = [e for e in self._bp_entries() if self.val(self.obj(e[1]).get('IBR:IBFTN')) != bid]
         self._set_blueprints(entries)
 
+    # --- feat requirements ----------------------------------------------------------------
+    PSI_SKILLS = ('Thought Control', 'Psychokinesis', 'Metathermics', 'Temporal Manipulation')
+
+    def _known_psi(self):
+        cs = self.obj(self.m.get('C1:PA'))
+        if cs is None:
+            return set()
+        sl = self.obj(cs.get('CS4:SL'))
+        m = dict(zip(sl.names, sl.values))
+        vals = self.obj(m['values']).items[:m['_size'].value]
+        return {(self.val(self.obj(v).get('CR:CFTN')) or '').lower() for v in vals}
+
+    def feat_check(self, fid):
+        """[(met, kind, data)] for each requirement of a feat, using the game's rules (base values
+        unless a requirement asks for modified ones). Empty if the feat has none or is unknown."""
+        info = gamedata.feat_requirements().get(fid, {})
+        reqs = info.get('requires', [])
+        out = []
+        if info.get('selectable') is False:
+            # the level-up screen never offers it (character creation, quests, trainers, tattoos…)
+            out.append((False, 'outside_leveling', {}))
+        if not reqs:
+            return out
+        attrs = {f.name: (f.value, f.extra[0].value) for f in self.attributes()}
+        skills = {f.name: (f.value, f.extra[0].value) for f in self.skills()}
+        feats = set(self.feats())
+        level = self.level or 0
+        for r in reqs:
+            k = r['kind']
+            idx = 1 if r.get('modified') else 0
+            if k == 'attribute':
+                have = attrs.get(r['attribute'], (0, 0))[idx]
+                out.append((have >= r['min'], k, dict(r, have=have)))
+            elif k == 'skill':
+                have = max((skills.get(n, (0, 0))[idx] for n in r['skills']), default=0)
+                out.append((have >= r['min'], k, dict(r, have=have)))
+            elif k == 'any_psi':
+                have = max(skills.get(n, (0, 0))[idx] for n in self.PSI_SKILLS)
+                out.append((have >= r['min'], k, dict(r, have=have)))
+            elif k == 'level':
+                out.append((level >= r['min'], k, dict(r, have=level)))
+            elif k == 'feat':
+                out.append((bool(feats & set(r['feats'])), k, r))
+            elif k == 'not_feat':
+                clash = sorted(feats & set(r['feats']))
+                out.append((not clash, k, dict(r, clash=clash)))
+            elif k == 'psi':
+                known = self._known_psi()
+                out.append((any(a.lower() in known for a in r['abilities']), k, r))
+            elif k == 'only_one_increased_base_ability':
+                clash = sorted(f for f in feats if f.startswith('increased') and f != fid
+                               and f != 'increasedbaseability')
+                out.append((not clash, k, dict(r, clash=clash)))
+            elif k == 'only_one_empowered_invocation':
+                clash = sorted(f for f in feats if f.startswith('empoweredinvocation') and f != fid)
+                out.append((not clash, k, dict(r, clash=clash)))
+        return out
+
     # --- object helpers -------------------------------------------------------------------
     def shallow_copy(self, o):
         """New object with the same class/metadata and member values. References are shared,

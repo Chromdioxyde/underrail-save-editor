@@ -120,6 +120,28 @@ DE = {
         'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
+    'Only available': 'Nur verfügbare',
+    'Not available when leveling up (character creation, quests, trainers or events)':
+        'Nicht beim Levelaufstieg wählbar (Charaktererstellung, Quests, Trainer oder Ereignisse)',
+    'Hide entries whose requirements your character does not meet': 'Einträge ausblenden, deren Voraussetzungen der Charakter nicht erfüllt',
+    'Requirements not met:': 'Voraussetzungen nicht erfüllt:',
+    'Requirements:': 'Voraussetzungen:',
+    'No requirements': 'Keine Voraussetzungen',
+    'none': 'keine',
+    'modified': 'effektiv',
+    'or': 'oder',
+    'Any psi skill {n}': 'Beliebiger Psi-Skill {n}',
+    'Level {n}': 'Level {n}',
+    'Feat: {names}': 'Feat: {names}',
+    'Not together with: {names}': 'Nicht zusammen mit: {names}',
+    'Psi ability: {names}': 'Psi-Fähigkeit: {names}',
+    'Only one "Increased <attribute>" feat': 'Nur ein „Increased <Attribut>“-Feat',
+    'Only one "Empowered" invocation feat': 'Nur ein „Empowered“-Feat',
+    'you have {n}': 'du hast {n}',
+    'you have {names}': 'du hast {names}',
+    "Feats marked ⚠ don't meet the game's requirements (checked against base values, as the game does); they can still be added. Adding a feat only records it as learned.":
+        'Mit ⚠ markierte Feats erfüllen die Voraussetzungen des Spiels nicht (geprüft gegen Grundwerte, wie im '
+        'Spiel); hinzufügen lassen sie sich trotzdem. Ein hinzugefügter Feat wird nur als gelernt eingetragen.',
     'no money': 'kein Geld',
     'Component quality. The game has no upper limit; above {n} the quality bonus curve stops rising, but higher values still scale the stats linearly.':
         'Komponenten-Qualität. Das Spiel hat keine Obergrenze; über {n} steigt die Bonuskurve nicht weiter, '

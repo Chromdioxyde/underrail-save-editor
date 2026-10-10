@@ -46,6 +46,12 @@ Project language is English (docs, code, commit messages); the GUI additionally 
   Value types must be written inline, never referenced. Both found via in-game tests.
 - Blueprint list (`PC1:B`) is a SortedList read via binary search; insertion order matters.
 
+## Feat requirements
+`tools/extract_feat_requirements.py` -> `data/feat_requirements.json` (239 feats). Feat id = custom
+attribute on the feat class; requirement classes recognised by their diagnostic strings; checks use
+base values (Stat.S4:V) unless a requirement's "modified" flag is set; "selectable" = the feat base
+method the tooltip uses for "acquired outside leveling". `Save.feat_check()` evaluates them.
+
 ## exe analysis
 Python only: venv with `dnfile` + `dncil` (in the scratchpad, not in the repo). Item instance = class
 `coh` (field `k` = `II:D`); durability factor `coh::afc` = 0.15 + 0.85·min(1, D/max); max = `bk3::yj`
