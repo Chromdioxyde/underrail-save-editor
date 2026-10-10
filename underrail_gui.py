@@ -5,7 +5,7 @@ import os
 import re
 import sys
 
-from PySide6.QtCore import QObject, QRunnable, QSize, Qt, QThreadPool, Signal
+from PySide6.QtCore import QFileSystemWatcher, QObject, QRunnable, QSize, Qt, QThreadPool, QTimer, Signal
 from PySide6.QtGui import QAction, QIcon, QKeySequence, QPixmap
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QDialog,
                                QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGroupBox,
@@ -119,6 +119,19 @@ class IconJob(QRunnable):
             pass  # app is shutting down
 
 
+def cached_details(folder):
+    """Save details only if already cached (never parses global.dat on the UI thread)."""
+    import json
+    try:
+        with open(os.path.join(gamedata.CACHE, 'savedetails.json')) as fh:
+            hit = json.load(fh).get(folder)
+        if hit and hit['mtime'] == os.path.getmtime(os.path.join(folder, 'global.dat')):
+            return hit['details']
+    except (OSError, ValueError, KeyError):
+        pass
+    return None
+
+
 def item_icon(vm, category=None, cls=None, wtype=None):
     """(QIcon or None, is_placeholder) for a visual id, falling back to a category placeholder."""
     path = gamedata.icon_path(vm)
@@ -129,6 +142,50 @@ def item_icon(vm, category=None, cls=None, wtype=None):
         if ph:
             return QIcon(ph), True
     return None, False
+
+
+class DetailsJob(QRunnable):
+    """Reads HP/XP/money of each save in the background (cached after the first run)."""
+
+    def __init__(self, folders, signals):
+        super().__init__()
+        self.folders, self.signals = folders, signals
+
+    def run(self):
+        for folder in self.folders:
+            try:
+                us.save_details(folder)
+                self.signals.done.emit('details', folder)
+            except RuntimeError:
+                return  # app is shutting down
+            except Exception:
+                continue
+
+
+def save_label(name, info, details):
+    """Multi-line text for the save list."""
+    if not info:
+        return f'{name}\n    {tr("(unreadable info)")}'
+    when = datetime.datetime.fromtimestamp(info['mtime']).strftime('%Y-%m-%d %H:%M')
+    lines = [name, f"    {info['name']} · L{info['level']} · {info['location']}"]
+    meta = []
+    if info.get('hours') is not None:
+        h = info['hours']
+        meta.append(f'{int(h)}h {int(h * 60) % 60:02d}m')
+    if info.get('difficulty') is not None:
+        meta.append(tr(str(info['difficulty'])))
+    meta.append(when)
+    lines.append('    ' + ' · '.join(meta))
+    if details:
+        hp = f"HP {details['hp']:.0f}/{details['hp_max']:.0f}" if details.get('hp') is not None else ''
+        parts = [p for p in (hp, f"XP {details['xp']:,}" if details.get('xp') is not None else '',
+                             f"{details.get('stygian', 0):,} {tr('Stygian')}", f"{details.get('sgs', 0):,} SGS") if p]
+        lines.append('    ' + ' · '.join(parts))
+        unspent = {k: v for k, v in (details.get('unspent') or {}).items() if v}
+        if unspent:
+            labels = {'PC1:BAPC': tr('attr.'), 'PC1:SPC': tr('skill'), 'PC1:FC': tr('feat'), 'PC1:SP': tr('spec')}
+            lines.append('    ' + tr('unspent') + ': ' + ', '.join(f'{v} {labels.get(k, k)}' for k, v in unspent.items()))
+    return '\n'.join(lines)
 
 
 class PortraitJob(QRunnable):
@@ -771,7 +828,7 @@ class Main(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Underrail Save Editor')
-        self.resize(1200, 780)
+        self.resize(1300, 800)
         self.save = None
         self.dirty = False
 
@@ -782,7 +839,13 @@ class Main(QMainWindow):
         left = QWidget()
         lv = QVBoxLayout(left)
         lv.setContentsMargins(0, 0, 0, 0)
-        lv.addWidget(QLabel(tr('Saves')))
+        head = QHBoxLayout()
+        head.addWidget(QLabel(tr('Saves')), 1)
+        refresh = QPushButton(tr('Refresh'))
+        refresh.setToolTip(tr('Reload the save list (F5). The list also updates by itself when the game saves.'))
+        refresh.clicked.connect(self.refresh_list)
+        head.addWidget(refresh)
+        lv.addLayout(head)
         lv.addWidget(self.saves, 1)
         lv.addWidget(self.shot)
 
@@ -809,7 +872,7 @@ class Main(QMainWindow):
         split = QSplitter()
         split.addWidget(left)
         split.addWidget(right)
-        split.setSizes([330, 870])
+        split.setSizes([400, 900])
         self.setCentralWidget(split)
 
         menu = self.menuBar().addMenu(tr('Language'))
@@ -820,6 +883,15 @@ class Main(QMainWindow):
             menu.addAction(act)
         self.lang_actions = menu.actions()
 
+        # watch the save folders so new/overwritten saves show up without a manual refresh;
+        # the game writes several files per save, so changes are debounced
+        self.watcher = QFileSystemWatcher(self)
+        self.watcher.directoryChanged.connect(self.saves_changed)
+        self.watcher.fileChanged.connect(self.saves_changed)
+        self.refresh_timer = QTimer(self, singleShot=True, interval=2000, timeout=self.refresh_list)
+        self.loaded_mtime = None
+        portrait_signals().done.connect(self.details_done)
+
         self.addAction(QAction(self, shortcut=QKeySequence.Save, triggered=self.write))
         self.addAction(QAction(self, shortcut=QKeySequence.Refresh, triggered=self.refresh_list))
         self.refresh_list()
@@ -828,21 +900,61 @@ class Main(QMainWindow):
         current = self.save.folder if self.save else None
         self.saves.blockSignals(True)
         self.saves.clear()
+        pending = []
         for name, folder, info in us.list_saves():
-            if info:
-                cn, lvl, loc, mt = info
-                when = datetime.datetime.fromtimestamp(mt).strftime('%Y-%m-%d %H:%M')
-                text = f'{name}\n    {cn} L{lvl} · {loc} · {when}'
-            else:
-                text = f'{name}\n    {tr("(unreadable info)")}'
-            it = QListWidgetItem(text)
+            details = cached_details(folder)
+            if details is None:
+                pending.append(folder)
+            it = QListWidgetItem(save_label(name, info, details))
             it.setData(Qt.UserRole, folder)
+            it.setData(Qt.UserRole + 1, (name, info))
+            if info:
+                dlcs = ', '.join(info.get('dlcs') or []) or '–'
+                it.setToolTip(tr('Game time is the in-game world clock stored in the save.') + '\n'
+                              + tr('DLCs: {dlcs}', dlcs=dlcs))
             self.saves.addItem(it)
             if folder == current:
                 self.saves.setCurrentItem(it)
         self.saves.blockSignals(False)
         if not current and self.saves.count():
             self.saves.setCurrentRow(0)
+        self.watch_saves()
+        self.check_loaded_changed()
+        if pending:
+            QThreadPool.globalInstance().start(DetailsJob(pending, portrait_signals()))
+
+    def watch_saves(self):
+        paths = [us.SAVES] + [f for _, f, _ in us.list_saves()]
+        paths += [os.path.join(f, 'global.dat') for f in paths[1:]]
+        old = self.watcher.directories() + self.watcher.files()
+        if old:
+            self.watcher.removePaths(old)
+        self.watcher.addPaths([p for p in paths if os.path.exists(p)])
+
+    def saves_changed(self, _path):
+        self.refresh_timer.start()
+
+    def check_loaded_changed(self):
+        """Hint when the game overwrote the save that is open in the editor."""
+        if not self.save or self.loaded_mtime is None:
+            return
+        try:
+            changed = os.path.getmtime(self.save.path) != self.loaded_mtime
+        except OSError:
+            changed = True
+        if changed:
+            self.status.setText(tr('This save was changed on disk (by the game?). Revert/reselect it to reload; '
+                                   'saving now would overwrite the game\'s version.'))
+            self.btn_revert.setEnabled(True)
+
+    def details_done(self, kind, folder):
+        if kind != 'details':
+            return
+        for i in range(self.saves.count()):
+            it = self.saves.item(i)
+            if it.data(Qt.UserRole) == folder:
+                name, info = it.data(Qt.UserRole + 1)
+                it.setText(save_label(name, info, cached_details(folder)))
 
     def pick(self, item, prev):
         if not item:
@@ -868,6 +980,7 @@ class Main(QMainWindow):
             self.status.setText(tr('Could not read save: {e}', e=e))
             return
         s = self.save
+        self.loaded_mtime = os.path.getmtime(s.path)
         pix = QPixmap(os.path.join(folder, 'screenshot.png'))
         self.shot.setPixmap(pix.scaledToWidth(320, Qt.SmoothTransformation) if not pix.isNull() else QPixmap())
         self.update_title()
@@ -939,6 +1052,16 @@ class Main(QMainWindow):
                                    tr('Underrail seems to be running. It may overwrite this save.\nWrite anyway?'),
                                    QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
                 return
+        try:
+            on_disk = os.path.getmtime(self.save.path)
+        except OSError:
+            on_disk = None
+        if on_disk != self.loaded_mtime and QMessageBox.warning(
+                self, tr('Save changed on disk'),
+                tr('The game has changed this save since you opened it. Saving overwrites those changes '
+                   '(a backup is made first).\nSave anyway?'),
+                QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
+            return
         try:
             bak = self.save.write()
         except Exception as e:

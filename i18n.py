@@ -104,6 +104,30 @@ DE = {
         'Haltbarkeit der ausgewählten Items (Inventar und Ausrüstung) auf voll setzen',
     'all categories': 'alle Kategorien',
     'crafted item': 'gecraftetes Item',
+    'Easy': 'Leicht',
+    'Normal': 'Normal',
+    'Hard': 'Schwer',
+    'Dominating': 'Dominating',
+    'Custom': 'Benutzerdefiniert',
+    'Stygian': 'Stygian',
+    'attr.': 'Attr.',
+    'skill': 'Skill',
+    'feat': 'Feat',
+    'spec': 'Spez.',
+    'unspent': 'frei',
+    'Game time is the in-game world clock stored in the save.':
+        'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
+    'DLCs: {dlcs}': 'DLCs: {dlcs}',
+    'Refresh': 'Aktualisieren',
+    'Save changed on disk': 'Spielstand geändert',
+    'The game has changed this save since you opened it. Saving overwrites those changes (a backup is made first).\nSave anyway?':
+        'Das Spiel hat diesen Spielstand seit dem Öffnen geändert. Speichern überschreibt diese Änderungen '
+        '(vorher wird ein Backup angelegt).\nTrotzdem speichern?',
+    'Reload the save list (F5). The list also updates by itself when the game saves.':
+        'Spielstand-Liste neu laden (F5). Die Liste aktualisiert sich auch selbst, wenn das Spiel speichert.',
+    "This save was changed on disk (by the game?). Revert/reselect it to reload; saving now would overwrite the game's version.":
+        'Dieser Spielstand wurde auf der Festplatte geändert (vom Spiel?). Mit „Verwerfen“ neu laden; '
+        'Speichern würde die Version des Spiels überschreiben.',
     '(placeholder icon – the game has no icon for this item)':
         '(Platzhalter-Icon – das Spiel hat für dieses Item kein Icon)',
     'Remove items': 'Items entfernen',
@@ -152,7 +176,9 @@ def language():
     global _lang
     if _lang is None:
         c = chosen()
-        _lang = c if c in LANGUAGES else ('de' if QLocale.system().name().startswith('de') else 'en')
+        system = QLocale.system().name().split('_')[0]  # e.g. 'de_AT' -> 'de'
+        # explicit choice, else the system language if translated, else English
+        _lang = c if c in LANGUAGES else (system if system in LANGUAGES else 'en')
     return _lang
 
 

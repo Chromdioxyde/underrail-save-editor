@@ -647,14 +647,57 @@ class Save:
         return bak
 
 
+DIFFICULTIES = ['Easy', 'Normal', 'Hard', 'Dominating', 'Custom']  # TimelapseVertigo.Rules.GameDifficulty
+DLC_NAMES = {'xpbl': 'Expedition', 'xphw': 'Heavy Duty'}
+
+
 def save_info(folder):
-    """Cheap summary from info.dat: (name, level, location, mtime)."""
+    """Cheap summary from info.dat, or None if unreadable."""
     try:
         f = File(os.path.join(folder, 'info.dat'))
         r = f.p.objects[f.p.root]
-        return f.val(r.get('SGI:CN')), f.val(r.get('SGI:CL')), f.val(r.get('SGI:L')), os.path.getmtime(folder)
+        diff = f.val(r.get('SGI:D'))
+        ticks = f.val(r.get('SGI:P'))  # .NET TimeSpan ticks; equals the world clock TG:WT
+        dlcs = [f.val(v) for v in seq_get(r, 'SGI:DL')] if 'SGI:DL:Count' in r else []
+        return {'name': f.val(r.get('SGI:CN')), 'level': f.val(r.get('SGI:CL')), 'location': f.val(r.get('SGI:L')),
+                'mtime': os.path.getmtime(folder), 'hours': ticks / 1e7 / 3600 if ticks else None,
+                'difficulty': DIFFICULTIES[diff] if isinstance(diff, int) and 0 <= diff < len(DIFFICULTIES) else diff,
+                'dlcs': [DLC_NAMES.get(d, d) for d in dlcs]}
     except Exception:
         return None
+
+
+CURRENCIES = {'currency\\sgscredits': 'sgs', 'currency\\stygiancoin': 'stygian'}
+
+
+def save_details(folder):
+    """Expensive summary from global.dat (HP, XP, money), cached per save folder and mtime."""
+    import json
+    cache = os.path.join(gamedata.CACHE, 'savedetails.json')
+    try:
+        with open(cache) as fh:
+            data = json.load(fh)
+    except (OSError, ValueError):
+        data = {}
+    mtime = os.path.getmtime(os.path.join(folder, 'global.dat'))
+    hit = data.get(folder)
+    if hit and hit.get('mtime') == mtime:
+        return hit['details']
+    s = Save(folder)
+    hp = s.obj(s.obj(s.m['C1:D2']).get('CD1:H'))
+    money = {'sgs': 0, 'stygian': 0}
+    for it in s.inventory():
+        key = CURRENCIES.get((it.path or '').lower())
+        if key:
+            money[key] += it.fields()[0].value
+    details = {'hp': s.val(hp.get('BV:V')) if hp else None, 'hp_max': s.val(hp.get('BV:MX')) if hp else None,
+               'xp': s.val(s.m.get('PC1:E')), **money,
+               'unspent': {k: s.val(s.m.get(k)) for k, _ in POINT_FIELDS[1:] if k in s.m}}
+    data[folder] = {'mtime': mtime, 'details': details}
+    os.makedirs(gamedata.CACHE, exist_ok=True)
+    with open(cache, 'w') as fh:
+        json.dump(data, fh)
+    return details
 
 
 def list_saves():
