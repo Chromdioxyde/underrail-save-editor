@@ -7,7 +7,7 @@ import sys
 
 from PySide6.QtCore import QFileSystemWatcher, QObject, QRunnable, QSize, Qt, QThreadPool, QTimer, Signal
 from PySide6.QtGui import QAction, QIcon, QKeySequence, QPixmap
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QDialog,
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGroupBox,
                                QHBoxLayout, QHeaderView, QInputDialog, QLabel, QLineEdit, QListWidget,
                                QListWidgetItem, QMainWindow, QMessageBox, QPushButton,
@@ -163,30 +163,143 @@ class DetailsJob(QRunnable):
                 continue
 
 
-def save_label(name, info, details):
-    """Multi-line text for the save list."""
-    if not info:
-        return f'{name}\n    {tr("(unreadable info)")}'
-    when = datetime.datetime.fromtimestamp(info['mtime']).strftime('%Y-%m-%d %H:%M')
-    lines = [name, f"    {info['name']} · L{info['level']} · {info['location']}"]
-    meta = []
-    if info.get('hours') is not None:
-        h = info['hours']
-        meta.append(f'{int(h)}h {int(h * 60) % 60:02d}m')
-    if info.get('difficulty') is not None:
-        meta.append(tr(str(info['difficulty'])))
-    meta.append(when)
-    lines.append('    ' + ' · '.join(meta))
-    if details:
-        hp = f"HP {details['hp']:.0f}/{details['hp_max']:.0f}" if details.get('hp') is not None else ''
-        parts = [p for p in (hp, f"XP {details['xp']:,}" if details.get('xp') is not None else '',
-                             f"{details.get('stygian', 0):,} {tr('Stygian')}", f"{details.get('sgs', 0):,} SGS") if p]
-        lines.append('    ' + ' · '.join(parts))
-        unspent = {k: v for k, v in (details.get('unspent') or {}).items() if v}
+THUMB_W, THUMB_H = 224, 126  # card thumbnail (screenshots are cropped to 16:9)
+
+
+def thumb_path(folder):
+    """Cached thumbnail of a save's screenshot, keyed by folder and screenshot mtime."""
+    import hashlib
+    shot = os.path.join(folder, 'screenshot.png')
+    try:
+        key = f'{folder}|{os.path.getmtime(shot)}'
+    except OSError:
+        return None
+    return os.path.join(gamedata.CACHE, 'thumbs', hashlib.sha1(key.encode()).hexdigest() + '.png')
+
+
+class ThumbJob(QRunnable):
+    """Scales save screenshots down to card thumbnails off the UI thread."""
+
+    def __init__(self, folders, signals):
+        super().__init__()
+        self.folders, self.signals = folders, signals
+
+    def run(self):
+        from PySide6.QtGui import QImage
+        for folder in self.folders:
+            out = thumb_path(folder)
+            if not out or os.path.exists(out):
+                continue
+            img = QImage(os.path.join(folder, 'screenshot.png'))
+            if img.isNull():
+                continue
+            # fill the 16:9 box, cropping the wide in-game screenshots in the middle
+            img = img.scaled(THUMB_W, THUMB_H, Qt.KeepAspectRatioByExpanding, Qt.SmoothTransformation)
+            img = img.copy((img.width() - THUMB_W) // 2, (img.height() - THUMB_H) // 2, THUMB_W, THUMB_H)
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            img.save(out)
+            try:
+                self.signals.done.emit('thumb', folder)
+            except RuntimeError:
+                return  # app is shutting down
+
+
+class SaveCard(QWidget):
+    """One save in the list: screenshot on the left, structured info on the right."""
+
+    STYLE = """
+        QFrame#card { border: 1px solid palette(mid); border-radius: 8px; background: palette(base); }
+        QFrame#card[selected="true"] { border: 2px solid palette(highlight); background: palette(alternate-base); }
+        QLabel#thumb { border-radius: 4px; background: palette(window); }
+        QLabel#title { font-weight: bold; font-size: 11pt; }
+        QLabel#dim { color: palette(placeholder-text); }
+        QLabel#badge { color: palette(highlighted-text); background: palette(highlight);
+                       border-radius: 4px; padding: 1px 6px; }
+    """
+
+    def __init__(self, name, folder, info):
+        super().__init__()
+        self.folder, self.info = folder, info
+        self.frame = QFrame(objectName='card')
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(4, 3, 4, 3)
+        outer.addWidget(self.frame)
+        self.setStyleSheet(self.STYLE)
+        row = QHBoxLayout(self.frame)
+        row.setContentsMargins(8, 8, 8, 8)
+        row.setSpacing(10)
+        self.thumb = QLabel(objectName='thumb', alignment=Qt.AlignCenter)
+        self.thumb.setFixedSize(THUMB_W, THUMB_H)
+        row.addWidget(self.thumb)
+        text = QVBoxLayout()
+        text.setSpacing(2)
+        self.title = QLabel(name, objectName='title')
+        self.title.setWordWrap(True)
+        self.setMinimumWidth(THUMB_W + 160)
+        text.addWidget(self.title)
+        if info:
+            when = datetime.datetime.fromtimestamp(info['mtime']).strftime('%Y-%m-%d %H:%M')
+            text.addWidget(QLabel(f"{info['name']} · {tr('Level')} {info['level']}"))
+            loc = QLabel(info['location'] or '', objectName='dim')
+            loc.setWordWrap(True)
+            text.addWidget(loc)
+            meta = []
+            if info.get('hours') is not None:
+                h = info['hours']
+                meta.append(f'⏱ {int(h)}h {int(h * 60) % 60:02d}m')
+            if info.get('difficulty') is not None:
+                meta.append(tr(str(info['difficulty'])))
+            text.addWidget(QLabel(' · '.join(meta), objectName='dim'))
+            text.addWidget(QLabel(when, objectName='dim'))
+            dlcs = ', '.join(info.get('dlcs') or []) or '–'
+            self.setToolTip(tr('Game time is the in-game world clock stored in the save.') + '\n'
+                            + tr('DLCs: {dlcs}', dlcs=dlcs))
+        else:
+            text.addWidget(QLabel(tr('(unreadable info)'), objectName='dim'))
+        self.stats = QLabel()
+        self.money = QLabel(objectName='dim')
+        self.unspent = QLabel(objectName='badge')
+        self.unspent.hide()
+        text.addWidget(self.stats)
+        text.addWidget(self.money)
+        badge_row = QHBoxLayout()
+        badge_row.addWidget(self.unspent)
+        badge_row.addStretch()
+        text.addLayout(badge_row)
+        text.addStretch()
+        row.addLayout(text, 1)
+        self.set_thumb()
+
+    def set_thumb(self):
+        p = thumb_path(self.folder)
+        if p and os.path.exists(p):
+            self.thumb.setPixmap(QPixmap(p))
+        else:
+            self.thumb.setText('…')
+
+    def set_details(self, d):
+        if not d:
+            self.stats.setText(tr('loading…'))
+            return
+        parts = []
+        if d.get('hp') is not None:
+            parts.append(f"❤ {d['hp']:.0f}/{d['hp_max']:.0f}")
+        if d.get('xp') is not None:
+            parts.append(f"XP {d['xp']:,}")
+        self.stats.setText('   '.join(parts))
+        self.money.setText(f"{d.get('stygian', 0):,} {tr('Stygian')} · {d.get('sgs', 0):,} SGS")
+        unspent = {k: v for k, v in (d.get('unspent') or {}).items() if v}
         if unspent:
             labels = {'PC1:BAPC': tr('attr.'), 'PC1:SPC': tr('skill'), 'PC1:FC': tr('feat'), 'PC1:SP': tr('spec')}
-            lines.append('    ' + tr('unspent') + ': ' + ', '.join(f'{v} {labels.get(k, k)}' for k, v in unspent.items()))
-    return '\n'.join(lines)
+            self.unspent.setText(tr('unspent') + ': ' + ', '.join(f'{v} {labels.get(k, k)}' for k, v in unspent.items()))
+            self.unspent.show()
+        else:
+            self.unspent.hide()
+
+    def set_selected(self, on):
+        self.frame.setProperty('selected', on)
+        self.frame.style().unpolish(self.frame)
+        self.frame.style().polish(self.frame)
 
 
 class PortraitJob(QRunnable):
@@ -895,14 +1008,20 @@ class Main(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Underrail Save Editor')
-        self.resize(1300, 800)
+        self.resize(1400, 850)
         self.save = None
         self.dirty = False
 
         self.saves = QListWidget()
+        self.saves.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
+        # cards always take the list's width; text wraps instead of scrolling sideways
+        self.saves.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.saves.setResizeMode(QListWidget.Adjust)
+        self.saves.setSpacing(0)
+        # the cards draw their own selection; hide the list's highlight behind them
+        self.saves.setStyleSheet('QListWidget::item:selected, QListWidget::item:hover { background: transparent; }')
         self.saves.currentItemChanged.connect(self.pick)
-        self.shot = QLabel(alignment=Qt.AlignCenter)
-        self.shot.setMinimumHeight(160)
+        self.cards = {}
         left = QWidget()
         lv = QVBoxLayout(left)
         lv.setContentsMargins(0, 0, 0, 0)
@@ -914,7 +1033,6 @@ class Main(QMainWindow):
         head.addWidget(refresh)
         lv.addLayout(head)
         lv.addWidget(self.saves, 1)
-        lv.addWidget(self.shot)
 
         self.title = QLabel()
         f = self.title.font(); f.setPointSize(f.pointSize() + 3); f.setBold(True)
@@ -939,7 +1057,7 @@ class Main(QMainWindow):
         split = QSplitter()
         split.addWidget(left)
         split.addWidget(right)
-        split.setSizes([400, 900])
+        split.setSizes([480, 900])
         self.setCentralWidget(split)
 
         settings = self.menuBar().addMenu(tr('Settings'))
@@ -987,28 +1105,41 @@ class Main(QMainWindow):
         current = self.save.folder if self.save else None
         self.saves.blockSignals(True)
         self.saves.clear()
-        pending = []
+        self.cards = {}
+        pending, thumbs = [], []
         for name, folder, info in us.list_saves():
             details = cached_details(folder)
             if details is None:
                 pending.append(folder)
-            it = QListWidgetItem(save_label(name, info, details))
+            card = SaveCard(name, folder, info)
+            card.set_details(details)
+            if not (thumb_path(folder) and os.path.exists(thumb_path(folder))):
+                thumbs.append(folder)
+            it = QListWidgetItem()
             it.setData(Qt.UserRole, folder)
-            it.setData(Qt.UserRole + 1, (name, info))
-            if info:
-                dlcs = ', '.join(info.get('dlcs') or []) or '–'
-                it.setToolTip(tr('Game time is the in-game world clock stored in the save.') + '\n'
-                              + tr('DLCs: {dlcs}', dlcs=dlcs))
+            it.setSizeHint(card.sizeHint())
             self.saves.addItem(it)
+            self.saves.setItemWidget(it, card)
+            self.cards[folder] = card
             if folder == current:
                 self.saves.setCurrentItem(it)
         self.saves.blockSignals(False)
         if not current and self.saves.count():
             self.saves.setCurrentRow(0)
+        self.mark_selected()
         self.watch_saves()
         self.check_loaded_changed()
+        pool = QThreadPool.globalInstance()
+        if thumbs:
+            pool.start(ThumbJob(thumbs, portrait_signals()))
         if pending:
-            QThreadPool.globalInstance().start(DetailsJob(pending, portrait_signals()))
+            pool.start(DetailsJob(pending, portrait_signals()))
+
+    def mark_selected(self):
+        cur = self.saves.currentItem()
+        sel = cur.data(Qt.UserRole) if cur else None
+        for folder, card in self.cards.items():
+            card.set_selected(folder == sel)
 
     def watch_saves(self):
         saves = us.saves_dir()
@@ -1036,13 +1167,13 @@ class Main(QMainWindow):
             self.btn_revert.setEnabled(True)
 
     def details_done(self, kind, folder):
-        if kind != 'details':
+        card = self.cards.get(folder)
+        if card is None:
             return
-        for i in range(self.saves.count()):
-            it = self.saves.item(i)
-            if it.data(Qt.UserRole) == folder:
-                name, info = it.data(Qt.UserRole + 1)
-                it.setText(save_label(name, info, cached_details(folder)))
+        if kind == 'details':
+            card.set_details(cached_details(folder))
+        elif kind == 'thumb':
+            card.set_thumb()
 
     def pick(self, item, prev):
         if not item:
@@ -1052,6 +1183,7 @@ class Main(QMainWindow):
             self.saves.setCurrentItem(prev)
             self.saves.blockSignals(False)
             return
+        self.mark_selected()
         self.load(item.data(Qt.UserRole))
 
     def confirm_discard(self):
@@ -1069,8 +1201,6 @@ class Main(QMainWindow):
             return
         s = self.save
         self.loaded_mtime = os.path.getmtime(s.path)
-        pix = QPixmap(os.path.join(folder, 'screenshot.png'))
-        self.shot.setPixmap(pix.scaledToWidth(320, Qt.SmoothTransformation) if not pix.isNull() else QPixmap())
         self.update_title()
 
         # attribute and skill names are game terms and stay as the game shows them
