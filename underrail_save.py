@@ -108,7 +108,7 @@ class File:
 
     def serialize(self):
         body = nrbf.serialize(self.p)
-        nrbf.Parser(body).parse()  # sanity check
+        nrbf.check(body)  # refuse to write anything the game couldn't load
         if self.compressed:
             body = gzip.compress(body, mtime=0)
         return self.header + body
@@ -437,10 +437,19 @@ class Save:
 
     # --- object helpers -------------------------------------------------------------------
     def shallow_copy(self, o):
-        """New object with the same class/metadata and member values (references shared)."""
+        """New object with the same class/metadata and member values. References are shared,
+        except value types (negative ids), which .NET requires to be unique per owner: those are copied."""
         c = nrbf.Obj(self.g.new_id(o.id < 0), o.cls, o.names, o.lib, o.bt, o.extra, 1, o.meta)
-        c.values = [nrbf.Prim(v.ptype, None, v.value) if isinstance(v, nrbf.Prim) else
-                    (nrbf.Ref(v.id) if isinstance(v, (nrbf.Obj, nrbf.Arr, nrbf.Str)) else v) for v in o.values]
+
+        def conv(v):
+            if isinstance(v, nrbf.Prim):
+                return nrbf.Prim(v.ptype, None, v.value)
+            if isinstance(v, (nrbf.Ref, nrbf.Obj, nrbf.Arr, nrbf.Str)):
+                if v.id < 0:
+                    return nrbf.Ref(self.deep_copy(self.obj(v)).id)
+                return nrbf.Ref(v.id)
+            return v
+        c.values = [conv(v) for v in o.values]
         self.g.p.objects[c.id] = c
         return c
 
@@ -469,7 +478,8 @@ class Save:
                 own.add(oid)
             elif isinstance(o, nrbf.Str) or (isinstance(o, nrbf.Obj) and o.cls == 'System.Version'):
                 continue
-            elif parents.get(oid, set()) <= sub:
+            elif oid < 0 or parents.get(oid, set()) <= sub:
+                # value types are always copied: .NET can't share them between objects
                 own.add(oid)
         idmap = {oid: self.g.new_id(oid < 0) for oid in own}
 

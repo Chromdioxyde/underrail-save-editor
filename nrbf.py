@@ -281,6 +281,10 @@ class Writer:
                 tuple(o.extra) if o.extra else None)
 
     def record(self, r):
+        if isinstance(r, Ref) and r.id < 0 and r.id not in self.emitted and r.id in self.p.objects:
+            # value types (negative ids) must be written inline where they are used; .NET never
+            # references them and fails with "An object cannot be registered twice" otherwise
+            r = self.p.objects[r.id]
         if isinstance(r, (Obj, Arr, Str)):
             if r.id in self.emitted:
                 r = Ref(r.id)
@@ -295,6 +299,8 @@ class Writer:
         elif isinstance(r, Prim):
             self.u8(8); self.u8(r.ptype); self.prim(r.ptype, r.value)
         elif isinstance(r, Ref):
+            if r.id < 0:
+                raise ValueError(f'value type #{r.id} is shared by several objects; copy it instead')
             self.u8(9); self.i32(r.id)
             if r.id not in self.emitted:
                 self.wanted.append(r.id)
@@ -423,3 +429,14 @@ def reachable(p):
 
 def serialize(parser):
     return Writer(parser).write()
+
+
+def check(data):
+    """Parses serialized data and rejects things .NET can't load (references to value types)."""
+    p = Parser(data).parse()
+    for o in p.objects.values():
+        vals = o.values if isinstance(o, Obj) else (o.items if isinstance(o, Arr) and isinstance(o.items, list) else [])
+        for v in vals:
+            if isinstance(v, Ref) and v.id < 0:
+                raise ValueError(f'reference to value type #{v.id} in #{o.id}')
+    return p
