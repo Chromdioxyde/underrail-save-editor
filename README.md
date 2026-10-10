@@ -28,7 +28,7 @@ always appear as the game names them.
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)
 - **Feats:** all feats with descriptions, add/remove via checkbox
 - **Specializations:** edit values, add/remove specializations
-- **Inventory:** sortable (click a column header) and filterable by category; stack size, component
+- **Inventory:** item icons, sortable (click a column header) and filterable by category; stack size, component
   quality, durability (with maximum, *Repair* / *Repair all*), battery; add items from all ~1460 game
   items, duplicate (crafted items too), remove; edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
@@ -41,6 +41,14 @@ Test structural changes (feats, specializations, blueprints, items, name, portra
 The game reads `CustomPortraits/<id>_s.png`, `<id>_l.png`, `<id>_h.png` (50/100/200 px) from
 `Documents/My Games/Underrail`. *Import PNG…* in the portrait dialog crops the image to a square and
 writes the three sizes there.
+
+## Item icons
+
+Icons are cut out of the game's sprite sheets (`data/icons/*.xnb`) on first start (a few seconds,
+cached in `~/.cache/underrail-save-editor/icons/`). An item's visual id (`I:VM`) is either a name from
+`icons.iconset` (grid cell(s) per sheet; multi-part icons are layers with their own opacity) or
+`<Sheet>.<n>` = cell n of a 10-column grid. Cells are 33 px on a 34 px pitch. About 95 % of the items
+get an icon; crafted weapons with composite visuals (`sniper.4.frame` …) don't.
 
 ## Durability and quality
 

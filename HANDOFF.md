@@ -22,8 +22,10 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 1. User tests in-game (on `test` save): name/portrait, adding feat/spec/blueprint, adding items
    (e.g. robe), duplicate/remove items, durability/quality edits. Treat structural edits as unverified
    until then.
-2. Possible additions: factions (`C1:PA1`, eATTI), psi abilities (`C1:PA`), difficulty (`TG:D`).
-3. Offered, not requested: warn about specs without their feat, spec maxima as upper bound. Real feat
+2. Item icons extracted from sprite sheets (see README); ~72 items have no icon (composite weapon
+   visuals, some ammo names missing from icons.iconset).
+3. Possible additions: factions (`C1:PA1`, eATTI), psi abilities (`C1:PA`), difficulty (`TG:D`).
+4. Offered, not requested: warn about specs without their feat, spec maxima as upper bound. Real feat
    requirements only exist in the (obfuscated) code.
 
 ## Findings

@@ -192,6 +192,13 @@ class Item:
         return [f for f in out if f]
 
     @property
+    def visual(self):
+        """Visual/icon id (I:VM) of the item."""
+        if self.data is not None:
+            return self.save.g.val(self.data.get('I:VM'))
+        return self.info.get('vm') if self.info else None
+
+    @property
     def max_battery(self):
         """Battery capacity (I:MB), or None for items without a battery."""
         if self.data is not None:

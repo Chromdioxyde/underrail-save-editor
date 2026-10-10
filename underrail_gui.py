@@ -101,6 +101,29 @@ def portrait_signals():
     return _portrait_signals
 
 
+class IconJob(QRunnable):
+    """Extracts item icons that aren't cached yet, then notifies the main window."""
+
+    def __init__(self, vms, signals):
+        super().__init__()
+        self.vms, self.signals = vms, signals
+
+    def run(self):
+        try:
+            gamedata.extract_icons(self.vms)
+        except Exception:
+            pass
+        try:
+            self.signals.done.emit('icons', '')
+        except RuntimeError:
+            pass  # app is shutting down
+
+
+def item_icon(vm):
+    path = gamedata.icon_path(vm)
+    return QIcon(path) if path else None
+
+
 class PortraitJob(QRunnable):
     def __init__(self, pid, path, signals):
         super().__init__()
@@ -233,8 +256,14 @@ class AddItemDialog(QDialog):
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        self.table.setIconSize(QSize(33, 33))
+        self.table.verticalHeader().setDefaultSectionSize(36)
         for row, i in enumerate(self.db):
-            self.table.setItem(row, 0, QTableWidgetItem(i['name']))
+            cell = QTableWidgetItem(i['name'])
+            icon = item_icon(i.get('vm'))
+            if icon:
+                cell.setIcon(icon)
+            self.table.setItem(row, 0, cell)
             self.table.setItem(row, 1, QTableWidgetItem(i['category']))
             self.table.setItem(row, 2, QTableWidgetItem(i['path']))
         self.table.itemSelectionChanged.connect(self.selected)
@@ -545,6 +574,8 @@ class ItemTable(QTableWidget):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setEditTriggers(QTableWidget.NoEditTriggers)
         self.horizontalHeader().setSortIndicatorShown(sortable)
+        self.setIconSize(QSize(33, 33))
+        self.verticalHeader().setDefaultSectionSize(36)
 
     def fill(self, items):
         self.setSortingEnabled(False)
@@ -568,6 +599,9 @@ class ItemTable(QTableWidget):
                     if name == 'Name':
                         cell.setData(Qt.UserRole, row)
                         cell.setToolTip(it.path or tr('crafted item'))
+                        icon = item_icon(it.visual)
+                        if icon:
+                            cell.setIcon(icon)
                     self.setItem(row, col, cell)
                     continue
                 f = fields.get(name)
@@ -842,6 +876,28 @@ class Main(QMainWindow):
             self.tabs.setCurrentIndex(tab)
         self.dirty = False
         self.update_status()
+        self.fetch_icons()
+
+    def fetch_icons(self):
+        """Extract missing item icons in the background (first run takes a few seconds)."""
+        vms = {i.get('vm') for i in gamedata.items().values()}
+        vms |= {it.visual for it in self.save.inventory() + self.save.equipped()}
+        missing = {v for v in vms if v and not gamedata.icon_path(v)} - getattr(self, 'icons_tried', set())
+        if not missing:
+            return
+        self.icons_tried = getattr(self, 'icons_tried', set()) | missing
+        sig = portrait_signals()
+        sig.done.connect(self.icons_done)
+        QThreadPool.globalInstance().start(IconJob(missing, sig))
+
+    def icons_done(self, kind, _):
+        if kind != 'icons':
+            return
+        portrait_signals().done.disconnect(self.icons_done)
+        inv = next((self.tabs.widget(i) for i in range(self.tabs.count())
+                    if isinstance(self.tabs.widget(i), InventoryTab)), None)
+        if inv is not None:
+            inv.build()
 
     def update_title(self):
         s = self.save

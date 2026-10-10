@@ -83,7 +83,7 @@ def _build_items():
                 'stack': _val(p, o.get('I:MS')) or 1, 'value': _val(p, o.get('I:CV')),
                 'weight': _val(p, o.get('I:W')), 'category': rel.split('\\')[0].lower(),
                 'level': _val(p, o.get('I:L')) or 0, 'wtype': _val(p, o.get('WI:WT')),
-                'battery': _val(p, o.get('I:MB')) or 0,
+                'battery': _val(p, o.get('I:MB')) or 0, 'vm': _val(p, o.get('I:VM')),
             }
     return out
 
@@ -96,7 +96,7 @@ def items():
     global _items
     if _items is None:
         base = os.path.join(GAME, 'data', 'rules', 'items')
-        _items = _cached('items-v3.json', [base, os.path.join(GAME, 'underrail.exe')], _build_items)
+        _items = _cached('items-v4.json', [base, os.path.join(GAME, 'underrail.exe')], _build_items)
     return _items
 
 
@@ -265,3 +265,87 @@ def import_portrait(image_path, pid):
     for suffix, size in PORTRAIT_SIZES.items():
         im.resize((size, size), Image.LANCZOS).save(os.path.join(d, f'{pid}_{suffix}.png'))
 
+
+
+# --- item icons ---------------------------------------------------------------------------
+# Icons live in sprite sheets (data/icons/*.xnb). icons.iconset maps names to grid cells; item
+# visuals not listed there are "<Sheet>.<n>" = cell n of a 10-column grid. Cells are 33 px on a
+# 34 px pitch (verified visually against the sheets).
+ICON_DIR = os.path.join(GAME, 'data', 'icons')
+ICON_SIZE, ICON_PITCH, ICON_COLS = 33, 34, 10
+
+
+def _iconset():
+    p = read_nrbf(os.path.join(ICON_DIR, 'icons.iconset'))
+    r = p.objects[p.root]
+    out = {}
+    for i in range(r.get('ISD:I:Count').value):
+        d = nrbf.resolve(p, r.get(f'ISD:I:{i}'))
+        parts = []
+        for k in range(d.get('ID:P:Count').value):
+            part = nrbf.resolve(p, d.get(f'ID:P:{k}'))
+            pt = nrbf.resolve(p, part.get('IPD:P'))
+            parts.append((_val(p, part.get('IPD:TN')), pt.values[0].value, pt.values[1].value,
+                          _val(p, part.get('IPD:A'))))
+        out[_val(p, d.get('ID:N'))] = parts
+    return out
+
+
+def icon_file(vm):
+    return os.path.join(CACHE, 'icons', re.sub(r'[^A-Za-z0-9_.-]', '_', vm) + '.png')
+
+
+def icon_path(vm):
+    """Cached PNG of an item visual, or None (not extracted yet / no icon)."""
+    if not vm:
+        return None
+    f = icon_file(vm)
+    return f if os.path.exists(f) else None
+
+
+def extract_icons(vms=None, progress=None):
+    """Cuts the icons of all item visuals (or the given ones) out of the sheets into the cache."""
+    import xnb
+    from PIL import Image
+    if vms is None:
+        vms = {i.get('vm') for i in items().values()}
+    vms = sorted(v for v in vms if v)
+    iconset = _iconset()
+    sheet_names = {f[:-4].lower(): f[:-4] for f in os.listdir(ICON_DIR) if f.endswith('.xnb')}
+    sheets = {}
+
+    def tile(tn, x, y):
+        key = tn.lower()
+        if key not in sheets:
+            w, h, px = xnb.read_texture(os.path.join(ICON_DIR, sheet_names[key] + '.xnb'))
+            sheets[key] = Image.frombytes('RGBA', (w, h), px)
+        x0, y0 = x * ICON_PITCH, y * ICON_PITCH
+        return sheets[key].crop((x0, y0, x0 + ICON_SIZE, y0 + ICON_SIZE))
+
+    os.makedirs(os.path.join(CACHE, 'icons'), exist_ok=True)
+    for n, vm in enumerate(vms):
+        if progress:
+            progress(n, len(vms))
+        if os.path.exists(icon_file(vm)):
+            continue
+        try:
+            parts = iconset.get(vm)
+            if parts:
+                img = Image.new('RGBA', (ICON_SIZE, ICON_SIZE))
+                # multi-part icons are layers drawn in order, each with its own opacity
+                for tn, x, y, a in parts:
+                    layer = tile(tn, x, y)
+                    if a is not None and a < 1.0:
+                        layer.putalpha(layer.getchannel('A').point(lambda v, a=a: int(v * a)))
+                    img.alpha_composite(layer)
+            else:
+                m = re.fullmatch(r'(\w+)\.(\d+)', vm)
+                if not m or m.group(1).lower() not in sheet_names:
+                    continue
+                k = int(m.group(2))
+                img = tile(m.group(1), k % ICON_COLS, k // ICON_COLS)
+            img.save(icon_file(vm))
+        except Exception:
+            continue
+    if progress:
+        progress(len(vms), len(vms))
