@@ -260,7 +260,9 @@ PORTRAIT_SIZES = {'s': 50, 'l': 100, 'h': 200}
 
 
 def import_portrait(image_path, pid):
-    """Writes <pid>_s/_l/_h.png into CustomPortraits (square crop, game sizes)."""
+    """Writes <pid>_s/_l/_h.png into CustomPortraits (square crop, game sizes). The game scans that
+    folder for *_l.png at startup and uses the lower-cased file name (minus "_l") as portrait id."""
+    pid = pid.lower()
     from PIL import Image
     im = Image.open(image_path).convert('RGBA')
     side = min(im.size)

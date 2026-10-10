@@ -50,9 +50,10 @@ Test structural changes (feats, specializations, blueprints, items, name, portra
 
 ## Custom portraits
 
-The game reads `CustomPortraits/<id>_s.png`, `<id>_l.png`, `<id>_h.png` (50/100/200 px) from
-`Documents/My Games/Underrail`. *Import PNG…* in the portrait dialog crops the image to a square and
-writes the three sizes there.
+At startup the game scans `Documents/My Games/Underrail/CustomPortraits` for `*_l.png` and loads
+`<id>_h.png`, `<id>_l.png`, `<id>_s.png` (200/100/50 px), using the lower-cased file name as portrait
+id (verified in `underrail.exe`). *Import PNG…* in the portrait dialog crops an image to a square and
+writes the three sizes there; restart the game afterwards.
 
 ## Item icons
 

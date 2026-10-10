@@ -279,7 +279,9 @@ class PortraitDialog(QDialog):
             n += 1
         pid, ok = QInputDialog.getText(self, tr('Portrait id'), tr('Id (letters, digits, underscore):'),
                                        text=f'custom{n}')
-        if not ok or not re.fullmatch(r'[A-Za-z0-9_]+', pid or ''):
+        # the game lower-cases custom portrait ids when it scans the folder
+        pid = (pid or '').strip().lower()
+        if not ok or not re.fullmatch(r'[a-z0-9_]+', pid):
             return
         if pid in self.portraits and self.portraits[pid][0] != 'custom':
             QMessageBox.warning(self, tr('Portrait id'), tr('"{pid}" is a built-in portrait id.', pid=pid))
@@ -288,6 +290,9 @@ class PortraitDialog(QDialog):
         self.portraits = gamedata.portraits()
         self.selected = pid
         self.populate()
+        QMessageBox.information(self, tr('Portrait imported'), tr(
+            'Saved as "{pid}" in the CustomPortraits folder. Underrail reads custom portraits when it starts, '
+            'so restart the game after saving.', pid=pid))
 
     def accept(self):
         it = self.view.currentItem()

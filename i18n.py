@@ -119,6 +119,10 @@ DE = {
         'Die Spielzeit ist die im Spielstand gespeicherte Uhr der Spielwelt.',
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
+    'Portrait imported': 'Portrait importiert',
+    'Saved as "{pid}" in the CustomPortraits folder. Underrail reads custom portraits when it starts, so restart the game after saving.':
+        'Als „{pid}“ im Ordner CustomPortraits gespeichert. Underrail liest eigene Portraits beim Start ein, '
+        'also das Spiel nach dem Speichern neu starten.',
     'Settings': 'Einstellungen',
     'Game folders…': 'Spielordner…',
     'Game folders': 'Spielordner',
