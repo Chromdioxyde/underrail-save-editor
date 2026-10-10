@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Underrail Save Editor
+GenericName=Save Game Editor
+Comment=Edit Underrail save games: character, feats, specializations, inventory, blueprints
+Comment[de]=Underrail-Spielstände bearbeiten: Charakter, Feats, Spezialisierungen, Inventar, Baupläne
+Exec=underrail-save-editor
+Icon=underrail-save-editor
+Terminal=false
+Categories=Game;
+Keywords=Underrail;save;editor;savegame;
+StartupNotify=true
+StartupWMClass=underrail-save-editor

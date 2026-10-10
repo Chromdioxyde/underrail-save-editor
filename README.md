@@ -4,6 +4,17 @@ Save game editor for Underrail (Steam/Proton on Linux) with a GUI (PySide6) and 
 Requires Python 3, PySide6 and Pillow. Game data (item names, feats, portraits) is read directly from
 the Underrail installation.
 
+## Install
+
+```
+./packaging/install.sh      # per-user, no root; re-run to update
+./packaging/uninstall.sh    # removes the app, keeps backups
+```
+
+Installs the program to `~/.local/share/underrail-save-editor/app`, the launchers `underrail-save-editor`
+(GUI) and `underrail-spec` (CLI) to `~/.local/bin`, plus an icon and an application menu entry.
+Dependencies: PySide6 and Pillow (on Arch-based systems: `sudo pacman -S pyside6 python-pillow`).
+
 ## Usage
 
 ```
@@ -14,7 +25,8 @@ the Underrail installation.
 ```
 
 Quit Underrail before saving, otherwise the game may overwrite the save.
-Before every save, `global.dat` and `info.dat` are copied to `backups/<save>/<timestamp>/`.
+Before every save, `global.dat` and `info.dat` are copied to
+`~/.local/share/underrail-save-editor/backups/<save>/<timestamp>/`.
 To roll back, copy both files back into the save folder.
 
 The GUI is available in English and German. It follows the system language by default; the

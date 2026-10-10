@@ -12,7 +12,9 @@ import gamedata
 import nrbf
 
 SAVES = os.path.join(gamedata.USERDIR, 'Saves')
-BACKUPS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backups')
+# backups live in the user's data dir, independent of where the program is installed
+BACKUPS = os.path.join(os.environ.get('XDG_DATA_HOME') or os.path.expanduser('~/.local/share'),
+                       'underrail-save-editor', 'backups')
 HEADER_LEN = 24  # GUID + version bytes, kept verbatim
 
 # skill objects carry no name; the save keeps them in the in-game order

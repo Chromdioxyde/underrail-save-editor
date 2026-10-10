@@ -979,6 +979,10 @@ class Main(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName('Underrail Save Editor')
+    # matches the .desktop file so launchers/taskbars (Wayland app_id) show the right icon
+    app.setDesktopFileName('underrail-save-editor')
+    icon = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'underrail-save-editor.svg')
+    app.setWindowIcon(QIcon.fromTheme('underrail-save-editor', QIcon(icon)))
 
     def stop_jobs():
         pool = QThreadPool.globalInstance()
