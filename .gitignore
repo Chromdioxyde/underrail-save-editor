@@ -1,3 +1,4 @@
 __pycache__/
-# Save-Backups des Editors, persoenliche Spielstaende
+# save backups made while running from the checkout (personal save games)
 /backups/
+/build/

@@ -16,7 +16,8 @@ Project language is English (docs, code, commit messages); the GUI additionally 
   quality, remove, duplicate with new GUID, add from item DB with full durability).
 - `underrail_gui.py`: tabs for all of the above, sortable/filterable inventory, repair, portrait gallery.
 - `i18n.py`: English/German UI, system language by default, *Language* menu override.
-- In-game verified: spec point editing (V=M=8 allowed redistributing points).
+- In-game verified: spec point editing (V=M=8 allowed redistributing points); a bug with added items
+  ("An object cannot be registered twice": GUID struct written as reference) was found in-game and fixed.
 
 ## Open / next steps
 1. User tests in-game (on `test` save): name/portrait, adding feat/spec/blueprint, adding items
@@ -27,6 +28,12 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 3. Possible additions: factions (`C1:PA1`, eATTI), psi abilities (`C1:PA`), difficulty (`TG:D`).
 4. Offered, not requested: warn about specs without their feat, spec maxima as upper bound. Real feat
    requirements only exist in the (obfuscated) code.
+
+## Packaging
+- `packaging/install.sh` (per-user Linux install), `build-appimage.sh` (portable AppImage, tested on
+  Ubuntu 22.04/Debian 12 in Docker; Debian 11 is too old for PySide6's libstdc++), PyInstaller spec +
+  GitHub Actions workflow for Windows (Windows build not tested yet – no Windows machine, repo not on GitHub).
+- `paths.py` detects folders on Linux/Steam Deck/Windows; Windows detection is untested.
 
 ## Findings
 - `SNF:M` is not the maximum (in-game test with V=M=8 allowed distributing points) → keep V and M in sync.

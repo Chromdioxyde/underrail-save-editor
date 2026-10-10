@@ -4,7 +4,18 @@ Save game editor for Underrail (Steam/Proton on Linux) with a GUI (PySide6) and 
 Requires Python 3, PySide6 and Pillow. Game data (item names, feats, portraits) is read directly from
 the Underrail installation.
 
-## Install
+## Download and run
+
+- **Linux / Steam Deck:** the AppImage bundles Python, Qt and Pillow. Make it executable and run it
+  (on the Steam Deck: Desktop Mode, right-click → Properties → Permissions → executable, then double-click).
+  Needs glibc ≥ 2.28 and libstdc++ from GCC 11+ (SteamOS 3, Ubuntu 22.04, Debian 12, Fedora 35 or newer).
+- **Windows:** unzip `UnderrailSaveEditor-…-windows-x64.zip` and start `UnderrailSaveEditor.exe`.
+
+The game and save folders are detected automatically: all Steam libraries (incl. SD cards and Flatpak
+Steam), GOG on Windows, the Proton prefix on Linux and `Documents\My Games\Underrail` on Windows. If
+nothing is found, choose them under *Settings → Game folders…*.
+
+## Install from source (Linux)
 
 ```
 ./packaging/install.sh      # per-user, no root; re-run to update
@@ -99,3 +110,21 @@ The player is `TG:PC` (class `P2`). Important members:
 | `PC1:BAPC`, `PC1:SPC`, `PC1:FC`, `PC1:SP` | unspent attribute/skill/feat/specialization points |
 | `PC1:O:i:Key/Value` | oddities |
 | `PC1:B` | known blueprints: .NET `SortedList` name → `IBR` (`IBR:IBFTN` = lower-case id from `data/knowledge/itemblueprints.k`). Not re-sorted on load and read by binary search → entries are inserted in .NET culture order (`gamedata.sort_key`, verified against saved lists) |
+
+## Building
+
+```
+./packaging/build-appimage.sh          # -> build/Underrail_Save_Editor-<version>-x86_64.AppImage
+```
+
+The AppImage uses a portable CPython (python-build-standalone) and manylinux wheels, so it doesn't depend
+on the build machine's libraries. The Windows build uses PyInstaller and has to run on Windows:
+
+```
+python -m pip install pyinstaller PySide6-Essentials pillow
+python packaging/make_icon.py build
+pyinstaller --noconfirm --distpath build/dist --workpath build/work packaging/underrail-save-editor.spec
+```
+
+`.github/workflows/build.yml` builds both on every push and attaches them to a GitHub release for
+`v*` tags.
