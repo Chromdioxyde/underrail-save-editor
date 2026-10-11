@@ -1,4 +1,4 @@
-# Handoff – status 2026-10-11
+# Handoff – status 2026-10-11 (evening)
 
 Goal: GUI editor with as many features as possible (inventory, portrait, everything editable).
 Project language is English (docs, code, commit messages); the GUI additionally has a German translation.
@@ -37,6 +37,12 @@ Project language is English (docs, code, commit messages); the GUI additionally 
   marker. `LocationsDialog` in the GUI lists all sources and marks them on `WorldMapView`.
 - Unplaced merchants (no map NPC, probably events): gc_fsh, gc_gypsy, dun_diedrick, ezra,
   jackquicksilver, oldjonas, cc_jkkquartermaster.
+
+## Open from the latest requests
+- Rarity colours are a guess (exe lookup didn't find the quality enum by name); verify against the game.
+- Vehicle frames have more fields (VFI:C/D/T/S/N) whose meaning isn't known; only size/power are shown.
+- Skill damage factor (0.7/0.5) from the wiki; `c4r::a` in the exe computes (ac[x] + skill * ad[x]) * y –
+  probably the real formula, not decoded yet.
 
 ## Builds
 `builds.py`: archetypes with weapon families (from `WI:WT` + visual model `WI:WVM`: k knife, s sledgehammer,

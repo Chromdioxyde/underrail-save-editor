@@ -54,7 +54,13 @@ always appear as the game names them.
   *Only available* hides them
 - **Specializations:** edit values (up to the game's maximum per specialization), add/remove; only
   specializations of feats the character has are offered, like in the game
-- **Inventory:** selecting a weapon or armor piece compares it with what is equipped in its slot (both
+- **Inventory:** weight and total weight (weight × stack) columns plus the total carried, to find what
+  makes you encumbered; rarity tiers coloured (junk grey, fine green, good blue, superior purple,
+  excellent orange, unique gold – our choice, the game's exact colours weren't extracted); category filter
+  with subcategories; the game's description in the tooltip. *Add item…* shows type, rarity and details
+  (vehicle parts: build size small/medium/large from `VPI:S`, engine power `VEI:P`), presets durability
+  (full), batteries (full) and component quality (your own item's, else 100 where quality matters).
+  Selecting a weapon or armor piece compares it with what is equipped in its slot (both
   weapon slots for weapons): damage, AP, damage per AP and your damage per AP, crit, precision,
   Strength, range, magazine, resistances/thresholds per damage type, armor penalty, level, durability,
   weight – differences green/red like in Diablo. Item icons, sortable (click a column header) and filterable by category; stack size, component
