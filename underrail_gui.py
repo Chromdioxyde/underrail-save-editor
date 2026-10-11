@@ -647,7 +647,7 @@ class AddItemDialog(QDialog):
         self.table.setSortingEnabled(True)
         self.table.sortItems(0, Qt.AscendingOrder)
         self.table.itemSelectionChanged.connect(self.selected)
-        self.table.doubleClicked.connect(lambda _: self.accept())
+        self.table.doubleClicked.connect(lambda _: self.add_current())
 
         self.desc = QLabel(wordWrap=True)
         self.count_label = QLabel(tr('Stack size'))
@@ -666,13 +666,22 @@ class AddItemDialog(QDialog):
         form.addRow(tr('Durability'), dl)
         ql = QHBoxLayout(); ql.addWidget(self.quality); ql.addWidget(self.quality_hint, 1)
         form.addRow(self.quality_label, ql)
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        buttons.button(QDialogButtonBox.Ok).setText(tr('Add'))
-        buttons.accepted.connect(self.accept)
-        buttons.rejected.connect(self.reject)
+        # adding keeps the dialog open so several items can be added in a row; a short note confirms each
+        self.added = 0
+        self.note = QLabel()
+        self.note_timer = QTimer(self, singleShot=True, interval=4000, timeout=lambda: self.note.setText(''))
+        add = QPushButton(tr('Add'))
+        add.setDefault(True)
+        add.clicked.connect(self.add_current)
+        close = QPushButton(tr('Close'))
+        close.clicked.connect(self.accept)
+        bl = QHBoxLayout()
+        bl.addWidget(self.note, 1)
+        bl.addWidget(add)
+        bl.addWidget(close)
         lay = QVBoxLayout(self)
         lay.addLayout(top); lay.addWidget(self.table, 1); lay.addWidget(self.desc)
-        lay.addLayout(form); lay.addWidget(buttons)
+        lay.addLayout(form); lay.addLayout(bl)
 
     def refilter(self, *_):
         q = self.search.text().lower()
@@ -690,6 +699,26 @@ class AddItemDialog(QDialog):
     def stackable(self):
         i = self.current()
         return bool(i and i['stack'] and i['stack'] > 1)
+
+    def add_current(self):
+        """Add the selected item with the chosen stack/copies, durability and quality; stay open."""
+        i = self.current()
+        if not i:
+            return
+        stack, copies = (self.count.value(), 1) if self.stackable() else (1, self.count.value())
+        try:
+            for _ in range(copies):
+                self.save.add_item(i['path'], stack, self.dur.value(), self.quality.value())
+        except Exception as e:
+            self.note.setStyleSheet('color: #d33')
+            self.note.setText(tr('Could not add {name}: {e}', name=i['name'], e=e))
+            self.note_timer.start()
+            return
+        self.added += copies
+        n = stack if copies == 1 else copies
+        self.note.setStyleSheet('color: #2a2')
+        self.note.setText('✓ ' + tr('{n}× {name} added', n=n, name=i['name']))
+        self.note_timer.start()
 
     def default_quality(self, i):
         """Quality for a new component: the best of the same item the character already has, else 100 for
@@ -714,6 +743,7 @@ class AddItemDialog(QDialog):
         # non-stackable items are added as separate copies instead of one oversized stack
         self.count_label.setText(tr('Stack size') if self.stackable() else tr('Copies'))
         self.count.setMaximum(i['stack'] if self.stackable() else 50)
+        self.count.setValue(1)  # a new item starts at one, not at the count used for the previous one
         d = self.save.default_durability(i['path'])
         self.dur.setEnabled(d is not None)
         self.dur.setValue(d or 0.0)
@@ -1414,17 +1444,8 @@ class InventoryTab(QWidget):
 
     def add(self):
         d = AddItemDialog(self, self.main.save)
-        if d.exec():
-            i = d.current()
-            if not i:
-                return
-            stack, copies = (d.count.value(), 1) if d.stackable() else (1, d.count.value())
-            try:
-                for _ in range(copies):
-                    self.main.save.add_item(i['path'], stack, d.dur.value(), d.quality.value())
-            except Exception as e:
-                QMessageBox.warning(self, tr('Add item'), str(e))
-                return
+        d.exec()
+        if d.added:
             self.main.on_change()
             self.build()
 
