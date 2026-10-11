@@ -137,11 +137,53 @@ def world():
     return _world
 
 
+def _build_links():
+    """Zones without a map marker -> a marked zone their own map file leads to (transition targets)."""
+    import collections
+    d = os.path.join(gamedata.GAME, 'data', 'maps', 'locale', 'static')
+    marked = set(world()['marker'])
+    files = {f[:-3].lower(): f for f in os.listdir(d) if f.endswith('.uz')}
+    out = {}
+    for zid, fn in files.items():
+        if zid in marked:
+            continue
+        try:
+            p = gamedata.read_nrbf(os.path.join(d, fn))
+        except Exception:
+            continue
+        c = collections.Counter(o.value.lower() for o in p.objects.values()
+                                if isinstance(o, nrbf.Str) and o.value.lower() in marked and o.value.lower() != zid)
+        if c:
+            out[zid] = c.most_common(1)[0][0]
+    return out
+
+
+_links = None
+
+
+def linked(zid):
+    """Marked zone an unmarked one belongs to (from its transitions, or Core City for its dungeons)."""
+    global _links
+    if _links is None:
+        d = os.path.join(gamedata.GAME, 'data', 'maps', 'locale', 'static')
+        _links = gamedata._cached('zone_links_v1.json', [d, _path()], _build_links)
+    zid = zid.lower()
+    if zid in _links:
+        return _links[zid]
+    if zid.startswith(('dun_cc_', 'dun_ccres', 'cc_', 'xpbl_cc', 'xphw_cc')):
+        return 'cc1'
+    return None
+
+
 def marker(zid):
     """Index of the map marker that shows a zone, or None. Zones without their own marker (sub-levels like
     'lux-c6x') fall back to the zone they belong to."""
     m = world()['marker']
     zid = zid.lower()
+    if zid not in m:
+        target = linked(zid)
+        if target and target in m:
+            return m[target]
     while zid:
         if zid in m:
             return m[zid]
@@ -302,7 +344,8 @@ def zone_sprite(n, origin):
 
 
 def pages_ready():
-    return all(os.path.exists(os.path.join(gamedata.CACHE, f'worldmap_{p}.png')) for p in PAGES)
+    return all(os.path.exists(os.path.join(gamedata.CACHE, f'worldmap_{p}.png')) for p in PAGES) and \
+        os.path.exists(os.path.join(gamedata.CACHE, 'zone_links_v1.json'))
 
 
 # broad areas of the world by zone id prefix (first match wins), to tell the map's layers apart

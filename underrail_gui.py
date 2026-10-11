@@ -1497,6 +1497,7 @@ class MapScanJob(QRunnable):
             hints.map_index()
             for page in worldmap.PAGES:  # pre-render the world map pages
                 worldmap.page_image(page)
+            worldmap.linked('')  # where zones without a marker belong (reads their map files once)
         except Exception:
             pass
         try:
@@ -1620,25 +1621,31 @@ class WorldMapView(QGraphicsView):
             hit.setData(0, n)
             hit.setToolTip(tip)
             self.zone_items[n] = (x, y, img.width, img.height)
-            for k, (text, color) in enumerate(self.overlay.get(n, [])):
-                self.label(text, 8, x + img.width / 2, y + img.height / 2, 12 * k - 6 * (len(self.overlay[n]) - 1),
+            lines = self.overlay.get(n, [])
+            for k, (text, color) in enumerate(lines):
+                self.label(text, 10, x + img.width / 2, y + img.height / 2, 19 * k - 9.5 * (len(lines) - 1),
                            color, 5.5)
         self.draw_selection()
 
     def label(self, text, size, x, y, dy, color, zvalue):
-        """Text centred on a scene point that keeps its size on screen at any zoom level."""
+        """Text on a dark rounded box, centred on a scene point; keeps its size on screen at any zoom level."""
         lt = QGraphicsSimpleTextItem(text)
         f = lt.font(); f.setPointSize(size); f.setBold(True); lt.setFont(f)
         lt.setBrush(color)
-        lt.setPen(QPen(QColor(0, 0, 0), 0.6))
-        lt.setFlag(QGraphicsSimpleTextItem.ItemIgnoresTransformations)
         b = lt.boundingRect()
-        lt.setPos(x, y)
-        lt.setTransform(lt.transform().translate(-b.width() / 2, -b.height() / 2 + dy))
-        lt.setZValue(zvalue)
+        box = QGraphicsRectItem(-b.width() / 2 - 4, -b.height() / 2 - 1, b.width() + 8, b.height() + 2)
+        box.setBrush(QColor(0, 0, 0, 175))
+        box.setPen(QPen(Qt.NoPen))
+        box.setFlag(QGraphicsRectItem.ItemIgnoresTransformations)
+        box.setPos(x, y)
+        box.setTransform(box.transform().translate(0, dy))
+        box.setZValue(zvalue)
+        box.setAcceptedMouseButtons(Qt.NoButton)
+        lt.setParentItem(box)
+        lt.setPos(-b.width() / 2, -b.height() / 2)
         lt.setAcceptedMouseButtons(Qt.NoButton)
-        self.scene_.addItem(lt)
-        return lt
+        self.scene_.addItem(box)
+        return box
 
     def draw_selection(self):
         for it in self.sel_items:
@@ -2168,7 +2175,7 @@ class WorldMapDialog(QDialog):
                 c = hints.zone_contents(self.zone_ids(n))
                 lines = []
                 if 'merchant_names' in on:
-                    lines += [(m.split(' (')[0], QColor(120, 190, 255)) for m in c['merchants'][:3]]
+                    lines += [(m.split(' (')[0], QColor(130, 200, 255)) for m in c['merchants']]
                 if 'creature_names' in on:
                     lines += [(f'{name}{" ×" + str(k) if k > 1 else ""}', QColor(255, 140, 120))
                               for name, k in c['creatures'][:2]]

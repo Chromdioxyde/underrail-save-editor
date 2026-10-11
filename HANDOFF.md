@@ -49,6 +49,11 @@ Merchants/creatures can be written on the zones (WorldMapDialog toggles; objects
 filtered via hints.is_object). Hostility isn't known (no faction data in the index). The old
 prefix-based `REGIONS`/area combobox in LocationsDialog is hidden and can be removed; check SGS inset.
 
+## Zones without a marker
+`worldmap.linked()` maps them to a marked zone their own .uz file references (cache zone_links_v1.json,
+built in MapScanJob, ~1 min) or to Core City for cc dungeons. Still unplaced: lup-grampus (Grampus),
+xpbl_ww_dragndrop (Mixer Jessie) – nothing references them.
+
 ## Builds
 `builds.py`: archetypes with weapon families (from `WI:WT` + visual model `WI:WVM`: k knife, s sledgehammer,
 c crowbar, '' fist, xpbls spear, xpblm sword, ep/ap energy pistol), attributes, skills, feat ids and armor
