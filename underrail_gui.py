@@ -811,10 +811,18 @@ class CharacterTab(QWidget):
         form.addRow(tr('Name'), self.name)
         form.addRow(tr('Level'), spin_for(s.level_field(), self.changed, 1, 100))
         form.addRow(tr('Portrait'), pl)
+        # attributes next to points/experience/vitals (attribute names are game terms)
+        attrs = QGroupBox(tr('Attributes'))
+        QVBoxLayout(attrs).addWidget(FieldTable(main, s.attributes(), 1, 100, 'Effective (as saved)',
+                                                lambda f: f.extra[0].value, label=lambda f: f.name))
+        points = QGroupBox(tr('Points / experience / vitals'))
+        QVBoxLayout(points).addWidget(FieldTable(main, s.points() + s.vitals()))
+        row = QHBoxLayout()
+        row.addWidget(attrs, 1)
+        row.addWidget(points, 1)
         lay = QVBoxLayout(self)
         lay.addLayout(form)
-        lay.addWidget(QLabel(tr('Points / experience / vitals:')))
-        lay.addWidget(FieldTable(main, s.points() + s.vitals()), 1)
+        lay.addLayout(row, 1)
         self.show_portrait()
 
     def changed(self, f, v):
@@ -2498,8 +2506,6 @@ class Main(QMainWindow):
 
         # attribute and skill names are game terms and stay as the game shows them
         self.tabs.addTab(CharacterTab(self), tr('Character'))
-        self.tabs.addTab(FieldTable(self, s.attributes(), 1, 100, 'Effective (as saved)',
-                                    lambda f: f.extra[0].value, label=lambda f: f.name), tr('Attributes'))
         self.tabs.addTab(FieldTable(self, s.skills(), 0, 1000, 'Effective (as saved)',
                                     lambda f: f.extra[0].value, label=lambda f: f.name), tr('Skills'))
         self.tabs.addTab(feats_tab(self), tr('Feats'))

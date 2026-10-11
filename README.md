@@ -47,7 +47,7 @@ always appear as the game names them.
 ## Features (GUI)
 
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
-  XP, unspent attribute/skill/feat/specialization points, current health
+  attributes, XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)
 - **Feats:** all feats with descriptions, add/remove via checkbox; feats whose requirements your
   character doesn't meet (or that can't be picked when leveling up) are marked with the reasons, and
