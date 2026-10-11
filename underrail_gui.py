@@ -1279,7 +1279,7 @@ class InventoryTab(QWidget):
         for i in items:
             if i.category:
                 subs.setdefault(i.category, set()).add((i.info or {}).get('sub') or '')
-        current = self.cat.currentData()
+        current = self.cat.currentText()
         self.cat.blockSignals(True)
         self.cat.clear()
         self.cat.addItem(tr('all categories'), None)
@@ -1288,8 +1288,7 @@ class InventoryTab(QWidget):
             if len(subs[c] - {''}) > 1:
                 for sub in sorted(subs[c] - {''}):
                     self.cat.addItem(f'    {c} › {tr(sub)}', (c, sub))
-        idx = self.cat.findData(current) if current is not None else 0
-        self.cat.setCurrentIndex(max(0, idx))
+        self.cat.setCurrentIndex(max(0, self.cat.findText(current)))
         self.cat.blockSignals(False)
         self.table.fill(items)
         self.equip.fill(self.main.save.equipped())
