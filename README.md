@@ -55,8 +55,8 @@ always appear as the game names them.
 - **Specializations:** edit values (up to the game's maximum per specialization), add/remove; only
   specializations of feats the character has are offered, like in the game
 - **Inventory:** weight and total weight (weight × stack) columns plus the total carried, to find what
-  makes you encumbered; rarity tiers coloured (junk grey, fine green, good blue, superior purple,
-  excellent orange, unique gold – our choice, the game's exact colours weren't extracted); category filter
+  makes you encumbered; rarity tiers coloured like in the game (common white/plain, uncommon green, rare blue,
+  unique purple; broken junk grey); category filter
   with subcategories; the game's description in the tooltip. *Add item…* shows type, rarity and details
   (vehicle parts: build size small/medium/large from `VPI:S`, engine power `VEI:P`), presets durability
   (full), batteries (full) and component quality (your own item's, else 100 where quality matters).

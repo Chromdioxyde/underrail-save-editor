@@ -448,10 +448,9 @@ class PortraitDialog(QDialog):
         super().accept()
 
 
-# item rarity (I:Q) colours: Junk grey, Common plain, Fine green, Good blue, Superior purple, Excellent orange,
-# Unique gold
-RARITY_COLORS = {0: (128, 128, 128), 2: (40, 160, 40), 3: (50, 110, 230), 4: (150, 70, 210), 5: (230, 130, 20),
-                 6: (200, 160, 0)}
+# item rarity (I:Q) colours as in the game: common white (= default text colour here), uncommon green,
+# rare blue, unique purple; junk grey
+RARITY_COLORS = {0: (128, 128, 128), 2: (40, 160, 40), 3: (50, 110, 230), 4: (150, 70, 210), 5: (150, 70, 210)}
 SIZES = {1: 'small', 2: 'medium', 3: 'large'}
 
 

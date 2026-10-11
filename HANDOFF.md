@@ -39,7 +39,6 @@ Project language is English (docs, code, commit messages); the GUI additionally 
   jackquicksilver, oldjonas, cc_jkkquartermaster.
 
 ## Open from the latest requests
-- Rarity colours are a guess (exe lookup didn't find the quality enum by name); verify against the game.
 - Vehicle frames have more fields (VFI:C/D/T/S/N) whose meaning isn't known; only size/power are shown.
 - Skill damage factor (0.7/0.5) from the wiki; `c4r::a` in the exe computes (ac[x] + skill * ad[x]) * y –
   probably the real formula, not decoded yet.
