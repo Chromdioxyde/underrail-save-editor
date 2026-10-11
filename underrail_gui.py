@@ -1156,6 +1156,91 @@ class InventoryTab(QWidget):
         self.main.status.setText(tr('Repaired {n} item(s)', n=n) + (tr(' – unsaved') if n else ''))
 
 
+class HintsTab(QWidget):
+    """Best weapons and armor combinations computed from the game data, with merchants that sell them."""
+
+    def __init__(self, main):
+        super().__init__()
+        self.main = main
+        self.view = QTextBrowser()
+        self.view.setOpenLinks(False)
+        QVBoxLayout(self).addWidget(self.view)
+        self.built = False
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        if not self.built:  # computed on first view only
+            self.built = True
+            try:
+                self.view.setHtml(self.render())
+            except Exception as ex:
+                self.view.setPlainText(tr('Could not compute hints: {e}', e=ex))
+
+    @staticmethod
+    def sellers(info, limit=6):
+        import html
+        import hints
+        fixed, random_ = hints.where_to_buy(info)
+        parts = [f'<b>{html.escape(n)}</b>' for n in fixed]
+        rest = random_[:max(0, limit - len(parts))]
+        parts += [html.escape(n) for n in rest]
+        more = len(fixed) + len(random_) - len(parts)
+        if more > 0:
+            parts.append(tr('+{n} more', n=more))
+        return ', '.join(parts) if parts else tr('not sold by merchants (loot or quest)')
+
+    def render(self):
+        import html
+        import hints
+        esc = html.escape
+        h = [f'<p>{esc(tr("Computed from your game files with the formulas the game uses. Armor values at component quality {q}; merchants in bold always stock the item, the others may roll it in their random stock.", q=hints.QUALITY))}</p>']
+        feats = set(self.main.save.feats()) if self.main.save else set()
+        notes = []
+        if 'armorsloping' in feats:
+            notes.append(tr('You have Armor Sloping: metal plates cost you about 35% less armor penalty than listed (more with its specialization).'))
+        if 'ballistics' in feats:
+            notes.append(tr('You have Ballistics: carrier vests add extra mechanical damage threshold.'))
+        if 'juggernaut' in feats:
+            notes.append(tr('You have Juggernaut: +25% health only while the armor penalty of your suit is at least 50%.'))
+        if notes:
+            h.append('<ul>' + ''.join(f'<li>{esc(n)}</li>' for n in notes) + '</ul>')
+
+        h.append(f'<h2>{esc(tr("Best weapons (damage per action point)"))}</h2>')
+        h.append(f'<p><i>{esc(tr("Base values without ammo, feats or precision; burst weapons count all shots."))}</i></p>')
+        h.append('<table border="1" cellspacing="0" cellpadding="3">')
+        h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in
+                                  ('Weapon', 'Type', 'Damage', 'AP', 'Burst', 'Dmg/AP', 'Where to buy')) + '</tr>')
+        for r in hints.weapons(25):
+            dmg = ' + '.join(f'{lo}–{hi} {hints.SHORT.get(t, t)}' for lo, hi, t in r['ranges'])
+            h.append(f"<tr><td>{esc(r['info']['name'])}</td><td>{esc(tr(r['type']))}</td><td>{esc(dmg)}</td>"
+                     f"<td nowrap>{r['ap']}</td><td>{r['burst'] or '–'}</td><td nowrap><b>{r['per_ap']:.2f}</b></td>"
+                     f"<td>{self.sellers(r['info'])}</td></tr>")
+        h.append('</table>')
+
+        comps = hints.components()
+        h.append(f'<h2>{esc(tr("Best armor combinations (protection vs. armor penalty)"))}</h2>')
+        h.append(f'<p><i>{esc(tr("Armor penalty doesn\'t depend on quality – quality only raises protection. Penalties of worn pieces add up. Values: resistance %/threshold."))}</i></p>')
+        used = {}
+        for recipe in hints.RECIPES:
+            h.append(f'<h3>{esc(tr(recipe))}</h3><table border="1" cellspacing="0" cellpadding="3">')
+            h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in ('Components', 'Penalty', 'Strength', 'Protection')) + '</tr>')
+            for res in hints.armor_combos(recipe, 3, comps):
+                parts = '<br>'.join(f'{esc(tr(slot))}: <b>{esc(name)}</b>' for slot, name in res['parts'])
+                for _, name in res['parts']:
+                    used[name] = comps[name]['info']
+                h.append(f"<tr><td>{parts}</td><td>{res['penalty'] * 100:.0f}%</td>"
+                         f"<td>{res['strength'] or '–'}</td><td>{esc(hints.fmt_prot(res['prot']))}</td></tr>")
+            h.append('</table>')
+
+        h.append(f'<h2>{esc(tr("Where to get the components"))}</h2><table border="1" cellspacing="0" cellpadding="3">')
+        h.append(f'<tr><th>{esc(tr("Component"))}</th><th>{esc(tr("Where to buy"))}</th></tr>')
+        for name in sorted(used):
+            h.append(f'<tr><td>{esc(name)}</td><td>{self.sellers(used[name], 8)}</td></tr>')
+        h.append('</table>')
+        h.append(f'<p><i>{esc(tr("Leathers, carapaces and similar animal parts also come from skinning the creature with Skinner/Hunter; metal sheets and plates also drop as loot."))}</i></p>')
+        return '\n'.join(h)
+
+
 class FilteredFieldTab(QWidget):
     def __init__(self, main, fields, label=None, lo=0, hi=INT_MAX):
         super().__init__()
@@ -1386,6 +1471,7 @@ class Main(QMainWindow):
         self.tabs.addTab(blueprints_tab(self), tr('Blueprints'))
         self.tabs.addTab(FilteredFieldTab(self, s.oddities(), label=lambda f: gamedata.split_camel(
             f.name.split('.', 1)[-1])), tr('Oddities'))
+        self.tabs.addTab(HintsTab(self), tr('Hints'))
         if 0 <= tab < self.tabs.count():
             self.tabs.setCurrentIndex(tab)
         self.dirty = False

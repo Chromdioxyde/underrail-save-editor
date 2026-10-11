@@ -59,6 +59,9 @@ always appear as the game names them.
   items, duplicate (crafted items too), remove; edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
 - **Oddities:** collection counters
+- **Hints:** best weapons by damage per action point and the best armor/helmet/boot component
+  combinations by protection versus armor penalty (computed with the game's formulas), with the merchants
+  that sell them (fixed shipments or random stock) and notes on the character's crafting feats
 
 Test structural changes (feats, specializations, blueprints, items, name, portrait) on a copy first.
 

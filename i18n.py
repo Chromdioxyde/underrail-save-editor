@@ -121,6 +121,41 @@ DE = {
     'DLCs: {dlcs}': 'DLCs: {dlcs}',
     'Refresh': 'Aktualisieren',
     'Only available': 'Nur verfügbare',
+    'Hints': 'Tipps',
+    'Could not compute hints: {e}': 'Tipps konnten nicht berechnet werden: {e}',
+    '+{n} more': '+{n} weitere',
+    'not sold by merchants (loot or quest)': 'nicht beim Händler (Beute oder Quest)',
+    'Computed from your game files with the formulas the game uses. Armor values at component quality {q}; merchants in bold always stock the item, the others may roll it in their random stock.':
+        'Berechnet aus deinen Spieldateien mit den Formeln des Spiels. Rüstungswerte bei Komponenten-Qualität {q}; '
+        'fett gedruckte Händler führen das Item fest, die anderen können es im Zufallssortiment haben.',
+    'You have Armor Sloping: metal plates cost you about 35% less armor penalty than listed (more with its specialization).':
+        'Du hast Armor Sloping: Metallplatten kosten dich etwa 35 % weniger Rüstungsmalus als angegeben (mit Spezialisierung mehr).',
+    'You have Ballistics: carrier vests add extra mechanical damage threshold.':
+        'Du hast Ballistics: Trägerwesten geben zusätzliche mechanische Schadensschwelle.',
+    'You have Juggernaut: +25% health only while the armor penalty of your suit is at least 50%.':
+        'Du hast Juggernaut: +25 % Lebenspunkte nur, solange der Rüstungsmalus deiner Rüstung mindestens 50 % beträgt.',
+    'Best weapons (damage per action point)': 'Beste Waffen (Schaden pro Aktionspunkt)',
+    'Base values without ammo, feats or precision; burst weapons count all shots.':
+        'Grundwerte ohne Munition, Feats oder Präzision; Feuerstoßwaffen zählen alle Schüsse.',
+    'Weapon': 'Waffe', 'Type': 'Typ', 'Damage': 'Schaden', 'AP': 'AP', 'Burst': 'Feuerstoß', 'Dmg/AP': 'Schaden/AP',
+    'Where to buy': 'Wo kaufen',
+    'Pistol': 'Pistole', 'SMG': 'MP', 'Assault rifle': 'Sturmgewehr', 'Sniper rifle': 'Scharfschützengewehr',
+    'Shotgun': 'Schrotflinte', 'Crossbow / special': 'Armbrust / Spezial', 'Melee': 'Nahkampf',
+    'Grenade launcher': 'Granatwerfer', 'Heavy energy': 'Schwere Energiewaffe', 'Light machine gun': 'MG',
+    'Minigun': 'Minigun', 'Rocket launcher': 'Raketenwerfer',
+    'Best armor combinations (protection vs. armor penalty)': 'Beste Rüstungskombinationen (Schutz gegen Rüstungsmalus)',
+    "Armor penalty doesn't depend on quality – quality only raises protection. Penalties of worn pieces add up. Values: resistance %/threshold.":
+        'Der Rüstungsmalus hängt nicht von der Qualität ab – Qualität erhöht nur den Schutz. Die Mali getragener Teile '
+        'addieren sich. Werte: Resistenz %/Schwelle.',
+    'Tactical vest': 'Taktische Weste', 'Metal armor': 'Metallrüstung', 'Leather armor': 'Lederrüstung',
+    'Metal helmet': 'Metallhelm', 'Boots': 'Stiefel', 'Greaves': 'Beinschienen',
+    'Components': 'Komponenten', 'Penalty': 'Malus', 'Strength': 'Stärke', 'Protection': 'Schutz',
+    'carrier vest': 'Trägerweste', 'ballistic panel': 'Ballistik-Panel', 'armor plate': 'Panzerplatte',
+    'fabric': 'Stoff', 'metal plates': 'Metallplatten', 'leather': 'Leder', 'padding': 'Polsterung',
+    'Where to get the components': 'Wo es die Komponenten gibt', 'Component': 'Komponente',
+    'Leathers, carapaces and similar animal parts also come from skinning the creature with Skinner/Hunter; metal sheets and plates also drop as loot.':
+        'Leder, Panzer und ähnliche Tierteile bekommt man auch durch Häuten der Kreatur (Skinner/Hunter); Metallbleche '
+        'und -platten gibt es auch als Beute.',
     'Feat · max': 'Feat · Max',
     'feat missing': 'Feat fehlt',
     'All specializations of your feats are already present': 'Alle Spezialisierungen deiner Feats sind bereits vorhanden',
