@@ -1,4 +1,4 @@
-# Handoff – status 2026-10-10
+# Handoff – status 2026-10-11
 
 Goal: GUI editor with as many features as possible (inventory, portrait, everything editable).
 Project language is English (docs, code, commit messages); the GUI additionally has a German translation.
@@ -28,6 +28,15 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 3. Possible additions: factions (`C1:PA1`, eATTI), psi abilities (`C1:PA`), difficulty (`TG:D`).
 4. Offered, not requested: warn about specs without their feat, spec maxima as upper bound. Real feat
    requirements only exist in the (obfuscated) code.
+
+## Hints / world map
+- Map index (`hints.map_index()`, cache `map_index_v5.json`) is keyed by zone id (map file name without
+  the `_l<n>` layer suffix); display names come from `southunderrail.world`. Also indexes merchants
+  (`MEA1:S` store id -> zones + NPC name).
+- `worldmap.py` reads `globalmap.uz` markers (see README). 76 zone ids (dungeons, DLC interiors) have no
+  marker. `LocationsDialog` in the GUI lists all sources and marks them on `WorldMapView`.
+- Unplaced merchants (no map NPC, probably events): gc_fsh, gc_gypsy, dun_diedrick, ezra,
+  jackquicksilver, oldjonas, cc_jkkquartermaster.
 
 ## Packaging
 - `packaging/install.sh` (per-user Linux install), `build-appimage.sh` (portable AppImage, tested on

@@ -138,6 +138,18 @@ DE = {
     'carried by an NPC': 'bei einem NPC', 'random loot': 'Zufallsbeute', 'other': 'sonstiges',
     'Could not compute hints: {e}': 'Tipps konnten nicht berechnet werden: {e}',
     '+{n} more': '+{n} weitere',
+    'Location unknown: not placed in any map (appears through an event or quest).':
+        'Ort unbekannt: in keiner Karte platziert (erscheint durch ein Ereignis oder eine Quest).',
+    'Black Sea (Expedition)': 'Schwarzes Meer (Expedition)',
+    'All locations on the map…': 'Alle Fundorte auf der Karte…',
+    'Where to get {item}': 'Wo bekommt man {item}',
+    'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',
+    'always in stock': 'fest im Sortiment', 'random stock': 'Zufallssortiment',
+    'Merchant': 'Händler', 'Found in the world': 'In der Spielwelt', 'Creature': 'Kreatur',
+    'Numbers: how many. Wheel zooms, drag pans, click a zone for its entries.':
+        'Zahlen: Anzahl. Mausrad zoomt, Ziehen verschiebt, Klick auf eine Zone zeigt ihre Einträge.',
+    'This zone has no marker on the world map (dungeon or interior).':
+        'Diese Zone hat keinen Marker auf der Weltkarte (Dungeon oder Innenraum).',
     'not sold by merchants (loot or quest)': 'nicht beim Händler (Beute oder Quest)',
     'Computed from your game files with the formulas the game uses. Armor values at component quality {q}; merchants in bold always stock the item, the others may roll it in their random stock.':
         'Berechnet aus deinen Spieldateien mit den Formeln des Spiels. Rüstungswerte bei Komponenten-Qualität {q}; '

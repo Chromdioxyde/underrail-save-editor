@@ -64,7 +64,9 @@ always appear as the game names them.
   that sell them (fixed shipments or random stock), where they lie in the game world (scanned once from
   the map files: containers, ground, NPCs, job rewards, random container loot), for animal parts the
   zones where their creature is placed, and notes on the
-  character's crafting feats
+  character's crafting feats. *All locations on the map…* (or *+N more*) opens a list of every source
+  with a schematic world map that marks the zones (merchants blue, spots in the world orange, creatures
+  green; click a row to find it on the map, click a zone to find its rows)
 
 Test structural changes (feats, specializations, blueprints, items, name, portrait) on a copy first.
 
@@ -98,6 +100,17 @@ all others are below (worn), two are above (probably templates changed by a game
 Component quality is `CII:QL` (0 = component without a quality value). The game doesn't cap it: stats
 scale with `Q · (0.77 + 0.35 · min(1, max(0, Q−15)/170)^1.35)`, so the bonus curve flattens at 185 but
 higher values still count. The editor allows up to 999.
+
+## World map
+
+There's no drawn world map in the game files, but `data/maps/world/globalmap.uz` is a zone whose
+entities are markers: `ZMEA` = a zone (`ZMEA:R` zone ids, `ZMEA:CN` title, position in zone-sized grid
+units), `TRSMA` = a transition between two zones. `worldmap.py` reads them; the editor draws one square
+per zone and a line per transition (dashed for long jumps such as elevators and trains). Expedition's
+Black Sea zones (`xpbl*`, `cvw*`) share the coordinate space with the caves, so they're a separate page.
+South Gate Station's levels are an inset (`ZMEA:I` = 1) and are shown at the station's outer marker.
+Dungeons and interiors without a marker are listed but greyed out. Merchants are located through the
+merchant aspect `MEA1:S` (store id) of the NPC that trades, which also gives their real name.
 
 ## Save format
 

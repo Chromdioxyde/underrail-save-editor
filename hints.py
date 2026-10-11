@@ -40,6 +40,11 @@ def _val(p, o, k):
 
 def store_name(store_id):
     loc, _, who = store_id.partition('_')
+    placed = map_index()['merchants'].get(store_id.lower()) if map_index_ready() else None
+    if placed and placed['npc'] and placed['zones']:
+        # the trading NPC's own name and the zone they stand in
+        zid = max(placed['zones'], key=placed['zones'].get)
+        return f"{placed['npc']} ({LOCATIONS.get(loc) or zone_name(zid)})"
     if who and loc in LOCATIONS:
         return f'{who.replace("_", " ").title()} ({LOCATIONS[loc]})'
     return store_id.replace('_', ' ').title()
@@ -254,38 +259,60 @@ def _zone_names():
     return out
 
 
-def _build_map_index(progress=None):
+def zone_id(layer_file):
+    """Zone id of a map layer file: 'cc10_l2.uzl' -> 'cc10', 'xpbl_l10_l1.uzl' -> 'xpbl_l10'."""
     import re
+    base = layer_file.rsplit('.', 1)[0].lower()
+    m = re.match(r'^(.+)_l\d+(_[a-z].*)?$', base)
+    return m.group(1) if m else base
+
+
+def _build_map_index(progress=None):
     names = _zone_names()
     d = _maps_dir()
     files = sorted(f for f in os.listdir(d) if f.endswith('.uzl'))
-    index, creatures = {}, {}
+    index, creatures, merchants, zones = {}, {}, {}, {}
     for n, fn in enumerate(files):
         if progress:
             progress(n, len(files))
-        zone = re.sub(r'_l\d+.*$', '', fn[:-4])
-        zname = names.get(zone) or names.get(zone.split('_')[0])
+        zid = zone_id(fn)
+        zname = names.get(zid) or names.get(zid.split('_')[0])
         if not zname:
             # DLC layers whose ids aren't on the world map
-            zname = {'xpbl': 'Expedition', 'xphw': 'Heavy Duty'}.get(zone.split('_')[0], zone)
-        if 'test' in zone.lower() or zname.lower().startswith('test'):
+            zname = {'xpbl': 'Expedition', 'xphw': 'Heavy Duty'}.get(zid.split('_')[0], zid)
+        if 'test' in zid or zname.lower().startswith('test'):
             continue  # developer test maps aren't part of the game world
         try:
             p = gamedata.read_nrbf(os.path.join(d, fn))
         except Exception:
             continue
+        zones[zid] = zname
         parent = {}
         for x in p.objects.values():
             for k in nrbf.children(x):
                 parent.setdefault(k, x.id)
         for x in p.objects.values():
-            if isinstance(x, nrbf.Obj) and 'C1:N' in x.names:
+            if not isinstance(x, nrbf.Obj):
+                continue
+            if 'C1:N' in x.names:
                 # characters and creatures placed in the zone (by display name)
                 cname = gamedata._val(p, x.get('C1:N'))
                 if cname:
-                    zones = creatures.setdefault(cname, {})
-                    zones[zname] = zones.get(zname, 0) + 1
-            if not isinstance(x, nrbf.Obj) or 'II:DP' not in x.names:
+                    by_zone = creatures.setdefault(cname, {})
+                    by_zone[zid] = by_zone.get(zid, 0) + 1
+            if 'MEA1:S' in x.names:
+                # merchant aspect: store id, owned by the character that trades
+                sid = gamedata._val(p, x.get('MEA1:S'))
+                if sid:
+                    m = merchants.setdefault(sid.lower(), {'zones': {}, 'npc': None})
+                    m['zones'][zid] = m['zones'].get(zid, 0) + 1
+                    o = x
+                    while o is not None and not m['npc']:
+                        for k in ('C1:N', 'E2:N'):
+                            if k in getattr(o, 'names', ()):
+                                m['npc'] = gamedata._val(p, o.get(k))
+                        o = p.objects.get(parent.get(o.id))
+            if 'II:DP' not in x.names:
                 continue
             dp = nrbf.resolve(p, x.get('II:DP'))
             if dp is None or 'LIDP:P' not in dp.names:
@@ -295,34 +322,54 @@ def _build_map_index(progress=None):
             kind = HOLDER_KINDS.get(getattr(holder, 'cls', ''), 'other')
             key = gamedata._val(p, dp.get('LIDP:P')).lower()
             entry = index.setdefault(key, {})
-            entry[f'{zname}|{kind}'] = entry.get(f'{zname}|{kind}', 0) + 1
+            entry[f'{zid}|{kind}'] = entry.get(f'{zid}|{kind}', 0) + 1
     if progress:
         progress(len(files), len(files))
-    return {'items': index, 'creatures': creatures}
+    return {'items': index, 'creatures': creatures, 'merchants': merchants, 'zones': zones}
 
 
-MAP_CACHE = 'map_index_v4.json'
+MAP_CACHE = 'map_index_v5.json'
+_map_index = None
 
 
 def map_index_ready():
-    return os.path.exists(os.path.join(gamedata.CACHE, MAP_CACHE))
+    return _map_index is not None or os.path.exists(os.path.join(gamedata.CACHE, MAP_CACHE))
 
 
 def map_index(progress=None):
-    """{'items': item path -> {"zone|kind": count}, 'creatures': name -> {zone: count}}; scanning all map
-    layers takes under a minute, then it's cached."""
-    return gamedata._cached(MAP_CACHE, [_maps_dir()], lambda: _build_map_index(progress))
+    """{'items': item path -> {"zone id|kind": count}, 'creatures': name -> {zone id: count},
+    'merchants': store id -> {'zones': {zone id: count}, 'npc': name}, 'zones': zone id -> display name};
+    scanning all map layers takes under a minute, then it's cached."""
+    global _map_index
+    if _map_index is None:
+        _map_index = gamedata._cached(MAP_CACHE, [_maps_dir()], lambda: _build_map_index(progress))
+    return _map_index
 
 
-def where_found(info, limit=4):
-    """[(zone, kind, count)] for an item, most useful kinds first (fixed spots before random loot)."""
-    if not map_index_ready():
-        return None
+def zone_name(zid):
+    return map_index()['zones'].get(zid, zid) if map_index_ready() else zid
+
+
+def found_spots(info):
+    """[(zone id, kind, count)] for an item, most useful kinds first (fixed spots before random loot)."""
     entry = map_index()['items'].get(info['path'].lower(), {})
     rows = []
     for k, cnt in entry.items():
-        zone, kind = k.rsplit('|', 1)
-        rows.append((zone, kind, cnt))
+        zid, kind = k.rsplit('|', 1)
+        rows.append((zid, kind, cnt))
+    rows.sort(key=lambda r: (KIND_ORDER.index(r[1]) if r[1] in KIND_ORDER else 9, -r[2], r[0]))
+    return rows
+
+
+def where_found(info, limit=4):
+    """([(zone, kind, count)], total) by zone display name, or None while the maps aren't scanned yet."""
+    if not map_index_ready():
+        return None
+    merged = {}
+    for zid, kind, cnt in found_spots(info):
+        key = (zone_name(zid), kind)
+        merged[key] = merged.get(key, 0) + cnt
+    rows = [(z, k, c) for (z, k), c in merged.items()]
     rows.sort(key=lambda r: (KIND_ORDER.index(r[1]) if r[1] in KIND_ORDER else 9, -r[2], r[0]))
     return rows[:limit], len(rows)
 
@@ -358,10 +405,10 @@ def source_creature(info):
     return None
 
 
-def creature_zones(name, limit=5):
-    """[(zone, count)] where creatures of this name (or variants like "<name> Alpha") are placed."""
+def creature_spots(name):
+    """{zone id: count} where creatures of this name (or variants like "<name> Alpha") are placed."""
     if not map_index_ready() or not name:
-        return [], 0
+        return {}
     creatures = map_index()['creatures']
     words = name.split()
     # try the full name first, then shorter forms ("Heartbreaker Serpent" is placed as "Heartbreaker")
@@ -374,6 +421,44 @@ def creature_zones(name, limit=5):
                 for z, c in by_zone.items():
                     zones[z] = zones.get(z, 0) + c
         if zones:
-            rows = sorted(zones.items(), key=lambda kv: (-kv[1], kv[0]))
-            return rows[:limit], len(rows)
-    return [], 0
+            return zones
+    return {}
+
+
+def creature_zones(name, limit=5):
+    """([(zone, count)], total) by zone display name."""
+    merged = {}
+    for zid, c in creature_spots(name).items():
+        merged[zone_name(zid)] = merged.get(zone_name(zid), 0) + c
+    rows = sorted(merged.items(), key=lambda kv: (-kv[1], kv[0]))
+    return rows[:limit], len(rows)
+
+
+def merchant_zones(store_id):
+    """{zone id: count} where the merchant with this store stands (empty if not placed in a map)."""
+    if not map_index_ready():
+        return {}
+    return map_index()['merchants'].get(store_id.lower(), {}).get('zones', {})
+
+
+def locations(info):
+    """Everything known about where to get an item, with zone ids for the world map:
+    {'merchants': [(name, fixed, {zone id: n})], 'found': [(zone id, kind, n)],
+     'creature': name or None, 'creature_zones': {zone id: n}}"""
+    key, tag = info['path'].lower(), trade_tag(info)
+    merchants = {}
+    for sid, d in stores().items():
+        fixed = key in d['fixed']
+        if fixed or (tag is not None and tag in d['tags']):
+            name = store_name(sid)
+            prev = merchants.get(name)
+            zones = dict(prev[1]) if prev else {}
+            for z, c in merchant_zones(sid).items():
+                zones[z] = zones.get(z, 0) + c
+            merchants[name] = (fixed or bool(prev and prev[0]), zones)
+    ready = map_index_ready()
+    creature = source_creature(info) if info.get('category') == 'components' else None
+    return {'merchants': sorted(((n, f, z) for n, (f, z) in merchants.items()), key=lambda r: (not r[1], r[0])),
+            'found': found_spots(info) if ready else [],
+            'creature': creature,
+            'creature_zones': creature_spots(creature) if creature else {}}
