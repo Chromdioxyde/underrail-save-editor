@@ -448,6 +448,59 @@ class PortraitDialog(QDialog):
         super().accept()
 
 
+class CategoryFilter(QWidget):
+    """Two-level category filter: a category, then optionally one of its subcategories (item path folders).
+    The subcategory starts at "all" and only shows when the category has several."""
+    changed = Signal()
+
+    def __init__(self):
+        super().__init__()
+        self.cat = QComboBox()
+        self.sub = QComboBox()
+        self.sub.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.addWidget(self.cat)
+        lay.addWidget(self.sub)
+        self.subs = {}
+        self.cat.currentIndexChanged.connect(self.fill_subs)
+        self.sub.currentIndexChanged.connect(lambda _: self.changed.emit())
+
+    def set_categories(self, subs):
+        """subs: {category: {subcategory, …}} ('' = no subcategory); keeps the current choice if possible."""
+        cur_cat, cur_sub = self.value()
+        self.subs = subs
+        self.cat.blockSignals(True)
+        self.cat.clear()
+        self.cat.addItem(tr('all categories'), None)
+        for c in sorted(subs):
+            self.cat.addItem(c, c)
+        self.cat.setCurrentIndex(max(0, self.cat.findData(cur_cat)) if cur_cat else 0)
+        self.cat.blockSignals(False)
+        self.fill_subs(keep=cur_sub)
+
+    def fill_subs(self, _=None, keep=None):
+        c = self.cat.currentData()
+        names = sorted(self.subs.get(c, set()) - {''}, key=lambda s: tr(s).lower()) if c else []
+        self.sub.blockSignals(True)
+        self.sub.clear()
+        self.sub.addItem(tr('all subcategories'), None)
+        for s in names:
+            self.sub.addItem(tr(s), s)
+        self.sub.setCurrentIndex(max(0, self.sub.findData(keep)) if keep else 0)
+        self.sub.blockSignals(False)
+        self.sub.setVisible(len(names) > 1)
+        self.changed.emit()
+
+    def value(self):
+        # a lone subcategory isn't offered (count = 'all' + names)
+        return self.cat.currentData(), self.sub.currentData() if self.sub.count() > 2 else None
+
+    def matches(self, category, sub):
+        c, s = self.value()
+        return (c is None or category == c) and (s is None or (sub or '') == s)
+
+
 # item rarity (I:Q) colours as in the game: common white (= default text colour here), uncommon green,
 # rare blue, unique purple; junk grey; the quest-item tier gold
 RARITY_COLORS = {0: (128, 128, 128), 2: (40, 160, 40), 3: (50, 110, 230), 4: (150, 70, 210), 5: (215, 150, 0)}
@@ -486,18 +539,13 @@ class AddItemDialog(QDialog):
         self.save = save
         self.db = sorted(gamedata.items().values(), key=lambda i: (i['name'].lower(), i['path'].lower()))
 
-        # categories, and their subcategories (item path folders) where a category has several
-        self.cat = QComboBox()
-        self.cat.addItem(tr('all categories'), ('all', None))
+        # category, then optionally a subcategory (item path folder)
+        self.cat = CategoryFilter()
         subs = {}
         for i in self.db:
             subs.setdefault(i['category'], set()).add(i.get('sub') or '')
-        for c in sorted(subs):
-            self.cat.addItem(c, (c, None))
-            if len(subs[c] - {''}) > 1:
-                for sub in sorted(subs[c] - {''}):
-                    self.cat.addItem(f'    {c} › {tr(sub)}', (c, sub))
-        self.cat.currentIndexChanged.connect(self.refilter)
+        self.cat.set_categories(subs)
+        self.cat.changed.connect(self.refilter)
         self.search = filter_box(tr('Search name or path…'), self.refilter)
         top = QHBoxLayout()
         top.addWidget(self.cat); top.addWidget(self.search, 1)
@@ -579,10 +627,12 @@ class AddItemDialog(QDialog):
         lay.addLayout(form); lay.addWidget(buttons)
 
     def refilter(self, *_):
-        (c, sub), q = self.cat.currentData(), self.search.text().lower()
+        q = self.search.text().lower()
+        if not hasattr(self, 'table'):
+            return
         for row in range(self.table.rowCount()):
             i = self.db[self.table.item(row, 0).data(Qt.UserRole)]
-            hide = (c != 'all' and i['category'] != c) or (sub is not None and (i.get('sub') or '') != sub) or \
+            hide = not self.cat.matches(i['category'], i.get('sub')) or \
                 (q and q not in i['name'].lower() and q not in i['path'].lower())
             self.table.setRowHidden(row, bool(hide))
 
@@ -1234,8 +1284,8 @@ class InventoryTab(QWidget):
         super().__init__()
         self.main = main
         self.search = filter_box(tr('Filter…'), self.refilter)
-        self.cat = QComboBox()
-        self.cat.currentIndexChanged.connect(self.refilter)
+        self.cat = CategoryFilter()
+        self.cat.changed.connect(self.refilter)
         add = QPushButton(tr('Add item…')); add.clicked.connect(self.add)
         dup = QPushButton(tr('Duplicate')); dup.clicked.connect(self.duplicate)
         rm = QPushButton(tr('Remove')); rm.clicked.connect(self.remove)
@@ -1278,17 +1328,7 @@ class InventoryTab(QWidget):
         for i in items:
             if i.category:
                 subs.setdefault(i.category, set()).add((i.info or {}).get('sub') or '')
-        current = self.cat.currentText()
-        self.cat.blockSignals(True)
-        self.cat.clear()
-        self.cat.addItem(tr('all categories'), None)
-        for c in sorted(subs):
-            self.cat.addItem(c, (c, None))
-            if len(subs[c] - {''}) > 1:
-                for sub in sorted(subs[c] - {''}):
-                    self.cat.addItem(f'    {c} › {tr(sub)}', (c, sub))
-        self.cat.setCurrentIndex(max(0, self.cat.findText(current)))
-        self.cat.blockSignals(False)
+        self.cat.set_categories(subs)
         self.table.fill(items)
         self.equip.fill(self.main.save.equipped())
         self.update_weight()
@@ -1307,11 +1347,11 @@ class InventoryTab(QWidget):
         self.compare.setHtml(compare_html(self.main.save, sel[0]) if sel else '')
 
     def refilter(self, *_):
-        q, data = self.search.text().lower(), self.cat.currentData()
-        c, sub = data if data else (None, None)
+        q = self.search.text().lower()
+        if not hasattr(self, 'table'):
+            return
         for row, it in self.table.all_rows():
-            hide = (c is not None and it.category != c) or \
-                (sub is not None and ((it.info or {}).get('sub') or '') != sub) or \
+            hide = not self.cat.matches(it.category, (it.info or {}).get('sub')) or \
                 (q and q not in it.name.lower() and q not in it.category.lower())
             self.table.setRowHidden(row, bool(hide))
 
