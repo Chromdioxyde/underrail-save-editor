@@ -1275,14 +1275,21 @@ class InventoryTab(QWidget):
 
     def build(self):
         items = self.main.save.inventory()
-        cats = sorted({i.category for i in items if i.category})
+        subs = {}
+        for i in items:
+            if i.category:
+                subs.setdefault(i.category, set()).add((i.info or {}).get('sub') or '')
         current = self.cat.currentData()
         self.cat.blockSignals(True)
         self.cat.clear()
         self.cat.addItem(tr('all categories'), None)
-        for c in cats:
-            self.cat.addItem(c, c)
-        self.cat.setCurrentIndex(max(0, self.cat.findData(current)) if current in cats else 0)
+        for c in sorted(subs):
+            self.cat.addItem(c, (c, None))
+            if len(subs[c] - {''}) > 1:
+                for sub in sorted(subs[c] - {''}):
+                    self.cat.addItem(f'    {c} › {tr(sub)}', (c, sub))
+        idx = self.cat.findData(current) if current is not None else 0
+        self.cat.setCurrentIndex(max(0, idx))
         self.cat.blockSignals(False)
         self.table.fill(items)
         self.equip.fill(self.main.save.equipped())
@@ -1302,9 +1309,11 @@ class InventoryTab(QWidget):
         self.compare.setHtml(compare_html(self.main.save, sel[0]) if sel else '')
 
     def refilter(self, *_):
-        q, c = self.search.text().lower(), self.cat.currentData()
+        q, data = self.search.text().lower(), self.cat.currentData()
+        c, sub = data if data else (None, None)
         for row, it in self.table.all_rows():
             hide = (c is not None and it.category != c) or \
+                (sub is not None and ((it.info or {}).get('sub') or '') != sub) or \
                 (q and q not in it.name.lower() and q not in it.category.lower())
             self.table.setRowHidden(row, bool(hide))
 
