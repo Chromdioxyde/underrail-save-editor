@@ -2707,6 +2707,41 @@ class Main(QMainWindow):
         return answer == QMessageBox.Discard
 
     def load(self, folder):
+        """Open a save, with feedback: wait cursor and a note while it loads, then a green confirmation and a
+        short highlight of the title."""
+        self.status.setStyleSheet('')
+        self.status.setText(tr('Loading {name}…', name=os.path.basename(folder)))
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.processEvents()
+        try:
+            ok = self._load(folder)
+        finally:
+            QApplication.restoreOverrideCursor()
+        if ok:
+            s = self.save
+            if not (s.g.repaired or (s.info and s.info.repaired)):
+                self.status.setStyleSheet('color: #2a2')
+                self.status.setText('✓ ' + tr('Loaded {name} – {char}, level {level}', name=os.path.basename(folder),
+                                              char=s.name, level=s.level))
+                QTimer.singleShot(5000, lambda: (self.status.setStyleSheet(''), self.update_status())
+                                  if self.save is s and not self.dirty else None)
+            self.flash_title()
+
+    def flash_title(self):
+        """Fade a highlight behind the title so a (re)loaded save is noticed."""
+        from PySide6.QtCore import QVariantAnimation
+        hl = self.palette().highlight().color()
+        anim = QVariantAnimation(self)
+        anim.setDuration(1200)
+        anim.setStartValue(170)
+        anim.setEndValue(0)
+        anim.valueChanged.connect(lambda a: self.title.setStyleSheet(
+            f'background: rgba({hl.red()}, {hl.green()}, {hl.blue()}, {int(a)}); border-radius: 4px; padding: 2px 6px;'))
+        anim.finished.connect(lambda: self.title.setStyleSheet('padding: 2px 6px;'))
+        anim.start()
+        self._title_anim = anim
+
+    def _load(self, folder):
         tab = self.tabs.currentIndex()
         self.tabs.clear()
         try:
@@ -2714,8 +2749,9 @@ class Main(QMainWindow):
         except Exception as e:
             self.save = None
             self.title.setText(os.path.basename(folder))
+            self.status.setStyleSheet('color: #d33')
             self.status.setText(tr('Could not read save: {e}', e=e))
-            return
+            return False
         s = self.save
         self.loaded_mtime = os.path.getmtime(s.path)
         self.update_title()
@@ -2742,6 +2778,7 @@ class Main(QMainWindow):
             self.status.setText(tr('This save had {n} broken object id(s) from an older editor version; '
                                    'they were repaired – save to fix the file.', n=fixed))
         self.fetch_icons()
+        return True
 
     def fetch_icons(self):
         """Extract missing item icons in the background (first run takes a few seconds)."""
@@ -2769,6 +2806,7 @@ class Main(QMainWindow):
 
     def on_change(self):
         self.dirty = True
+        self.status.setStyleSheet('')
         self.update_title()
         self.update_status()
 
@@ -2811,7 +2849,8 @@ class Main(QMainWindow):
             return
         self.load(self.save.folder)
         self.refresh_list()
-        self.status.setText(tr('Saved. Backup: {path}', path=bak))
+        self.status.setStyleSheet('color: #2a2')
+        self.status.setText('✓ ' + tr('Saved. Backup: {path}', path=bak))
 
     def set_language(self, code):
         i18n.choose(code)
