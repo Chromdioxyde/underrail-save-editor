@@ -470,3 +470,46 @@ def locations(info):
             'found': found_spots(info) if ready else [],
             'creature': creature,
             'creature_zones': creature_spots(creature) if creature else {}}
+
+
+_zone_contents = None
+
+
+def zone_contents(zids):
+    """What the given zones hold: {'merchants': [name], 'creatures': [(name, n)], 'items': [(info, kind, n)]},
+    from the map index (empty until the maps are scanned)."""
+    global _zone_contents
+    if not map_index_ready():
+        return {'merchants': [], 'creatures': [], 'items': []}
+    if _zone_contents is None:
+        idx = map_index()
+        inv = {}
+        for path, spots in idx['items'].items():
+            for key, n in spots.items():
+                zid, kind = key.rsplit('|', 1)
+                inv.setdefault(zid, {'items': [], 'creatures': [], 'merchants': []})['items'].append((path, kind, n))
+        for name, zones in idx['creatures'].items():
+            for zid, n in zones.items():
+                inv.setdefault(zid, {'items': [], 'creatures': [], 'merchants': []})['creatures'].append((name, n))
+        for sid, m in idx['merchants'].items():
+            for zid in m['zones']:
+                inv.setdefault(zid, {'items': [], 'creatures': [], 'merchants': []})['merchants'].append(sid)
+        _zone_contents = inv
+    out = {'merchants': set(), 'creatures': {}, 'items': {}}
+    for zid in zids:
+        c = _zone_contents.get(zid)
+        if not c:
+            continue
+        out['merchants'] |= {store_name(s) for s in c['merchants']}
+        for name, n in c['creatures']:
+            out['creatures'][name] = out['creatures'].get(name, 0) + n
+        for path, kind, n in c['items']:
+            out['items'][(path, kind)] = out['items'].get((path, kind), 0) + n
+    items = []
+    for (path, kind), n in out['items'].items():
+        info = gamedata.item(path)
+        if info:
+            items.append((info, kind, n))
+    items.sort(key=lambda r: (KIND_ORDER.index(r[1]) if r[1] in KIND_ORDER else 9, -(r[0]['quality'] or 0), r[0]['name']))
+    return {'merchants': sorted(out['merchants']),
+            'creatures': sorted(out['creatures'].items(), key=lambda kv: (-kv[1], kv[0])), 'items': items}

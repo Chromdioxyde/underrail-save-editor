@@ -2016,6 +2016,162 @@ class WeaponsPanel(QWidget):
         dlg.exec()
 
 
+class WorldMapDialog(QDialog):
+    """The world map on its own: pages, areas, a zone search, and what a clicked zone holds (merchants,
+    creatures, items lying there)."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        import worldmap
+        self.setWindowTitle(tr('World map'))
+        self.resize(1400, 850)
+        self.map = WorldMapView()
+        self.map.zone_clicked.connect(self.show_zone)
+        self.pages = {}
+        bar = QHBoxLayout()
+        for p, label in (('main', 'Underrail'), ('sea', tr('Black Sea (Expedition)'))):
+            b = QPushButton(label)
+            b.setCheckable(True)
+            b.clicked.connect(lambda _=False, p=p: (self.area.setCurrentIndex(0), self.show_page(p)))
+            bar.addWidget(b)
+            self.pages[p] = b
+        self.area = QComboBox()
+        self.area.addItem(tr('All areas'), None)
+        for name in sorted({n for _, n in worldmap.REGIONS}, key=lambda n: tr(n)):
+            self.area.addItem(tr(name), name)
+        self.area.currentIndexChanged.connect(self.pick_area)
+        bar.addWidget(QLabel(tr('Area:')))
+        bar.addWidget(self.area)
+        self.search = filter_box(tr('Find a zone…'), lambda _: None)
+        self.search.returnPressed.connect(self.find)
+        bar.addWidget(self.search, 1)
+        self.info = QTextBrowser()
+        self.info.setOpenLinks(False)
+        self.info.anchorClicked.connect(self.open_link)
+        self.info.setPlaceholderText(tr('Click a zone to see its merchants, creatures and the items lying there.'))
+        self.links = []
+        split = QSplitter()
+        left = QWidget()
+        ll = QVBoxLayout(left)
+        ll.setContentsMargins(0, 0, 0, 0)
+        ll.addLayout(bar)
+        ll.addWidget(self.map, 1)
+        split.addWidget(left)
+        split.addWidget(self.info)
+        split.setSizes([1000, 400])
+        buttons = QDialogButtonBox(QDialogButtonBox.Close)
+        buttons.rejected.connect(self.reject)
+        lay = QVBoxLayout(self)
+        lay.addWidget(split, 1)
+        lay.addWidget(buttons)
+        self.show_page('main', fit=False)
+
+    def showEvent(self, e):
+        super().showEvent(e)
+        QTimer.singleShot(0, self.map.fit_all)
+
+    def show_page(self, page, fit=True):
+        self.map.set_page(page)
+        for p, b in self.pages.items():
+            b.setChecked(p == page)
+        if fit:
+            self.map.fit_all()
+
+    def pick_area(self, _):
+        import worldmap
+        name = self.area.currentData()
+        zones = self.map.world['zones']
+        idx = [n for n, z in enumerate(zones) if name and worldmap.region(z['ids'][0]) == name]
+        if idx:
+            page = max(worldmap.PAGES, key=lambda p: sum(1 for n in idx if zones[n]['page'] == p))
+            if page != self.map.page:
+                self.show_page(page, fit=False)
+        self.map.set_region(name)
+        self.map.fit_all()
+
+    def zone_ids(self, n):
+        """All zone ids shown by marker n (its own, contained ones, sub-levels that fall back to it)."""
+        import hints
+        import worldmap
+        known = set(hints.map_index()['zones']) if hints.map_index_ready() else set()
+        z = self.map.world['zones'][n]
+        return sorted({*z['ids'], *z['contains']} | {zid for zid in known if worldmap.marker(zid) == n})
+
+    def find(self):
+        import hints
+        q = self.search.text().strip().lower()
+        if not q:
+            return
+        hits = []
+        for n, z in enumerate(self.map.world['zones']):
+            names = {hints.zone_name(i).lower() for i in z['ids']} | {(z['title'] or '').lower()} | set(z['ids'])
+            if any(q in s for s in names):
+                hits.append(n)
+        if not hits:
+            self.info.setHtml(f'<p>{html_escape(tr("No zone found for {q}.", q=self.search.text()))}</p>')
+            return
+        page = self.map.world['zones'][hits[0]]['page']
+        hits = [n for n in hits if self.map.world['zones'][n]['page'] == page]
+        if self.area.currentIndex():
+            self.area.setCurrentIndex(0)
+        self.show_page(page, fit=False)
+        self.map.select(set(hits))
+        self.map.show_markers(hits)
+        self.show_zone(hits[0])
+
+    def show_zone(self, n):
+        import hints
+        import worldmap
+        esc = html_escape
+        z = self.map.world['zones'][n]
+        zids = self.zone_ids(n)
+        names = sorted({hints.zone_name(i) for i in z['ids']})
+        self.map.select({n})
+        h = [f'<h2>{esc(", ".join(names))}</h2>']
+        if z['title']:
+            h.append(f'<p><b>{esc(z["title"])}</b></p>')
+        h.append(f'<p><i>{esc(tr(worldmap.region(z["ids"][0])))} · {esc(", ".join(zids))}</i></p>')
+        if not hints.map_index_ready():
+            h.append(f'<p>{esc(tr("Map locations: scanning…"))}</p>')
+        else:
+            c = hints.zone_contents(zids)
+            if c['merchants']:
+                h.append(f'<h3>{esc(tr("Merchants"))}</h3><ul>' +
+                         ''.join(f'<li>{esc(m)}</li>' for m in c['merchants']) + '</ul>')
+            if c['creatures']:
+                h.append(f'<h3>{esc(tr("Characters and creatures"))}</h3><p>' +
+                         ', '.join(f'{esc(name)}{" ×" + str(k) if k > 1 else ""}' for name, k in c['creatures'][:60]) +
+                         (f' {esc(tr("+{n} more", n=len(c["creatures"]) - 60))}' if len(c['creatures']) > 60 else '') +
+                         '</p>')
+            if c['items']:
+                self.links = []
+                h.append(f'<h3>{esc(tr("Items"))}</h3><table cellspacing="0" cellpadding="2">')
+                for info, kind, k in c['items'][:150]:
+                    self.links.append(info)
+                    color = rarity_color(info['quality'])
+                    style = f' style="color:{color.name()}"' if color else ''
+                    h.append(f'<tr><td><a href="loc:{len(self.links) - 1}"{style}>{esc(info["name"])}</a></td>'
+                             f'<td>{esc(tr(kind))}</td><td align="right">{"×" + str(k) if k > 1 else ""}</td></tr>')
+                h.append('</table>')
+                if len(c['items']) > 150:
+                    h.append(f'<p>{esc(tr("+{n} more", n=len(c["items"]) - 150))}</p>')
+            if not (c['merchants'] or c['creatures'] or c['items']):
+                h.append(f'<p>{esc(tr("Nothing recorded for this zone."))}</p>')
+        h.append(f'<p><small>{esc(tr("Click an item to see everywhere it can be found."))}</small></p>')
+        self.info.setHtml('\n'.join(h))
+
+    def open_link(self, url):
+        s = url.toString()
+        if s.startswith('loc:'):
+            info = self.links[int(s[4:])]
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            try:
+                dlg = LocationsDialog(self, info)
+            finally:
+                QApplication.restoreOverrideCursor()
+            dlg.exec()
+
+
 class HintsTab(QWidget):
     """Best weapons and armor combinations computed from the game data, with merchants that sell them
     and where they lie in the game world."""
@@ -2309,6 +2465,10 @@ class Main(QMainWindow):
         refresh.setToolTip(tr('Reload the save list (F5). The list also updates by itself when the game saves.'))
         refresh.clicked.connect(self.refresh_list)
         head.addWidget(refresh)
+        world = QPushButton(QIcon.fromTheme('map-flat', QIcon.fromTheme('applications-education-geography')), tr('World map'))
+        world.setToolTip(tr('Open the game\'s world map (Ctrl+M)'))
+        world.clicked.connect(self.open_world_map)
+        head.addWidget(world)
         lv.addLayout(head)
         lv.addWidget(self.saves, 1)
 
@@ -2337,6 +2497,11 @@ class Main(QMainWindow):
         split.addWidget(right)
         split.setSizes([480, 900])
         self.setCentralWidget(split)
+
+        view = self.menuBar().addMenu(tr('View'))
+        wm = QAction(tr('World map…'), self, shortcut=QKeySequence('Ctrl+M'))
+        wm.triggered.connect(self.open_world_map)
+        view.addAction(wm)
 
         settings = self.menuBar().addMenu(tr('Settings'))
         folders = QAction(tr('Game folders…'), self)
@@ -2617,6 +2782,23 @@ class Main(QMainWindow):
         w.show()
         QApplication.instance().main_window = w
         self.close()
+
+    def open_world_map(self):
+        import worldmap
+        if not gamedata.GAME:
+            return
+        slow = not worldmap.pages_ready()
+        if slow:  # the first time renders the map from the game files
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            self.status.setText(tr('Rendering the world map from the game files (once)…'))
+            QApplication.processEvents()
+        try:
+            dlg = WorldMapDialog(self)
+        finally:
+            if slow:
+                QApplication.restoreOverrideCursor()
+        dlg.show()
+        self.world_dialog = dlg  # non-modal; keep a reference
 
     def closeEvent(self, e):
         if self.dirty and not self.confirm_discard():
