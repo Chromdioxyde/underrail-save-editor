@@ -74,7 +74,7 @@ def max_durability(level, wtype=None):
 
 # item rarity I:Q as the game colours it: white common, green uncommon, blue rare, purple unique; 0 = broken/junk
 # parts, 5 = a few quest items
-QUALITY = {0: 'Junk', 1: 'Common', 2: 'Uncommon', 3: 'Rare', 4: 'Unique', 5: 'Unique'}
+QUALITY = {0: 'Junk', 1: 'Common', 2: 'Uncommon', 3: 'Rare', 4: 'Unique', 5: 'Quest item'}
 
 
 def _subcategory(rel):
