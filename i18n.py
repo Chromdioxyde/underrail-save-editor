@@ -123,6 +123,7 @@ DE = {
     'Only available': 'Nur verfügbare',
     'Hints': 'Tipps',
     'Merchants': 'Händler',
+    'Harvest from {creature}': 'Gewinnen aus {creature}',
     'No merchant': 'Kein Händler',
     'Found': 'Fundorte',
     'Where to get': 'Wo bekommen',

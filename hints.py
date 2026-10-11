@@ -259,12 +259,17 @@ def _build_map_index(progress=None):
     names = _zone_names()
     d = _maps_dir()
     files = sorted(f for f in os.listdir(d) if f.endswith('.uzl'))
-    index = {}
+    index, creatures = {}, {}
     for n, fn in enumerate(files):
         if progress:
             progress(n, len(files))
         zone = re.sub(r'_l\d+.*$', '', fn[:-4])
-        zname = names.get(zone, zone)
+        zname = names.get(zone) or names.get(zone.split('_')[0])
+        if not zname:
+            # DLC layers whose ids aren't on the world map
+            zname = {'xpbl': 'Expedition', 'xphw': 'Heavy Duty'}.get(zone.split('_')[0], zone)
+        if 'test' in zone.lower() or zname.lower().startswith('test'):
+            continue  # developer test maps aren't part of the game world
         try:
             p = gamedata.read_nrbf(os.path.join(d, fn))
         except Exception:
@@ -274,6 +279,12 @@ def _build_map_index(progress=None):
             for k in nrbf.children(x):
                 parent.setdefault(k, x.id)
         for x in p.objects.values():
+            if isinstance(x, nrbf.Obj) and 'C1:N' in x.names:
+                # characters and creatures placed in the zone (by display name)
+                cname = gamedata._val(p, x.get('C1:N'))
+                if cname:
+                    zones = creatures.setdefault(cname, {})
+                    zones[zname] = zones.get(zname, 0) + 1
             if not isinstance(x, nrbf.Obj) or 'II:DP' not in x.names:
                 continue
             dp = nrbf.resolve(p, x.get('II:DP'))
@@ -287,26 +298,82 @@ def _build_map_index(progress=None):
             entry[f'{zname}|{kind}'] = entry.get(f'{zname}|{kind}', 0) + 1
     if progress:
         progress(len(files), len(files))
-    return index
+    return {'items': index, 'creatures': creatures}
+
+
+MAP_CACHE = 'map_index_v4.json'
 
 
 def map_index_ready():
-    return os.path.exists(os.path.join(gamedata.CACHE, 'map_items.json'))
+    return os.path.exists(os.path.join(gamedata.CACHE, MAP_CACHE))
 
 
 def map_index(progress=None):
-    """item path -> {"zone|kind": count}; scanning all map layers takes about a minute, then cached."""
-    return gamedata._cached('map_items.json', [_maps_dir()], lambda: _build_map_index(progress))
+    """{'items': item path -> {"zone|kind": count}, 'creatures': name -> {zone: count}}; scanning all map
+    layers takes under a minute, then it's cached."""
+    return gamedata._cached(MAP_CACHE, [_maps_dir()], lambda: _build_map_index(progress))
 
 
 def where_found(info, limit=4):
     """[(zone, kind, count)] for an item, most useful kinds first (fixed spots before random loot)."""
     if not map_index_ready():
         return None
-    entry = map_index().get(info['path'].lower(), {})
+    entry = map_index()['items'].get(info['path'].lower(), {})
     rows = []
     for k, cnt in entry.items():
         zone, kind = k.rsplit('|', 1)
         rows.append((zone, kind, cnt))
     rows.sort(key=lambda r: (KIND_ORDER.index(r[1]) if r[1] in KIND_ORDER else 9, -r[2], r[0]))
     return rows[:limit], len(rows)
+
+
+# animal parts: the creature they come from (leathers name it, other parts are named after it)
+PART_SUFFIXES = (' Leather', ' Skin', ' Scales', ' Carapace', ' Poison Gland', ' Gland', ' Hide', ' Shell')
+
+
+def source_creature(info):
+    """Creature an animal component is harvested from, or None."""
+    try:
+        p, o = _item_root(info)
+    except Exception:
+        return None
+    cp = nrbf.resolve(p, o.get('I:CP')) if 'I:CP' in o.names else None
+    if cp is not None and 'PC:P:Count' in cp.names:
+        for k in range(cp.get('PC:P:Count').value):
+            prop = nrbf.resolve(p, cp.get(f'PC:P:{k}'))
+            if gamedata._val(p, prop.get('P:N')) == 'SourceCreature':
+                name = gamedata._val(p, prop.get('P:V'))
+                # infused leather is refined normal leather
+                return name[len('Infused '):] if name and name.startswith('Infused ') else name
+    if not map_index_ready():
+        return None
+    known = map_index()['creatures']
+    name = info['name']
+    for suffix in PART_SUFFIXES:
+        if name.endswith(suffix):
+            base = name[:-len(suffix)]
+            base = base[len('Infused '):] if base.startswith('Infused ') else base
+            if base in known:
+                return base
+    return None
+
+
+def creature_zones(name, limit=5):
+    """[(zone, count)] where creatures of this name (or variants like "<name> Alpha") are placed."""
+    if not map_index_ready() or not name:
+        return [], 0
+    creatures = map_index()['creatures']
+    words = name.split()
+    # try the full name first, then shorter forms ("Heartbreaker Serpent" is placed as "Heartbreaker")
+    for n in range(len(words), 0, -1):
+        base = ' '.join(words[:n])
+        zones = {}
+        for cname, by_zone in creatures.items():
+            # "Rathound" also matches "Rathound Alpha"/"Rathound King", but not "Ancient Rathound"
+            if cname == base or cname.startswith(base + ' '):
+                for z, c in by_zone.items():
+                    zones[z] = zones.get(z, 0) + c
+        if zones:
+            rows = sorted(zones.items(), key=lambda kv: (-kv[1], kv[0]))
+            return rows[:limit], len(rows)
+    return [], 0

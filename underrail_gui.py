@@ -1237,6 +1237,14 @@ class HintsTab(QWidget):
                 text += '<br>' + tr('Found') + ': ' + ', '.join(spots)
             elif not parts:
                 text += '<br>' + html.escape(tr('not placed in the game world (crafted, quest or event)'))
+            creature = hints.source_creature(info) if info.get('category') == 'components' else None
+            if creature:
+                zones, total = hints.creature_zones(creature)
+                if zones:
+                    spots = [f'{html.escape(z)}{" ×" + str(c) if c > 1 else ""}' for z, c in zones]
+                    if total > len(zones):
+                        spots.append(tr('+{n} more', n=total - len(zones)))
+                    text += '<br>' + tr('Harvest from {creature}', creature=html.escape(creature)) + ': ' + ', '.join(spots)
         return text
 
     def render(self):

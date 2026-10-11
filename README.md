@@ -62,7 +62,8 @@ always appear as the game names them.
 - **Hints:** best weapons by damage per action point and the best armor/helmet/boot component
   combinations by protection versus armor penalty (computed with the game's formulas), with the merchants
   that sell them (fixed shipments or random stock), where they lie in the game world (scanned once from
-  the map files: containers, ground, NPCs, job rewards, random container loot) and notes on the
+  the map files: containers, ground, NPCs, job rewards, random container loot), for animal parts the
+  zones where their creature is placed, and notes on the
   character's crafting feats
 
 Test structural changes (feats, specializations, blueprints, items, name, portrait) on a copy first.
