@@ -15,7 +15,7 @@ import gamedata
 import nrbf
 
 CACHE = 'worldmap_v5.json'
-RENDER_VERSION = 2  # bump when the drawing changes
+RENDER_VERSION = 3  # bump when the drawing changes
 # Expedition's Black Sea zones share the coordinate space with the caves, so they get their own page
 SEA_PREFIXES = ('xpbl', 'cvw')
 PAGES = ('main', 'sea')
@@ -133,23 +133,41 @@ def _materialization(m):
     return {'t': gamedata._val(p, o.get('MU:T')), 's': pt('MU:S'), 'uo': pt('MU:UO'), 'to': pt('MU:TO')}
 
 
-def _page_of_sprites():
-    """page of every sprite: from the zone it marks, else from the nearest zone marker"""
+def _sprite_zones():
+    """Zone index every sprite belongs to: the zone it marks, else the nearest zone marker (or None)."""
     zones = world()['zones']
+    own = {z['sprite']: n for n, z in enumerate(zones) if z.get('sprite') is not None}
     grid = {}
-    for z in zones:
-        grid.setdefault((round(z['x']), round(z['y'])), []).append(z)
+    for n, z in enumerate(zones):
+        grid.setdefault((round(z['x']), round(z['y'])), []).append(n)
     out = []
-    for s in world()['sprites']:
+    for i, s in enumerate(world()['sprites']):
+        if i in own:
+            out.append(own[i])
+            continue
         x, y, _ = s['pos']
         best, dist = None, 1e9
         for dx in range(-3, 4):
             for dy in range(-3, 4):
-                for z in grid.get((round(x) + dx, round(y) + dy), ()):
-                    d = (z['x'] - x) ** 2 + (z['y'] - y) ** 2
+                for n in grid.get((round(x) + dx, round(y) + dy), ()):
+                    d = (zones[n]['x'] - x) ** 2 + (zones[n]['y'] - y) ** 2
                     if d < dist:
-                        best, dist = z, d
-        out.append(best['page'] if best else ('sea' if 'xpbl' in s['m'].lower() else 'main'))
+                        best, dist = n, d
+        out.append(best)
+    return out
+
+
+def _sprites_of(page, area=None):
+    """Sprites drawn on a page, optionally only those of one area (layer) of the world."""
+    zones = world()['zones']
+    out = []
+    for s, n in zip(world()['sprites'], _sprite_zones()):
+        if n is None:
+            pg, ar = ('sea' if 'xpbl' in s['m'].lower() else 'main'), None
+        else:
+            pg, ar = zones[n]['page'], region(zones[n]['ids'][0])
+        if pg == page and (area is None or ar == area):
+            out.append(s)
     return out
 
 
@@ -170,8 +188,16 @@ def sprite_image(s):
     if d is None:
         return None
     if d['t'] not in _textures:
-        w, h, pix = xnb.read_texture(os.path.join(gamedata.GAME, 'data', d['t'].replace('\\', '/').lower() + '.xnb'))
-        _textures[d['t']] = Image.frombytes('RGBA', (w, h), bytes(pix))
+        # decoding the DXT textures in Python takes seconds, so they're kept as PNG in the cache
+        src = os.path.join(gamedata.GAME, 'data', d['t'].replace('\\', '/').lower() + '.xnb')
+        png = os.path.join(gamedata.CACHE, 'maptex', f"{os.path.basename(src)[:-4]}-{int(os.path.getmtime(src))}.png")
+        if os.path.exists(png):
+            _textures[d['t']] = Image.open(png).convert('RGBA')
+        else:
+            w, h, pix = xnb.read_texture(src)
+            _textures[d['t']] = Image.frombytes('RGBA', (w, h), bytes(pix))
+            os.makedirs(os.path.dirname(png), exist_ok=True)
+            _textures[d['t']].save(png)
     (sx, sy), (ux, uy), (tx, ty) = d['s'], d['uo'], d['to']
     fx, fy = s['f']
     a, b = project(*s['pos'])
@@ -179,9 +205,9 @@ def sprite_image(s):
             (a - tx, b - ty))
 
 
-def _render(page, path):
+def _render(page, path, area=None):
     from PIL import Image
-    sprites = [s for s, pg in zip(world()['sprites'], _page_of_sprites()) if pg == page]
+    sprites = _sprites_of(page, area)
     pts = [project(*s['pos']) for s in sprites]
     left = min(a for a, b in pts) - MARGIN - 200
     top = min(b for a, b in pts) - MARGIN - 200
@@ -205,10 +231,13 @@ def _render(page, path):
     return [int(left) + box[0], int(top) + box[1]]
 
 
-def page_image(page):
-    """(png path, (left, top)) of a rendered map page; scene position of a zone = project() - (left, top)."""
+def page_image(page, area=None):
+    """(png path, (left, top)) of a rendered map page, or of one area (layer) of it; scene position of a
+    zone = project() - (left, top)."""
     import json
-    path = os.path.join(gamedata.CACHE, f'worldmap_{page}.png')
+    import re as _re
+    suffix = '' if area is None else '_' + _re.sub(r'\W+', '', area.lower())
+    path = os.path.join(gamedata.CACHE, f'worldmap_{page}{suffix}.png')
     meta = path[:-4] + '.json'
     stamp = [_path(), os.path.getmtime(_path()), RENDER_VERSION]
     try:
@@ -219,7 +248,7 @@ def page_image(page):
     except (OSError, ValueError, KeyError):
         pass
     os.makedirs(gamedata.CACHE, exist_ok=True)
-    origin = _render(page, path)
+    origin = _render(page, path, area)
     with open(meta, 'w') as f:
         json.dump({'stamp': stamp, 'origin': origin}, f)
     return path, origin
@@ -238,3 +267,39 @@ def zone_sprite(n, origin):
 
 def pages_ready():
     return all(os.path.exists(os.path.join(gamedata.CACHE, f'worldmap_{p}.png')) for p in PAGES)
+
+
+# broad areas of the world by zone id prefix (first match wins), to tell the map's layers apart
+REGIONS = [
+    (('stationalpha', 'forlorn', 'crossroadcaves', 'lu-southgatestation'), 'South Gate Station'),
+    (('up-cc', 'cc'), 'Core City'),
+    (('fom', 'crys'), 'Foundry Mine'),
+    (('fo',), 'Foundry'),
+    (('jyt',), 'Caves'),
+    (('ojy', 'jy'), 'Junkyard'),
+    (('rc',), 'Rail Crossing'),
+    (('lup', 'dun_lup'), 'Lower Passages'),
+    (('cvw',), 'Waterways'),
+    (('lux', 'cv'), 'Caves'),
+    (('lu',), 'Lower Underrail'),
+    (('up',), 'Upper Underrail'),
+    (('dc',), 'Deep Caverns'),
+    (('tch',), 'Institute of Tchort'),
+    (('wbb', 'wba', 'warehouse'), 'Warehouses'),
+    (('gammacompound', 'burc'), 'GMS Compound'),
+    (('xpbl',), 'Black Sea'),
+]
+
+
+def region(zid):
+    zid = zid.lower()
+    for prefixes, name in REGIONS:
+        if zid.startswith(prefixes):
+            return name
+    return 'Other'
+
+
+def area_ready(page, area):
+    import re as _re
+    suffix = '' if area is None else '_' + _re.sub(r'\W+', '', area.lower())
+    return os.path.exists(os.path.join(gamedata.CACHE, f'worldmap_{page}{suffix}.png'))

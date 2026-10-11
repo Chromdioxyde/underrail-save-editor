@@ -1270,6 +1270,9 @@ class WorldMapView(QGraphicsView):
         self.setScene(self.scene_)
         self.world = worldmap.world()
         self.page = None
+        self.region = None
+        self.cache = {}
+        self.sel_items = []
         self.marks = {}
         self.selected = set()
         self.items_ = []
@@ -1287,6 +1290,24 @@ class WorldMapView(QGraphicsView):
         self.marks = marks
         self.redraw()
 
+    def page_data(self):
+        """Per page, computed once: background pixmap and each zone's sprite (pixmap, PIL image, position)."""
+        import worldmap
+        from PIL.ImageQt import ImageQt
+        key = (self.page, self.region)
+        if key not in self.cache:
+            path, origin = worldmap.page_image(self.page, self.region)
+            sprites = {}
+            for n, z in enumerate(self.world['zones']):
+                if z['page'] != self.page or (self.region and worldmap.region(z['ids'][0]) != self.region):
+                    continue
+                r = worldmap.zone_sprite(n, origin)
+                if r is not None:
+                    img, (x, y) = r
+                    sprites[n] = (QPixmap.fromImage(ImageQt(img)), img, x, y)
+            self.cache[key] = (QPixmap(path), sprites)
+        return self.cache[key]
+
     def redraw(self):
         import hints
         import worldmap
@@ -1294,54 +1315,39 @@ class WorldMapView(QGraphicsView):
         if self.page is None:
             return
         self.scene_.clear()
+        self.sel_items = []
         self.zone_items = {}
-        path, origin = worldmap.page_image(self.page)
-        pix = QPixmap(path)
+        pix, sprites = self.page_data()
         self.scene_.addPixmap(pix)
         self.setSceneRect(QRectF(pix.rect()))
         on_page = {n: m for n, m in self.marks.items() if self.world['zones'][n]['page'] == self.page}
+        focus = set()
+        on_page = {n: m for n, m in on_page.items() if n in sprites}
         if on_page:
-            shade = self.scene_.addRect(QRectF(pix.rect()), QPen(Qt.NoPen), QColor(0, 0, 0, 140))
+            shade = self.scene_.addRect(QRectF(pix.rect()), QPen(Qt.NoPen), QColor(0, 0, 0, 150))
             shade.setZValue(1)
-        for n, z in enumerate(self.world['zones']):
-            if z['page'] != self.page:
-                continue
-            r = worldmap.zone_sprite(n, origin)
-            if r is None:
-                continue
-            img, (x, y) = r
+        for n, (spix, img, x, y) in sprites.items():
+            z = self.world['zones'][n]
+            reg = worldmap.region(z['ids'][0])
             names = sorted({hints.zone_name(i) for i in z['ids']})
-            tip = '\n'.join(names + ([z['title']] if z['title'] else []))
+            tip = '\n'.join(names + ([z['title']] if z['title'] else []) + [f'[{tr(reg)}]'])
             mark = on_page.get(n)
+            if mark or n in focus:
+                # the zone itself, undimmed
+                sprite = self.scene_.addPixmap(spix)
+                sprite.setPos(x, y); sprite.setZValue(2)
             if mark:
                 color, text, name = mark
-                # the zone itself, undimmed, with a coloured tint over its shape
-                sprite = self.scene_.addPixmap(QPixmap.fromImage(ImageQt(img)))
-                sprite.setPos(x, y); sprite.setZValue(2)
+                # coloured tint over the zone's shape
                 tint = img.copy()
                 tint.paste((color.red(), color.green(), color.blue(), 255), (0, 0, *img.size))
                 tint.putalpha(img.getchannel('A').point(lambda v: v * 0.55))
                 t = self.scene_.addPixmap(QPixmap.fromImage(ImageQt(tint)))
                 t.setPos(x, y); t.setZValue(3)
-                if n in self.selected:
-                    sel = self.scene_.addRect(QRectF(x, y, img.width, img.height), QPen(QColor(255, 255, 255), 3))
-                    sel.setZValue(4)
                 cx, cy = x + img.width / 2, y + img.height / 2
                 for label, size, dy in ((text, 13, 0), (name, 10, 18)):
-                    if not label:
-                        continue
-                    lt = QGraphicsSimpleTextItem(label)
-                    f = lt.font(); f.setPointSize(size - 2); f.setBold(True); lt.setFont(f)
-                    lt.setBrush(QColor(255, 255, 255))
-                    lt.setPen(QPen(QColor(0, 0, 0), 0.6))
-                    # same size on screen at any zoom level, centred on the zone
-                    lt.setFlag(QGraphicsSimpleTextItem.ItemIgnoresTransformations)
-                    b = lt.boundingRect()
-                    lt.setPos(cx, cy)
-                    lt.setTransform(lt.transform().translate(-b.width() / 2, -b.height() / 2 + dy * 0.8))
-                    lt.setZValue(5)
-                    lt.setAcceptedMouseButtons(Qt.NoButton)
-                    self.scene_.addItem(lt)
+                    if label:
+                        self.label(label, size - 2, cx, cy, dy * 0.8, QColor(255, 255, 255), 5)
             # invisible hit area for tooltips and clicks; marked zones lie on top
             hit = self.scene_.addRect(QRectF(x + img.width * 0.15, y + img.height * 0.2,
                                              img.width * 0.7, img.height * 0.6), QPen(Qt.NoPen))
@@ -1349,11 +1355,51 @@ class WorldMapView(QGraphicsView):
             hit.setData(0, n)
             hit.setToolTip(tip)
             self.zone_items[n] = (x, y, img.width, img.height)
+        self.draw_selection()
+
+    def label(self, text, size, x, y, dy, color, zvalue):
+        """Text centred on a scene point that keeps its size on screen at any zoom level."""
+        lt = QGraphicsSimpleTextItem(text)
+        f = lt.font(); f.setPointSize(size); f.setBold(True); lt.setFont(f)
+        lt.setBrush(color)
+        lt.setPen(QPen(QColor(0, 0, 0), 0.6))
+        lt.setFlag(QGraphicsSimpleTextItem.ItemIgnoresTransformations)
+        b = lt.boundingRect()
+        lt.setPos(x, y)
+        lt.setTransform(lt.transform().translate(-b.width() / 2, -b.height() / 2 + dy))
+        lt.setZValue(zvalue)
+        lt.setAcceptedMouseButtons(Qt.NoButton)
+        self.scene_.addItem(lt)
+        return lt
+
+    def draw_selection(self):
+        for it in self.sel_items:
+            self.scene_.removeItem(it)
+        self.sel_items = []
+        for n in self.selected:
+            if n in self.zone_items:
+                x, y, w, h = self.zone_items[n]
+                r = self.scene_.addRect(QRectF(x, y, w, h), QPen(QColor(255, 255, 255), 3))
+                r.setZValue(4)
+                self.sel_items.append(r)
+
+    def set_region(self, region):
+        """Show only one area (layer) of the world, None = everything."""
+        import worldmap
+        self.region = region
+        slow = not worldmap.area_ready(self.page, region)
+        if slow:  # the first view of an area renders it (cached afterwards)
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            self.redraw()
+        finally:
+            if slow:
+                QApplication.restoreOverrideCursor()
 
     def select(self, indexes):
         """Outline the given markers and bring them into view."""
         self.selected = set(indexes)
-        self.redraw()
+        self.draw_selection()
         if indexes:
             self.show_markers(indexes, zoom=False)
 
@@ -1505,10 +1551,22 @@ class LocationsDialog(QDialog):
         for p, label in (('main', 'Underrail'), ('sea', tr('Black Sea (Expedition)'))):
             b = QPushButton(f'{label} ({per_page[p]})')
             b.setCheckable(True)
-            b.clicked.connect(lambda _=False, p=p: self.show_page(p))
+            b.clicked.connect(lambda _=False, p=p: (self.region.setCurrentIndex(0), self.show_page(p)))
             pages.addWidget(b)
             self.page_buttons[p] = b
         pages.addStretch(1)
+        # focus one area of the world: the rest of the map is dimmed and its name highlighted
+        self.region = QComboBox()
+        self.region.addItem(tr('All areas'), None)
+        per_area = {}
+        for m in self.marked:
+            a = worldmap.region(zones[m]['ids'][0])
+            per_area[a] = per_area.get(a, 0) + 1
+        for name in sorted({n for _, n in worldmap.REGIONS}, key=lambda n: tr(n)):
+            self.region.addItem(tr(name) + (f' ({per_area[name]})' if name in per_area else ''), name)
+        self.region.currentIndexChanged.connect(self.pick_region)
+        pages.addWidget(QLabel(tr('Area:')))
+        pages.addWidget(self.region)
         self.start_page = 'sea' if per_page['sea'] > per_page['main'] else 'main'
         self.show_page(self.start_page, fit=False)
         right = QWidget()
@@ -1531,6 +1589,19 @@ class LocationsDialog(QDialog):
         super().showEvent(e)
         # fit once the view has its real size
         QTimer.singleShot(0, lambda: self.show_page(self.start_page))
+
+    def pick_region(self, _):
+        import worldmap
+        name = self.region.currentData()
+        zones = self.map.world['zones']
+        idx = [n for n, z in enumerate(zones) if name and worldmap.region(z['ids'][0]) == name]
+        if idx:
+            page = max(worldmap.PAGES, key=lambda p: sum(1 for n in idx if zones[n]['page'] == p))
+            if page != self.map.page:
+                self.show_page(page, fit=False)
+        self.map.set_region(name)
+        if idx:
+            self.map.show_markers(idx)
 
     def show_page(self, page, fit=True):
         self.map.set_page(page)
