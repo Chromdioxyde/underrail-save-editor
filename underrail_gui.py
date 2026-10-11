@@ -1156,8 +1156,28 @@ class InventoryTab(QWidget):
         self.main.status.setText(tr('Repaired {n} item(s)', n=n) + (tr(' – unsaved') if n else ''))
 
 
+class MapScanJob(QRunnable):
+    """Indexes items placed in the game's maps (about a minute, then cached)."""
+
+    def __init__(self, signals):
+        super().__init__()
+        self.signals = signals
+
+    def run(self):
+        import hints
+        try:
+            hints.map_index()
+        except Exception:
+            pass
+        try:
+            self.signals.done.emit('maps', '')
+        except RuntimeError:
+            pass  # app is shutting down
+
+
 class HintsTab(QWidget):
-    """Best weapons and armor combinations computed from the game data, with merchants that sell them."""
+    """Best weapons and armor combinations computed from the game data, with merchants that sell them
+    and where they lie in the game world."""
 
     def __init__(self, main):
         super().__init__()
@@ -1166,15 +1186,32 @@ class HintsTab(QWidget):
         self.view.setOpenLinks(False)
         QVBoxLayout(self).addWidget(self.view)
         self.built = False
+        self.scanning = False
+        portrait_signals().done.connect(self.scanned)
 
     def showEvent(self, e):
         super().showEvent(e)
         if not self.built:  # computed on first view only
             self.built = True
-            try:
-                self.view.setHtml(self.render())
-            except Exception as ex:
-                self.view.setPlainText(tr('Could not compute hints: {e}', e=ex))
+            import hints
+            if not hints.map_index_ready() and not self.scanning:
+                self.scanning = True
+                QThreadPool.globalInstance().start(MapScanJob(portrait_signals()))
+            self.refresh()
+
+    def refresh(self):
+        try:
+            bar = self.view.verticalScrollBar().value()
+            self.view.setHtml(self.render())
+            self.view.verticalScrollBar().setValue(bar)
+        except Exception as ex:
+            self.view.setPlainText(tr('Could not compute hints: {e}', e=ex))
+
+    def scanned(self, kind, _):
+        if kind == 'maps':
+            self.scanning = False
+            if self.built:
+                self.refresh()
 
     @staticmethod
     def sellers(info, limit=6):
@@ -1187,13 +1224,30 @@ class HintsTab(QWidget):
         more = len(fixed) + len(random_) - len(parts)
         if more > 0:
             parts.append(tr('+{n} more', n=more))
-        return ', '.join(parts) if parts else tr('not sold by merchants (loot or quest)')
+        text = (tr('Merchants') + ': ' + ', '.join(parts)) if parts else tr('No merchant')
+        found = hints.where_found(info)
+        if found is None:
+            text += '<br><i>' + html.escape(tr('Map locations: scanning…')) + '</i>'
+        else:
+            rows, total = found
+            if rows:
+                spots = [f'{html.escape(z)} ({html.escape(tr(k))}{" ×" + str(c) if c > 1 else ""})' for z, k, c in rows]
+                if total > len(rows):
+                    spots.append(tr('+{n} more', n=total - len(rows)))
+                text += '<br>' + tr('Found') + ': ' + ', '.join(spots)
+            elif not parts:
+                text += '<br>' + html.escape(tr('not placed in the game world (crafted, quest or event)'))
+        return text
 
     def render(self):
         import html
         import hints
         esc = html.escape
         h = [f'<p>{esc(tr("Computed from your game files with the formulas the game uses. Armor values at component quality {q}; merchants in bold always stock the item, the others may roll it in their random stock.", q=hints.QUALITY))}</p>']
+        if not hints.map_index_ready():
+            h.append(f'<p><b>{esc(tr("Scanning the game maps for item locations (about a minute, only once)…"))}</b></p>')
+        else:
+            h.append(f'<p><i>{esc(tr("Found: where the item lies in the game world – in a container, on the ground, carried by an NPC (loot when defeated), as a job reward, or as possible random loot of a container."))}</i></p>')
         feats = set(self.main.save.feats()) if self.main.save else set()
         notes = []
         if 'armorsloping' in feats:
@@ -1209,7 +1263,7 @@ class HintsTab(QWidget):
         h.append(f'<p><i>{esc(tr("Base values without ammo, feats or precision; burst weapons count all shots."))}</i></p>')
         h.append('<table border="1" cellspacing="0" cellpadding="3">')
         h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in
-                                  ('Weapon', 'Type', 'Damage', 'AP', 'Burst', 'Dmg/AP', 'Where to buy')) + '</tr>')
+                                  ('Weapon', 'Type', 'Damage', 'AP', 'Burst', 'Dmg/AP', 'Where to get')) + '</tr>')
         for r in hints.weapons(25):
             dmg = ' + '.join(f'{lo}–{hi} {hints.SHORT.get(t, t)}' for lo, hi, t in r['ranges'])
             h.append(f"<tr><td>{esc(r['info']['name'])}</td><td>{esc(tr(r['type']))}</td><td>{esc(dmg)}</td>"
@@ -1233,7 +1287,7 @@ class HintsTab(QWidget):
             h.append('</table>')
 
         h.append(f'<h2>{esc(tr("Where to get the components"))}</h2><table border="1" cellspacing="0" cellpadding="3">')
-        h.append(f'<tr><th>{esc(tr("Component"))}</th><th>{esc(tr("Where to buy"))}</th></tr>')
+        h.append(f'<tr><th>{esc(tr("Component"))}</th><th>{esc(tr("Where to get"))}</th></tr>')
         for name in sorted(used):
             h.append(f'<tr><td>{esc(name)}</td><td>{self.sellers(used[name], 8)}</td></tr>')
         h.append('</table>')

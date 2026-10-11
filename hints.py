@@ -227,3 +227,86 @@ def fmt_prot(prot):
     return ', '.join(f'{SHORT.get(t, t)} {dr * 100:.0f}%/{dt:.0f}'
                      for t, (dr, dt) in sorted(prot.items(), key=lambda x: order.index(x[0]) if x[0] in order else 9)
                      if dr > 0.005 or dt >= 1)
+
+
+# --- map locations ------------------------------------------------------------------------
+
+# how an item sits in a map layer, by the class of the object holding its inventory
+HOLDER_KINDS = {'CEA3': 'container', 'IO': 'random loot', 'C1': 'carried by an NPC', 'CGS': 'carried by an NPC',
+                'SAP#G1>C1#-': 'carried by an NPC', 'GIJ': 'job reward', 'AL': 'on the ground'}
+KIND_ORDER = ['container', 'on the ground', 'job reward', 'carried by an NPC', 'random loot']
+
+
+def _maps_dir():
+    return os.path.join(gamedata.GAME, 'data', 'maps', 'locale', 'static')
+
+
+def _zone_names():
+    """zone id (lower case, as in map file names) -> display name from the world map"""
+    p = gamedata.read_nrbf(os.path.join(gamedata.GAME, 'data', 'maps', 'world', 'southunderrail.world'))
+    root = p.objects[p.root]
+    out = {}
+    for k in range(root.get('WM:L:Count').value):
+        loc = nrbf.resolve(p, root.get(f'WM:L:{k}'))
+        zid, name = gamedata._val(p, loc.get('LD1:I')), gamedata._val(p, loc.get('LD1:N'))
+        if zid:
+            out[zid.lower()] = name or zid
+    return out
+
+
+def _build_map_index(progress=None):
+    import re
+    names = _zone_names()
+    d = _maps_dir()
+    files = sorted(f for f in os.listdir(d) if f.endswith('.uzl'))
+    index = {}
+    for n, fn in enumerate(files):
+        if progress:
+            progress(n, len(files))
+        zone = re.sub(r'_l\d+.*$', '', fn[:-4])
+        zname = names.get(zone, zone)
+        try:
+            p = gamedata.read_nrbf(os.path.join(d, fn))
+        except Exception:
+            continue
+        parent = {}
+        for x in p.objects.values():
+            for k in nrbf.children(x):
+                parent.setdefault(k, x.id)
+        for x in p.objects.values():
+            if not isinstance(x, nrbf.Obj) or 'II:DP' not in x.names:
+                continue
+            dp = nrbf.resolve(p, x.get('II:DP'))
+            if dp is None or 'LIDP:P' not in dp.names:
+                continue
+            ic = parent.get(x.id)
+            holder = p.objects.get(parent.get(ic)) if ic is not None else None
+            kind = HOLDER_KINDS.get(getattr(holder, 'cls', ''), 'other')
+            key = gamedata._val(p, dp.get('LIDP:P')).lower()
+            entry = index.setdefault(key, {})
+            entry[f'{zname}|{kind}'] = entry.get(f'{zname}|{kind}', 0) + 1
+    if progress:
+        progress(len(files), len(files))
+    return index
+
+
+def map_index_ready():
+    return os.path.exists(os.path.join(gamedata.CACHE, 'map_items.json'))
+
+
+def map_index(progress=None):
+    """item path -> {"zone|kind": count}; scanning all map layers takes about a minute, then cached."""
+    return gamedata._cached('map_items.json', [_maps_dir()], lambda: _build_map_index(progress))
+
+
+def where_found(info, limit=4):
+    """[(zone, kind, count)] for an item, most useful kinds first (fixed spots before random loot)."""
+    if not map_index_ready():
+        return None
+    entry = map_index().get(info['path'].lower(), {})
+    rows = []
+    for k, cnt in entry.items():
+        zone, kind = k.rsplit('|', 1)
+        rows.append((zone, kind, cnt))
+    rows.sort(key=lambda r: (KIND_ORDER.index(r[1]) if r[1] in KIND_ORDER else 9, -r[2], r[0]))
+    return rows[:limit], len(rows)

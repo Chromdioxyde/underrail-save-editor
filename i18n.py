@@ -122,6 +122,19 @@ DE = {
     'Refresh': 'Aktualisieren',
     'Only available': 'Nur verfügbare',
     'Hints': 'Tipps',
+    'Merchants': 'Händler',
+    'No merchant': 'Kein Händler',
+    'Found': 'Fundorte',
+    'Where to get': 'Wo bekommen',
+    'Map locations: scanning…': 'Fundorte: werden gesucht…',
+    'not placed in the game world (crafted, quest or event)': 'nicht in der Spielwelt platziert (Crafting, Quest oder Ereignis)',
+    'Scanning the game maps for item locations (about a minute, only once)…':
+        'Durchsuche die Spielkarten nach Fundorten (etwa eine Minute, nur einmal)…',
+    'Found: where the item lies in the game world – in a container, on the ground, carried by an NPC (loot when defeated), as a job reward, or as possible random loot of a container.':
+        'Fundorte: wo das Item in der Spielwelt liegt – in einem Behälter, auf dem Boden, bei einem NPC (Beute nach '
+        'einem Kampf), als Auftragsbelohnung oder als mögliche Zufallsbeute eines Behälters.',
+    'container': 'Behälter', 'on the ground': 'auf dem Boden', 'job reward': 'Auftragsbelohnung',
+    'carried by an NPC': 'bei einem NPC', 'random loot': 'Zufallsbeute', 'other': 'sonstiges',
     'Could not compute hints: {e}': 'Tipps konnten nicht berechnet werden: {e}',
     '+{n} more': '+{n} weitere',
     'not sold by merchants (loot or quest)': 'nicht beim Händler (Beute oder Quest)',
