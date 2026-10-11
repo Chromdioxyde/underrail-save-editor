@@ -352,6 +352,8 @@ DE = {
     'The most common characters and creatures placed in each zone.': 'Die häufigsten Charaktere und Kreaturen je Zone.',
     'Loading {name}…': 'Lade {name}…',
     'Loaded {name} – {char}, level {level}': '{name} geladen – {char}, Level {level}',
+    'File': 'Datei',
+    'Quit': 'Beenden',
     'All locations on the map…': 'Alle Fundorte auf der Karte…',
     'Where to get {item}': 'Wo bekommt man {item}',
     'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',

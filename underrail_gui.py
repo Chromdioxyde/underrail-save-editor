@@ -2549,6 +2549,19 @@ class Main(QMainWindow):
         split.setSizes([480, 900])
         self.setCentralWidget(split)
 
+        file = self.menuBar().addMenu(tr('File'))
+        save = QAction(QIcon.fromTheme('document-save'), tr('Save'), self, shortcut=QKeySequence.Save)
+        save.triggered.connect(self.write)
+        file.addAction(save)
+        revert = QAction(QIcon.fromTheme('document-revert'), tr('Revert'), self)
+        revert.triggered.connect(self.reload)
+        file.addAction(revert)
+        file.addSeparator()
+        quit_ = QAction(QIcon.fromTheme('application-exit'), tr('Quit'), self, shortcut=QKeySequence('Ctrl+Q'))
+        quit_.setMenuRole(QAction.QuitRole)
+        quit_.triggered.connect(self.close)  # closeEvent asks about unsaved changes
+        file.addAction(quit_)
+
         view = self.menuBar().addMenu(tr('View'))
         wm = QAction(tr('World map…'), self, shortcut=QKeySequence('Ctrl+M'))
         wm.triggered.connect(self.open_world_map)
@@ -2577,7 +2590,6 @@ class Main(QMainWindow):
         portrait_signals().done.connect(self.details_done)
         portrait_signals().done.connect(self.icons_done)
 
-        self.addAction(QAction(self, shortcut=QKeySequence.Save, triggered=self.write))
         self.addAction(QAction(self, shortcut=QKeySequence.Refresh, triggered=self.refresh_list))
         if gamedata.GAME and gamedata.USERDIR:
             self.refresh_list()
