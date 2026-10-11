@@ -359,6 +359,11 @@ def extract_icons(vms=None, progress=None):
         vms = {i.get('vm') for i in items().values()}
     vms = sorted(v for v in vms if v)
     iconset = _iconset()
+    try:
+        with open(os.path.join(DATA_DIR, 'ammo_icons.json')) as f:
+            ammo_cells = json.load(f)['icons']
+    except (OSError, ValueError, KeyError):
+        ammo_cells = {}
     sheet_names = {f[:-4].lower(): f[:-4] for f in os.listdir(ICON_DIR) if f.endswith('.xnb')}
     sheets = {}
 
@@ -386,6 +391,10 @@ def extract_icons(vms=None, progress=None):
                     if a is not None and a < 1.0:
                         layer.putalpha(layer.getchannel('A').point(lambda v, a=a: int(v * a)))
                     img.alpha_composite(layer)
+            elif vm in ammo_cells:
+                # bullets: registered by the game at runtime, see data/ammo_icons.json
+                sheet, x, y = ammo_cells[vm]
+                img = tile(sheet, x, y)
             else:
                 m = re.fullmatch(r'(\w+)\.(\d+)', vm)
                 if not m or m.group(1).lower() not in sheet_names:

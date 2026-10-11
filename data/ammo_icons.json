@@ -1,0 +1,125 @@
+{
+ "source": "underrail.exe",
+ "icons": {
+  "Ammo.Caliber_127_Cnt": [
+   "Ammo",
+   3,
+   5
+  ],
+  "Ammo.Caliber_127_JHP": [
+   "Ammo",
+   2,
+   5
+  ],
+  "Ammo.Caliber_127_Std": [
+   "Ammo",
+   0,
+   5
+  ],
+  "Ammo.Caliber_127_W2C": [
+   "Ammo",
+   1,
+   5
+  ],
+  "Ammo.Caliber_44_Exp": [
+   "Ammo",
+   3,
+   3
+  ],
+  "Ammo.Caliber_44_JHP": [
+   "Ammo",
+   2,
+   3
+  ],
+  "Ammo.Caliber_44_Std": [
+   "Ammo",
+   0,
+   3
+  ],
+  "Ammo.Caliber_44_W2C": [
+   "Ammo",
+   1,
+   3
+  ],
+  "Ammo.Caliber_5_JHP": [
+   "Ammo",
+   2,
+   0
+  ],
+  "Ammo.Caliber_5_Shock": [
+   "Ammo",
+   3,
+   0
+  ],
+  "Ammo.Caliber_5_Std": [
+   "Ammo",
+   0,
+   0
+  ],
+  "Ammo.Caliber_5_W2C": [
+   "Ammo",
+   1,
+   0
+  ],
+  "Ammo.Caliber_762_JHP": [
+   "Ammo",
+   2,
+   1
+  ],
+  "Ammo.Caliber_762_MS": [
+   "Ammo",
+   3,
+   1
+  ],
+  "Ammo.Caliber_762_Std": [
+   "Ammo",
+   0,
+   1
+  ],
+  "Ammo.Caliber_762_W2C": [
+   "Ammo",
+   1,
+   1
+  ],
+  "Ammo.Caliber_86_Inc": [
+   "Ammo",
+   3,
+   4
+  ],
+  "Ammo.Caliber_86_JHP": [
+   "Ammo",
+   2,
+   4
+  ],
+  "Ammo.Caliber_86_Std": [
+   "Ammo",
+   0,
+   4
+  ],
+  "Ammo.Caliber_86_W2C": [
+   "Ammo",
+   1,
+   4
+  ],
+  "Ammo.Caliber_9_Acid": [
+   "Ammo",
+   3,
+   2
+  ],
+  "Ammo.Caliber_9_JHP": [
+   "Ammo",
+   2,
+   2
+  ],
+  "Ammo.Caliber_9_Std": [
+   "Ammo",
+   0,
+   2
+  ],
+  "Ammo.Caliber_9_W2C": [
+   "Ammo",
+   1,
+   2
+  ]
+ }
+}

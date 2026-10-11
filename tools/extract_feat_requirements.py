@@ -505,6 +505,25 @@ def resolve_runtime_parts(feats):
             f.pop('dynamic', None)
 
 
+def extract_ammo_icons(exe):
+    """Icon cells of ammo the game registers at runtime: for every AmmoType enum value v below 700
+    it adds an icon "Ammo.<name>" on the "Ammo" sheet at column v % 100 - 1, row v // 100 - 1."""
+    import struct
+    pe, md, tname, types, *_ = load(exe)
+    enum = next((t for t in types if tname(t).endswith('.AmmoType')), None)
+    if enum is None:
+        return {}
+    fields = {f.row_index: str(f.row.Name) for f in enum.FieldList}
+    out = {}
+    for c in md.Constant.rows:
+        if c.Parent.table.name == 'Field' and c.Parent.row_index in fields:
+            v = struct.unpack('<i', bytes(c.Value.value)[:4])[0]
+            col, row = v % 100 - 1, v // 100 - 1
+            if 0 < v < 700 and col >= 0:
+                out['Ammo.' + fields[c.Parent.row_index]] = ['Ammo', col, row]
+    return dict(sorted(out.items()))
+
+
 if __name__ == '__main__':
     import gamedata
     exe = sys.argv[1] if len(sys.argv) > 1 else os.path.join(gamedata.GAME, 'underrail.exe')
@@ -514,3 +533,8 @@ if __name__ == '__main__':
     with open(dst, 'w') as f:
         json.dump({'source': 'underrail.exe', 'feats': dict(sorted(feats.items())), 'specs': specs}, f, indent=1)
     print(f'{len(feats)} feats, {len(specs)} specializations -> {dst}')
+    ammo = extract_ammo_icons(exe)
+    dst2 = os.path.join(ROOT, 'data', 'ammo_icons.json')
+    with open(dst2, 'w') as f:
+        json.dump({'source': 'underrail.exe', 'icons': ammo}, f, indent=1)
+    print(f'{len(ammo)} ammo icons -> {dst2}')

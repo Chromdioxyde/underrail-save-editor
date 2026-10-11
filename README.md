@@ -74,7 +74,9 @@ writes the three sizes there; restart the game afterwards.
 Icons are cut out of the game's sprite sheets (`data/icons/*.xnb`) on first start (a few seconds,
 cached in `~/.cache/underrail-save-editor/icons/`). An item's visual id (`I:VM`) is either a name from
 `icons.iconset` (grid cell(s) per sheet; multi-part icons are layers with their own opacity) or
-`<Sheet>.<n>` = cell n of a 10-column grid. Cells are 33 px on a 34 px pitch. About 95 % of the items
+`<Sheet>.<n>` = cell n of a 10-column grid. Bullets are registered by the game at runtime from the
+`AmmoType` enum (value v → column `v % 100 − 1`, row `v // 100 − 1` on the Ammo sheet); that mapping
+is extracted into `data/ammo_icons.json`. Cells are 33 px on a 34 px pitch. About 95 % of the items
 have their own icon. The rest (crafted weapons with composite visuals such as `sniper.4.frame`, some
 ammo) get a faded placeholder: the icon of a typical item of the same category, item class and weapon
 type, or the game's generic weapon icon.
