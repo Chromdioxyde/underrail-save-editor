@@ -109,7 +109,8 @@ def world():
                 (inset if z['inset'] else own).setdefault(zid, n)
             for zid in z['contains']:
                 inner.setdefault(zid, n)
-        _world['marker'] = {**inset, **inner, **own}
+        # insets (South Gate Station's levels) live on their own area page now, so they win too
+        _world['marker'] = {**inner, **inset, **own}
     return _world
 
 

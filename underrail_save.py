@@ -350,6 +350,12 @@ class Save:
     def set_portrait(self, pid):
         self.g.set_str(self.pc, 'C1:P2', pid)
 
+    def current_zone(self):
+        """Zone id of the map the character is in (TG:CL -> LR:LI), or None."""
+        root = self.g.p.objects[self.g.p.root]
+        cl = self.g.obj(root.get('TG:CL')) if 'TG:CL' in root.names else None
+        return self.g.val(cl.get('LR:LI')) if cl is not None and 'LR:LI' in cl.names else None
+
     def location(self):
         r = self._info_root()
         return self.info.val(r.get('SGI:L')) if r is not None else None

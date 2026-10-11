@@ -2050,10 +2050,11 @@ class WorldMapDialog(QDialog):
     """The world map on its own: pages, areas, a zone search, and what a clicked zone holds (merchants,
     creatures, items lying there)."""
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, zone=None, place=None):
         super().__init__(parent)
         import worldmap
         self.setWindowTitle(tr('World map'))
+        self.here = None  # marker of the character's position (zone id, else the place name from the save)
         self.resize(1400, 850)
         self.map = WorldMapView()
         self.map.zone_clicked.connect(self.show_zone)
@@ -2093,11 +2094,30 @@ class WorldMapDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.addWidget(split, 1)
         lay.addWidget(buttons)
-        self.show_page(self.area.currentData(), fit=False)
+        self.here = self.find_marker(zone, place)
+        start = self.map.world['zones'][self.here]['page'] if self.here is not None else self.area.currentData()
+        self.show_page(start, fit=False)
+
+    def find_marker(self, zone, place):
+        import hints
+        import worldmap
+        if zone:
+            m = worldmap.marker(zone)
+            if m is not None:
+                return m
+        if place:
+            for n, z in enumerate(self.map.world['zones']):
+                if place == z['title'] or place in {hints.zone_name(i) for i in z['ids']}:
+                    return n
+        return None
 
     def showEvent(self, e):
         super().showEvent(e)
-        QTimer.singleShot(0, self.map.fit_all)
+        if self.here is not None:
+            QTimer.singleShot(0, lambda: (self.map.select({self.here}), self.map.show_markers([self.here]),
+                                          self.show_zone(self.here)))
+        else:
+            QTimer.singleShot(0, self.map.fit_all)
 
     def update_overlay(self, *_):
         """Names of merchants and the most common creatures written on the zones of the current page."""
@@ -2179,6 +2199,8 @@ class WorldMapDialog(QDialog):
         names = sorted({hints.zone_name(i) for i in z['ids']})
         self.map.select({n})
         h = [f'<h2>{esc(", ".join(names))}</h2>']
+        if n == self.here:
+            h.append(f'<p><b>📍 {esc(tr("Your character is here."))}</b></p>')
         if z['title']:
             h.append(f'<p><b>{esc(z["title"])}</b></p>')
         h.append(f'<p><i>{esc(tr(worldmap.region(z["ids"][0])))} · {esc(", ".join(zids))}</i></p>')
@@ -2895,7 +2917,8 @@ class Main(QMainWindow):
             self.status.setText(tr('Rendering the world map from the game files (once)…'))
             QApplication.processEvents()
         try:
-            dlg = WorldMapDialog(self)
+            s = self.save
+            dlg = WorldMapDialog(self, s.current_zone() if s else None, s.location() if s else None)
         finally:
             if slow:
                 QApplication.restoreOverrideCursor()

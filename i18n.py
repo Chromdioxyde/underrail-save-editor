@@ -354,6 +354,7 @@ DE = {
     'Loaded {name} – {char}, level {level}': '{name} geladen – {char}, Level {level}',
     'File': 'Datei',
     'Quit': 'Beenden',
+    'Your character is here.': 'Dein Charakter ist hier.',
     'All locations on the map…': 'Alle Fundorte auf der Karte…',
     'Where to get {item}': 'Wo bekommt man {item}',
     'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',
