@@ -236,6 +236,25 @@ class Item:
         return [f for f in out if f]
 
     @property
+    def weight(self):
+        """Weight of one piece (I:W of the embedded or library item data)."""
+        if self.data is not None and 'I:W' in self.data:
+            return self.save.g.val(self.data.get('I:W'))
+        return self.info.get('weight') if self.info else None
+
+    @property
+    def rarity(self):
+        """Item quality tier I:Q (0 junk … 6 unique)."""
+        if self.data is not None and 'I:Q' in self.data:
+            return self.save.g.val(self.data.get('I:Q'))
+        return self.info.get('quality') if self.info else None
+
+    @property
+    def stack(self):
+        v = self.obj.get('II:S')
+        return v.value if isinstance(v, nrbf.Prim) else 1
+
+    @property
     def visual(self):
         """Visual/icon id (I:VM) of the item."""
         if self.data is not None:
@@ -702,7 +721,7 @@ class Save:
         mv = dict(zip(it.names, range(len(it.names))))
         if durability is None:
             durability = self.default_durability(info['path'])
-        sets = {'II:S': int(count), 'II:D': float(durability or 0.0), 'II:B': 0.0,
+        sets = {'II:S': int(count), 'II:D': float(durability or 0.0), 'II:B': float(info.get('battery') or 0),
                 'II:MB': 0, 'II:DR': 0.0, 'CII:QL': int(quality or 0)}
         for n, v in sets.items():
             if n in mv and isinstance(it.values[mv[n]], nrbf.Prim):

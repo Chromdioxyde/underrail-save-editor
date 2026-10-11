@@ -16,6 +16,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComb
                                QSpinBox, QSplitter, QTableWidget, QTableWidgetItem, QTabWidget,
                                QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
+from html import escape as html_escape
+
 import gamedata
 import i18n
 import paths
@@ -446,43 +448,109 @@ class PortraitDialog(QDialog):
         super().accept()
 
 
+# item rarity (I:Q) colours: Junk grey, Common plain, Fine green, Good blue, Superior purple, Excellent orange,
+# Unique gold
+RARITY_COLORS = {0: (128, 128, 128), 2: (40, 160, 40), 3: (50, 110, 230), 4: (150, 70, 210), 5: (230, 130, 20),
+                 6: (200, 160, 0)}
+SIZES = {1: 'small', 2: 'medium', 3: 'large'}
+
+
+def rarity_color(q):
+    """QColor for an item rarity, or None for common items (default text colour)."""
+    rgb = RARITY_COLORS.get(q)
+    if rgb is None:
+        return None
+    c = QColor(*rgb)
+    # brighter on dark themes
+    if QApplication.palette().base().color().lightness() < 128:
+        c = c.lighter(140)
+    return c
+
+
+def item_details(info):
+    """Short extra attributes of a library item: build size and power of vehicle parts, item level."""
+    parts = []
+    if info.get('size'):
+        parts.append(tr('size: {s}', s=tr(SIZES.get(info['size'], str(info['size'])))))
+    if info.get('power'):
+        parts.append(tr('power {p}', p=info['power']))
+    if info.get('level'):
+        parts.append(tr('level {level}', level=info['level']))
+    return ', '.join(parts)
+
+
 class AddItemDialog(QDialog):
     def __init__(self, parent, save):
         super().__init__(parent)
         self.setWindowTitle(tr('Add item'))
-        self.resize(820, 620)
+        self.resize(980, 660)
         self.save = save
         self.db = sorted(gamedata.items().values(), key=lambda i: (i['name'].lower(), i['path'].lower()))
 
+        # categories, and their subcategories (item path folders) where a category has several
         self.cat = QComboBox()
-        self.cat.addItem(tr('all categories'), 'all')
-        for c in sorted({i['category'] for i in self.db}):
-            self.cat.addItem(c, c)
-        self.cat.currentTextChanged.connect(self.refilter)
+        self.cat.addItem(tr('all categories'), ('all', None))
+        subs = {}
+        for i in self.db:
+            subs.setdefault(i['category'], set()).add(i.get('sub') or '')
+        for c in sorted(subs):
+            self.cat.addItem(c, (c, None))
+            if len(subs[c] - {''}) > 1:
+                for sub in sorted(subs[c] - {''}):
+                    self.cat.addItem(f'    {c} › {tr(sub)}', (c, sub))
+        self.cat.currentIndexChanged.connect(self.refilter)
         self.search = filter_box(tr('Search name or path…'), self.refilter)
         top = QHBoxLayout()
         top.addWidget(self.cat); top.addWidget(self.search, 1)
 
-        self.table = QTableWidget(len(self.db), 3)
-        self.table.setHorizontalHeaderLabels([tr('Name'), tr('Category'), tr('Path')])
+        cols = [tr('Name'), tr('Category'), tr('Type'), tr('Rarity'), tr('Details'), tr('Path')]
+        self.table = QTableWidget(len(self.db), len(cols))
+        self.table.setHorizontalHeaderLabels(cols)
         self.table.verticalHeader().hide()
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
         self.table.setIconSize(QSize(33, 33))
         self.table.verticalHeader().setDefaultSectionSize(36)
         for row, i in enumerate(self.db):
-            cell = QTableWidgetItem(i['name'])
+            cell = SortItem(i['name'])
+            cell.setData(Qt.UserRole, row)
             icon, placeholder = item_icon(i.get('vm'), i['category'], i['cls'], i.get('wtype'))
+            tip = f"<b>{html_escape(i['name'])}</b>"
+            q = gamedata.QUALITY.get(i['quality'])
+            if q:
+                tip += f' · {html_escape(tr(q))}'
+            details = item_details(i)
+            if details:
+                tip += f'<br>{html_escape(details)}'
+            if i['desc']:
+                tip += f"<p>{html_escape(i['desc'])}</p>"
             if icon:
                 cell.setIcon(icon)
                 if placeholder:
-                    cell.setToolTip(tr('(placeholder icon – the game has no icon for this item)'))
+                    tip += '<p><i>' + html_escape(tr('(placeholder icon – the game has no icon for this item)')) + '</i></p>'
+            cell.setToolTip(tip)
+            color = rarity_color(i['quality'])
+            if color:
+                cell.setForeground(color)
             self.table.setItem(row, 0, cell)
-            self.table.setItem(row, 1, QTableWidgetItem(i['category']))
-            self.table.setItem(row, 2, QTableWidgetItem(i['path']))
+            self.table.setItem(row, 1, SortItem(i['category']))
+            self.table.setItem(row, 2, SortItem(tr(i.get('sub') or '')))
+            rc = SortItem(tr(q) if q else '', i['quality'] if i['quality'] is not None else -1)
+            if color:
+                rc.setForeground(color)
+            self.table.setItem(row, 3, rc)
+            self.table.setItem(row, 4, SortItem(details, (i.get('size') or 0, i.get('power') or 0, i.get('level') or 0)))
+            self.table.setItem(row, 5, SortItem(i['path']))
+        self.table.resizeColumnsToContents()
+        head = self.table.horizontalHeader()
+        head.setSectionResizeMode(0, QHeaderView.Stretch)
+        # the path is long and rarely needed; keep it narrow so names have room
+        head.setSectionResizeMode(5, QHeaderView.Interactive)
+        self.table.setColumnWidth(5, 200)
+        self.table.setSortingEnabled(True)
+        self.table.sortItems(0, Qt.AscendingOrder)
         self.table.itemSelectionChanged.connect(self.selected)
         self.table.doubleClicked.connect(lambda _: self.accept())
 
@@ -496,11 +564,13 @@ class AddItemDialog(QDialog):
                                    'curve stops rising, but higher values still scale the stats linearly.',
                                    n=QUALITY_CURVE_END))
         self.quality_label = QLabel(tr('Quality'))
+        self.quality_hint = QLabel()
         form = QFormLayout()
         form.addRow(self.count_label, self.count)
         dl = QHBoxLayout(); dl.addWidget(self.dur); dl.addWidget(self.dur_hint, 1)
         form.addRow(tr('Durability'), dl)
-        form.addRow(self.quality_label, self.quality)
+        ql = QHBoxLayout(); ql.addWidget(self.quality); ql.addWidget(self.quality_hint, 1)
+        form.addRow(self.quality_label, ql)
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.button(QDialogButtonBox.Ok).setText(tr('Add'))
         buttons.accepted.connect(self.accept)
@@ -510,26 +580,41 @@ class AddItemDialog(QDialog):
         lay.addLayout(form); lay.addWidget(buttons)
 
     def refilter(self, *_):
-        c, q = self.cat.currentData(), self.search.text().lower()
-        for row, i in enumerate(self.db):
-            hide = (c != 'all' and i['category'] != c) or (q and q not in i['name'].lower() and q not in i['path'].lower())
+        (c, sub), q = self.cat.currentData(), self.search.text().lower()
+        for row in range(self.table.rowCount()):
+            i = self.db[self.table.item(row, 0).data(Qt.UserRole)]
+            hide = (c != 'all' and i['category'] != c) or (sub is not None and (i.get('sub') or '') != sub) or \
+                (q and q not in i['name'].lower() and q not in i['path'].lower())
             self.table.setRowHidden(row, bool(hide))
 
     def current(self):
         rows = self.table.selectionModel().selectedRows()
-        return self.db[rows[0].row()] if rows else None
+        return self.db[self.table.item(rows[0].row(), 0).data(Qt.UserRole)] if rows else None
 
     def stackable(self):
         i = self.current()
         return bool(i and i['stack'] and i['stack'] > 1)
+
+    def default_quality(self, i):
+        """Quality for a new component: the best of the same item the character already has, else 100 for
+        components whose stats scale with quality (0 for the rest, which ignore it)."""
+        have = [f.value for it in self.save.inventory() if it.path and it.path.lower() == i['path'].lower()
+                for f in it.fields() if f.name == 'Quality']
+        if have and max(have) > 0:
+            return max(have), tr('like the one you have')
+        if i.get('quality_scaled'):
+            return 100, tr('typical value')
+        return 0, tr('quality has no effect on this item')
 
     def selected(self):
         i = self.current()
         if not i:
             return
         q = gamedata.QUALITY.get(i['quality'], '')
-        self.desc.setText(f"<b>{i['name']}</b> {('· ' + q) if q else ''} · {tr('level {level}', level=i.get('level', 0))} · "
-                          f"{tr('max stack {n}', n=i['stack'])}<br>{i['desc']}")
+        details = item_details(i)
+        self.desc.setText(f"<b>{html_escape(i['name'])}</b> {('· ' + html_escape(tr(q))) if q else ''}"
+                          f"{(' · ' + html_escape(details)) if details else ''} · "
+                          f"{tr('max stack {n}', n=i['stack'])}<br>{html_escape(i['desc'])}")
         # non-stackable items are added as separate copies instead of one oversized stack
         self.count_label.setText(tr('Stack size') if self.stackable() else tr('Copies'))
         self.count.setMaximum(i['stack'] if self.stackable() else 50)
@@ -540,6 +625,13 @@ class AddItemDialog(QDialog):
         comp = us.INSTANCE_CLASS.get(i['cls']) == 'CII'
         self.quality.setEnabled(comp)
         self.quality_label.setEnabled(comp)
+        if comp:
+            value, why = self.default_quality(i)
+            self.quality.setValue(value)
+            self.quality_hint.setText(why)
+        else:
+            self.quality.setValue(0)
+            self.quality_hint.setText('')
 
 
 class FoldersDialog(QDialog):
@@ -1004,18 +1096,30 @@ class ItemTable(QTableWidget):
             fields = {f.name: f for f in it.fields()}
             mx = it.max_durability
             mb = it.max_battery
+            w = it.weight
+            tw = None if w is None else w * it.stack
             cells = {'Slot': tr(it.slot) if it.slot else '', 'Name': it.name, 'Category': it.category,
                      'Max': '' if mx is None else f'{mx:g}', 'Max bat.': '' if mb is None else f'{mb:g}',
-                     'Crafted': '✓' if it.crafted else ''}
+                     'Crafted': '✓' if it.crafted else '', 'Weight': '' if w is None else f'{w:g}',
+                     'Total weight': '' if tw is None else f'{tw:.2f}'.rstrip('0').rstrip('.')}
             for col, name in enumerate(self.cols):
                 if name in cells:
-                    key = {'Max': mx, 'Max bat.': mb}.get(name)
+                    key = {'Max': mx, 'Max bat.': mb, 'Weight': w, 'Total weight': tw}.get(name)
                     key = cells[name] if key is None else key
                     cell = SortItem(cells[name], key)
                     if name == 'Name':
                         cell.setData(Qt.UserRole, row)
+                        color = rarity_color(it.rarity)
+                        if color:
+                            cell.setForeground(color)
                         path, placeholder = it.icon()
                         tip = it.path or tr('crafted item')
+                        q = gamedata.QUALITY.get(it.rarity)
+                        if q:
+                            tip = f'{tr(q)} · {tip}'
+                        desc = it.info['desc'] if it.info else ''
+                        if desc:
+                            tip += '\n\n' + desc
                         if path:
                             cell.setIcon(QIcon(path))
                             if placeholder:
@@ -1042,6 +1146,16 @@ class ItemTable(QTableWidget):
         cell.set_key(v)
         self.tab.main.save.set(f, v)
         self.tab.main.on_change()
+        if f.name == 'Stack' and 'Total weight' in self.cols:
+            row = self.indexFromItem(cell).row()
+            it = self.item_at(row)
+            if it.weight is not None:
+                tw = it.weight * v
+                c = self.item(row, self.cols.index('Total weight'))
+                c.setText(f'{tw:.2f}'.rstrip('0').rstrip('.'))
+                c.set_key(tw)
+            if hasattr(self.tab, 'update_weight'):
+                self.tab.update_weight()
 
     def item_at(self, row):
         return self.items[self.item(row, self.cols.index('Name')).data(Qt.UserRole)]
@@ -1114,7 +1228,8 @@ def compare_html(save, item):
 
 
 class InventoryTab(QWidget):
-    COLS = ['Name', 'Category', 'Stack', 'Quality', 'Durability', 'Max', 'Battery', 'Max bat.', 'Crafted']
+    COLS = ['Name', 'Category', 'Stack', 'Weight', 'Total weight', 'Quality', 'Durability', 'Max', 'Battery',
+            'Max bat.', 'Crafted']
 
     def __init__(self, main):
         super().__init__()
@@ -1134,7 +1249,10 @@ class InventoryTab(QWidget):
             top.addWidget(b)
         self.table = ItemTable(self, self.COLS)
         # equipped items keep the game's slot order
-        self.equip = ItemTable(self, ['Slot', 'Name', 'Durability', 'Max', 'Battery', 'Max bat.'], sortable=False)
+        self.equip = ItemTable(self, ['Slot', 'Name', 'Weight', 'Durability', 'Max', 'Battery', 'Max bat.'],
+                               sortable=False)
+        self.weight = QLabel()
+        top.addWidget(self.weight)
         eq = QGroupBox(tr('Equipped'))
         QVBoxLayout(eq).addWidget(self.equip)
         split = QSplitter(Qt.Vertical)
@@ -1168,7 +1286,16 @@ class InventoryTab(QWidget):
         self.cat.blockSignals(False)
         self.table.fill(items)
         self.equip.fill(self.main.save.equipped())
+        self.update_weight()
         self.refilter()
+
+    def update_weight(self):
+        """Total weight carried: inventory stacks plus equipped items."""
+        save = self.main.save
+        total = sum((it.weight or 0) * it.stack for it in save.inventory())
+        worn = sum(it.weight or 0 for it in save.equipped())
+        self.weight.setText(tr('Weight: {total} (+{worn} equipped)', total=f'{total:.1f}', worn=f'{worn:.1f}'))
+        self.weight.setToolTip(tr('Sort by "Total weight" to see what weighs you down. Stacks count weight × stack size.'))
 
     def show_compare(self, table):
         sel = table.selected()
@@ -2228,16 +2355,36 @@ class Main(QMainWindow):
     def pick(self, item, prev):
         if not item:
             return
+        folder = item.data(Qt.UserRole)
+        prev_folder = prev.data(Qt.UserRole) if prev else None
         if self.dirty and not self.confirm_discard():
-            self.saves.blockSignals(True)
-            self.saves.setCurrentItem(prev)
-            self.saves.blockSignals(False)
+            self.select_folder(prev_folder)
             return
+        # saving from the prompt rebuilds the list, so select by folder rather than by the old item
+        self.select_folder(folder)
         self.mark_selected()
-        self.load(item.data(Qt.UserRole))
+        self.load(folder)
+
+    def select_folder(self, folder):
+        self.saves.blockSignals(True)
+        for row in range(self.saves.count()):
+            if self.saves.item(row).data(Qt.UserRole) == folder:
+                self.saves.setCurrentRow(row)
+                break
+        self.saves.blockSignals(False)
 
     def confirm_discard(self):
-        return QMessageBox.question(self, tr('Unsaved changes'), tr('Discard unsaved changes?')) == QMessageBox.Yes
+        """Ask what to do with unsaved edits before leaving the save; True = go on."""
+        name = os.path.basename(self.save.folder) if self.save else ''
+        box = QMessageBox(QMessageBox.Warning, tr('Unsaved changes'),
+                          tr('"{name}" has unsaved changes. Save them before continuing?', name=name),
+                          QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel, self)
+        box.setDefaultButton(QMessageBox.Save)
+        answer = box.exec()
+        if answer == QMessageBox.Save:
+            self.write()
+            return not self.dirty  # writing can be cancelled or fail
+        return answer == QMessageBox.Discard
 
     def load(self, folder):
         tab = self.tabs.currentIndex()

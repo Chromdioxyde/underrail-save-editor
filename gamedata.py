@@ -75,6 +75,16 @@ def max_durability(level, wtype=None):
 QUALITY = {0: 'Junk', 1: 'Common', 2: 'Fine', 3: 'Good', 4: 'Superior', 5: 'Excellent', 6: 'Unique'}
 
 
+def _subcategory(rel):
+    """Second folder of an item path as a readable subcategory ('vehicleparts\\engines\\x' -> 'engines')."""
+    parts = rel.lower().split('\\')
+    if len(parts) < 3:
+        return ''
+    sub = re.sub(r'^(xpbl|xphw)_?', '', parts[1])
+    return {'jetskisuspensions': 'jet ski suspensions', 'metalplates': 'metal plates',
+            'ballisticpanels': 'ballistic panels', 'ballisticarmorplates': 'armor plates'}.get(sub, sub)
+
+
 def _build_items():
     base = os.path.join(GAME, 'data', 'rules', 'items')
     out = {}
@@ -96,6 +106,11 @@ def _build_items():
                 'weight': _val(p, o.get('I:W')), 'category': rel.split('\\')[0].lower(),
                 'level': _val(p, o.get('I:L')) or 0, 'wtype': _val(p, o.get('WI:WT')),
                 'battery': _val(p, o.get('I:MB')) or 0, 'vm': _val(p, o.get('I:VM')),
+                # vehicle parts: build size (VPI:S 1 small, 2 medium, 3 large) and engine power
+                'size': _val(p, o.get('VPI:S')), 'power': _val(p, o.get('VEI:P')),
+                # components whose stats scale with quality (they list stat ranges)
+                'quality_scaled': bool(_val(p, o.get('CI:SR:Count'))),
+                'sub': _subcategory(rel),
             }
     return out
 
@@ -105,7 +120,7 @@ def items():
     global _items
     if _items is None:
         base = os.path.join(GAME, 'data', 'rules', 'items')
-        _items = _cached('items-v4.json', [base, os.path.join(GAME, 'underrail.exe')], _build_items)
+        _items = _cached('items-v5.json', [base, os.path.join(GAME, 'underrail.exe')], _build_items)
     return _items
 
 
