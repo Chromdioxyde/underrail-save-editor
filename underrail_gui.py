@@ -449,27 +449,32 @@ class PortraitDialog(QDialog):
 
 
 class CategoryFilter(QWidget):
-    """Two-level category filter: a category, then optionally one of its subcategories (item path folders).
-    The subcategory starts at "all" and only shows when the category has several."""
+    """Category filter in up to three steps: a category, optionally one of its subcategories (item path
+    folders), and for vehicle parts their build size. The extra steps start at "all" and only show when
+    the category offers a choice."""
     changed = Signal()
 
     def __init__(self):
         super().__init__()
         self.cat = QComboBox()
         self.sub = QComboBox()
-        self.sub.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.size = QComboBox()
+        for c in (self.sub, self.size):
+            c.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         lay = QHBoxLayout(self)
         lay.setContentsMargins(0, 0, 0, 0)
-        lay.addWidget(self.cat)
-        lay.addWidget(self.sub)
-        self.subs = {}
+        for c in (self.cat, self.sub, self.size):
+            lay.addWidget(c)
+        self.subs, self.sizes = {}, {}
         self.cat.currentIndexChanged.connect(self.fill_subs)
         self.sub.currentIndexChanged.connect(lambda _: self.changed.emit())
+        self.size.currentIndexChanged.connect(lambda _: self.changed.emit())
 
-    def set_categories(self, subs):
-        """subs: {category: {subcategory, …}} ('' = no subcategory); keeps the current choice if possible."""
-        cur_cat, cur_sub = self.value()
-        self.subs = subs
+    def set_categories(self, subs, sizes=None):
+        """subs: {category: {subcategory, …}} ('' = none); sizes: {category: {build size, …}}.
+        Keeps the current choice where possible."""
+        cur_cat, cur_sub, cur_size = self.value()
+        self.subs, self.sizes = subs, sizes or {}
         self.cat.blockSignals(True)
         self.cat.clear()
         self.cat.addItem(tr('all categories'), None)
@@ -477,9 +482,9 @@ class CategoryFilter(QWidget):
             self.cat.addItem(c, c)
         self.cat.setCurrentIndex(max(0, self.cat.findData(cur_cat)) if cur_cat else 0)
         self.cat.blockSignals(False)
-        self.fill_subs(keep=cur_sub)
+        self.fill_subs(keep=(cur_sub, cur_size))
 
-    def fill_subs(self, _=None, keep=None):
+    def fill_subs(self, _=None, keep=(None, None)):
         c = self.cat.currentData()
         names = sorted(self.subs.get(c, set()) - {''}, key=lambda s: tr(s).lower()) if c else []
         self.sub.blockSignals(True)
@@ -487,18 +492,28 @@ class CategoryFilter(QWidget):
         self.sub.addItem(tr('all subcategories'), None)
         for s in names:
             self.sub.addItem(tr(s), s)
-        self.sub.setCurrentIndex(max(0, self.sub.findData(keep)) if keep else 0)
+        self.sub.setCurrentIndex(max(0, self.sub.findData(keep[0])) if keep[0] else 0)
         self.sub.blockSignals(False)
         self.sub.setVisible(len(names) > 1)
+        sizes = sorted(self.sizes.get(c, set()) - {None}) if c else []
+        self.size.blockSignals(True)
+        self.size.clear()
+        self.size.addItem(tr('all sizes'), None)
+        for s in sizes:
+            self.size.addItem(tr(SIZES.get(s, str(s))), s)
+        self.size.setCurrentIndex(max(0, self.size.findData(keep[1])) if keep[1] else 0)
+        self.size.blockSignals(False)
+        self.size.setVisible(len(sizes) > 1)
         self.changed.emit()
 
     def value(self):
-        # a lone subcategory isn't offered (count = 'all' + names)
-        return self.cat.currentData(), self.sub.currentData() if self.sub.count() > 2 else None
+        # a lone option isn't offered (count = 'all' + options)
+        return (self.cat.currentData(), self.sub.currentData() if self.sub.count() > 2 else None,
+                self.size.currentData() if self.size.count() > 2 else None)
 
-    def matches(self, category, sub):
-        c, s = self.value()
-        return (c is None or category == c) and (s is None or (sub or '') == s)
+    def matches(self, category, sub, size=None):
+        c, s, z = self.value()
+        return (c is None or category == c) and (s is None or (sub or '') == s) and (z is None or size == z)
 
 
 # item rarity (I:Q) colours as in the game: common white (= default text colour here), uncommon green,
@@ -572,10 +587,12 @@ class AddItemDialog(QDialog):
 
         # category, then optionally a subcategory (item path folder)
         self.cat = CategoryFilter()
-        subs = {}
+        subs, sizes = {}, {}
         for i in self.db:
             subs.setdefault(i['category'], set()).add(i.get('sub') or '')
-        self.cat.set_categories(subs)
+            if i.get('size'):
+                sizes.setdefault(i['category'], set()).add(i['size'])
+        self.cat.set_categories(subs, sizes)
         self.cat.changed.connect(self.refilter)
         self.search = filter_box(tr('Search name, type, size, rarity, description…'), self.refilter)
         top = QHBoxLayout()
@@ -663,7 +680,7 @@ class AddItemDialog(QDialog):
             return
         for row in range(self.table.rowCount()):
             i = self.db[self.table.item(row, 0).data(Qt.UserRole)]
-            hide = not self.cat.matches(i['category'], i.get('sub')) or (q and not search_match(q, self.texts[i['path']]))
+            hide = not self.cat.matches(i['category'], i.get('sub'), i.get('size')) or (q and not search_match(q, self.texts[i['path']]))
             self.table.setRowHidden(row, bool(hide))
 
     def current(self):
@@ -1354,11 +1371,13 @@ class InventoryTab(QWidget):
 
     def build(self):
         items = self.main.save.inventory()
-        subs = {}
+        subs, sizes = {}, {}
         for i in items:
             if i.category:
                 subs.setdefault(i.category, set()).add((i.info or {}).get('sub') or '')
-        self.cat.set_categories(subs)
+                if (i.info or {}).get('size'):
+                    sizes.setdefault(i.category, set()).add(i.info['size'])
+        self.cat.set_categories(subs, sizes)
         self.table.fill(items)
         self.equip.fill(self.main.save.equipped())
         self.update_weight()
@@ -1381,7 +1400,7 @@ class InventoryTab(QWidget):
         if not hasattr(self, 'table'):
             return
         for row, it in self.table.all_rows():
-            hide = not self.cat.matches(it.category, (it.info or {}).get('sub')) or \
+            hide = not self.cat.matches(it.category, (it.info or {}).get('sub'), (it.info or {}).get('size')) or \
                 (q and not search_match(q, f'{it.name} {it.category} '.lower() + search_text(it.info)))
             self.table.setRowHidden(row, bool(hide))
 
