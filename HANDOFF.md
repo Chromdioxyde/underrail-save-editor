@@ -38,6 +38,12 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 - Unplaced merchants (no map NPC, probably events): gc_fsh, gc_gypsy, dun_diedrick, ezra,
   jackquicksilver, oldjonas, cc_jkkquartermaster.
 
+## Builds
+`builds.py`: archetypes with weapon families (from `WI:WT` + visual model `WI:WVM`: k knife, s sledgehammer,
+c crowbar, '' fist, xpbls spear, xpblm sword, ep/ap energy pistol), attributes, skills, feat ids and armor
+profile; `detect(save)` scores skills + owned key feats + equipped weapon family. Worn armor penalty = sum
+of `AI1:E`. Weapon table only covers library (non-crafted) weapons – crafted weapon stats not analysed yet.
+
 ## Packaging
 - `packaging/install.sh` (per-user Linux install), `build-appimage.sh` (portable AppImage, tested on
   Ubuntu 22.04/Debian 12 in Docker; Debian 11 is too old for PySide6's libstdc++), PyInstaller spec +

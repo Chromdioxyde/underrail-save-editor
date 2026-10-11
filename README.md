@@ -59,7 +59,14 @@ always appear as the game names them.
   items, duplicate (crafted items too), remove; edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
 - **Oddities:** collection counters
-- **Hints:** best weapons by damage per action point and the best armor/helmet/boot component
+- **Hints:** tailored to a build (assault rifle, sniper, SMG, pistol, shotgun, heavy guns, crossbow,
+  stealth knife, unarmed/psi monk, sledgehammer, spear, sword, throwing, psi – the archetypes players
+  commonly describe in Steam guides, on underrail.info and RPG Codex). The build is detected from skills,
+  feats and equipped weapons or picked by hand; it shows the build's key attributes, skills and feats
+  (owned ✓, unmet requirements ⚠), checks the equipped weapons and worn armor penalty, lists only its
+  weapon family and weighs armor penalty by the build's armor profile (light: penalty counts a lot, max
+  15 %; medium: max 40 %; heavy: protection first), limited to what the character's Strength can wear.
+  Below that: best weapons by damage per action point and the best armor/helmet/boot component
   combinations by protection versus armor penalty (computed with the game's formulas), with the merchants
   that sell them (fixed shipments or random stock), where they lie in the game world (scanned once from
   the map files: containers, ground, NPCs, job rewards, random container loot), for animal parts the

@@ -118,11 +118,15 @@ def where_to_buy(info):
 
 # --- weapons ------------------------------------------------------------------------------
 
-def weapons(limit=40):
-    """Library weapons ranked by average damage per base action point."""
+def weapons(limit=40, families=None):
+    """Library weapons ranked by average damage per base action point, optionally only the given weapon
+    families (see builds.weapon_family)."""
+    import builds
     rows, seen = [], set()
     for info in gamedata.items().values():
         if info['cls'] != 'WI' or info['name'] in seen:
+            continue
+        if families is not None and builds.library_family(info) not in families:
             continue
         seen.add(info['name'])
         try:
@@ -188,8 +192,9 @@ def rate(prot):
     return sum(WEIGHTS.get(t, 0.3) * (dr * 100 + dt * 1.5) for t, (dr, dt) in prot.items())
 
 
-def armor_combos(recipe, top=5, comps=None):
-    """Best component combinations of a recipe by protection score per (1 + penalty)."""
+def armor_combos(recipe, top=5, comps=None, weight=2.0, max_penalty=None, max_strength=None):
+    """Best component combinations of a recipe by protection score per (1 + weight * penalty); combinations
+    above max_penalty or needing more than max_strength are left out."""
     import itertools
     comps = comps or components()
     r = RECIPES[recipe]
@@ -210,9 +215,12 @@ def armor_combos(recipe, top=5, comps=None):
         if r.get('halve') in prot:
             dr, dt = prot[r['halve']]
             prot[r['halve']] = (dr / 2, dt / 2)
+        if (max_penalty is not None and penalty > max_penalty + 1e-9) or \
+                (max_strength is not None and strength > max_strength):
+            continue
         score = rate(prot)
         results.append({'parts': list(zip([s for _, s in r['slots']], parts)), 'prot': prot, 'penalty': penalty,
-                        'strength': strength, 'score': score, 'balance': score / (1 + 2 * penalty)})
+                        'strength': strength, 'score': score, 'balance': score / (1 + weight * penalty)})
     results.sort(key=lambda x: -x['balance'])
     # avoid near-duplicates (e.g. normal and infused variants of the same leather)
     out, seen = [], set()

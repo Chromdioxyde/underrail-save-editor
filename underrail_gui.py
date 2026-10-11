@@ -1499,7 +1499,18 @@ class HintsTab(QWidget):
         self.view.setOpenLinks(False)
         self.view.anchorClicked.connect(self.open_link)
         self.links = []  # item infos behind the "loc:<n>" links of the current page
-        QVBoxLayout(self).addWidget(self.view)
+        self.build = QComboBox()
+        self.build.setToolTip(tr('The build decides which weapons are listed and how armor penalty is weighed. '
+                                 'Auto picks it from skills, feats and equipped weapons.'))
+        self.build.currentIndexChanged.connect(lambda _: self.built and self.refresh())
+        top = QHBoxLayout()
+        top.addWidget(QLabel(tr('Build:')))
+        top.addWidget(self.build)
+        top.addStretch(1)
+        lay = QVBoxLayout(self)
+        lay.addLayout(top)
+        lay.addWidget(self.view)
+        self.fill_builds()
         self.built = False
         self.scanning = False
         portrait_signals().done.connect(self.scanned)
@@ -1514,6 +1525,17 @@ class HintsTab(QWidget):
                 self.scanning = True
                 QThreadPool.globalInstance().start(MapScanJob(portrait_signals()))
             self.refresh()
+
+    def fill_builds(self):
+        import builds
+        detected = builds.detect(self.main.save)[0][0] if self.main.save else None
+        self.build.blockSignals(True)
+        self.build.clear()
+        if detected:
+            self.build.addItem(tr('Auto: {build}', build=tr(detected['name'])), detected['id'])
+        for b in builds.BUILDS:
+            self.build.addItem(tr(b['name']), b['id'])
+        self.build.blockSignals(False)
 
     def refresh(self):
         try:
@@ -1582,16 +1604,66 @@ class HintsTab(QWidget):
                 QApplication.restoreOverrideCursor()
             dlg.exec()
 
+    def build_section(self, build, profile):
+        """The chosen build: what defines it and how the character measures up."""
+        import html
+        import builds
+        esc = html.escape
+        save = self.main.save
+        h = [f'<h2>{esc(tr("Build: {build}", build=tr(build["name"])))}</h2>', f'<p>{esc(tr(build["note"]))}</p>']
+        if save is None:
+            return h
+        attrs = {f.name: f.value for f in save.attributes()}
+        skills = {f.name: f.value for f in save.skills()}
+        feats = set(save.feats())
+        names = gamedata.feats()
+        h.append('<table cellpadding="2">')
+        h.append(f'<tr><td><b>{esc(tr("Main attributes"))}</b></td><td>' +
+                 ', '.join(f'{esc(a)} {attrs.get(a, "?")}' for a in build['attributes']) + '</td></tr>')
+        h.append(f'<tr><td><b>{esc(tr("Key skills"))}</b></td><td>' +
+                 ', '.join(f'{esc(s)} {skills.get(s, "?")}' for s in build['skills']) + '</td></tr>')
+        marks = []
+        for fid in build['feats']:
+            name = esc(names.get(fid, (fid,))[0])
+            if fid in feats:
+                marks.append(f'<span style="color:#3a3">✓ {name}</span>')
+            else:
+                unmet = any(not met for met, kind, _ in save.feat_check(fid) if kind != 'outside_leveling')
+                marks.append(f'{name} ⚠' if unmet else name)
+        h.append(f'<tr><td valign="top"><b>{esc(tr("Key feats"))}</b></td><td>{", ".join(marks)}</td></tr>')
+        # equipment check: weapons of the build's families, total armor penalty within the profile
+        weapons = [(it.name, builds.item_family(it)) for it in save.equipped()
+                   if it.category == 'weapons' and it.slot and it.slot.startswith('Weapon')]
+        if weapons:
+            txt = ', '.join(f'{esc(n)} ({esc(tr(f or "?"))})' for n, f in weapons)
+            fits = any(f in build['families'] for _, f in weapons) or not build['families']
+            txt += ' – ' + (esc(tr('fits the build')) if fits else
+                            f'<span style="color:#c60">{esc(tr("no weapon of this build equipped"))}</span>')
+            h.append(f'<tr><td><b>{esc(tr("Equipped weapons"))}</b></td><td>{txt}</td></tr>')
+        penalty = equipped_armor_penalty(save)
+        cap = profile['max_penalty']
+        txt = f'{penalty * 100:.0f}%'
+        if cap is not None and penalty > cap + 1e-9:
+            txt += f' – <span style="color:#c60">{esc(tr("above the {cap}% this build usually accepts", cap=round(cap * 100)))}</span>'
+        h.append(f'<tr><td><b>{esc(tr("Armor penalty worn"))}</b></td><td>{txt}</td></tr>')
+        h.append('</table>')
+        h.append(f'<p><i>{esc(tr("Builds are the archetypes players commonly describe (Steam guides, underrail.info, RPG Codex); ⚠ = requirements not met yet."))}</i></p>')
+        return h
+
     def render(self):
         import html
+        import builds
         import hints
         esc = html.escape
         self.links = []
+        build = builds.BY_ID.get(self.build.currentData()) or builds.BUILDS[0]
+        profile = builds.ARMOR_PROFILES[build['armor']]
         h = [f'<p>{esc(tr("Computed from your game files with the formulas the game uses. Armor values at component quality {q}; merchants in bold always stock the item, the others may roll it in their random stock.", q=hints.QUALITY))}</p>']
         if not hints.map_index_ready():
             h.append(f'<p><b>{esc(tr("Scanning the game maps for item locations (about a minute, only once)…"))}</b></p>')
         else:
             h.append(f'<p><i>{esc(tr("Found: where the item lies in the game world – in a container, on the ground, carried by an NPC (loot when defeated), as a job reward, or as possible random loot of a container."))}</i></p>')
+        h += self.build_section(build, profile)
         feats = set(self.main.save.feats()) if self.main.save else set()
         notes = []
         if 'armorsloping' in feats:
@@ -1604,25 +1676,44 @@ class HintsTab(QWidget):
             h.append('<ul>' + ''.join(f'<li>{esc(n)}</li>' for n in notes) + '</ul>')
 
         h.append(f'<h2>{esc(tr("Best weapons (damage per action point)"))}</h2>')
-        h.append(f'<p><i>{esc(tr("Base values without ammo, feats or precision; burst weapons count all shots."))}</i></p>')
-        h.append('<table border="1" cellspacing="0" cellpadding="3">')
-        h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in
-                                  ('Weapon', 'Type', 'Damage', 'AP', 'Burst', 'Dmg/AP', 'Where to get')) + '</tr>')
-        for r in hints.weapons(25):
-            dmg = ' + '.join(f'{lo}–{hi} {hints.SHORT.get(t, t)}' for lo, hi, t in r['ranges'])
-            h.append(f"<tr><td>{esc(r['info']['name'])}</td><td>{esc(tr(r['type']))}</td><td>{esc(dmg)}</td>"
-                     f"<td nowrap>{r['ap']}</td><td>{r['burst'] or '–'}</td><td nowrap><b>{r['per_ap']:.2f}</b></td>"
-                     f"<td>{self.sellers(r['info'])}</td></tr>")
-        h.append('</table>')
+        rows = hints.weapons(25, set(build['families'])) if build['families'] else []
+        if not build['families']:
+            h.append(f'<p>{esc(tr("This build fights without weapons."))}</p>')
+        elif not rows:
+            h.append(f'<p>{esc(tr("The game has no fixed (non-crafted) weapons of this kind; craft them or buy the parts."))}</p>')
+        else:
+            h.append(f'<p><i>{esc(tr("Base values without ammo, feats or precision; burst weapons count all shots. Only weapons that exist as fixed items – crafted weapons are often better."))}</i></p>')
+            h.append('<table border="1" cellspacing="0" cellpadding="3">')
+            h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in
+                                      ('Weapon', 'Type', 'Damage', 'AP', 'Burst', 'Dmg/AP', 'Where to get')) + '</tr>')
+            for r in rows:
+                dmg = ' + '.join(f'{lo}–{hi} {hints.SHORT.get(t, t)}' for lo, hi, t in r['ranges'])
+                family = builds.library_family(r['info'])
+                h.append(f"<tr><td>{esc(r['info']['name'])}</td><td>{esc(tr(family or r['type']))}</td><td>{esc(dmg)}</td>"
+                         f"<td nowrap>{r['ap']}</td><td>{r['burst'] or '–'}</td><td nowrap><b>{r['per_ap']:.2f}</b></td>"
+                         f"<td>{self.sellers(r['info'])}</td></tr>")
+            h.append('</table>')
 
         comps = hints.components()
+        strength = None
+        if self.main.save:
+            strength = {f.name: f.value for f in self.main.save.attributes()}.get('Strength')
         h.append(f'<h2>{esc(tr("Best armor combinations (protection vs. armor penalty)"))}</h2>')
+        cap = profile['max_penalty']
+        h.append(f'<p>{esc(tr({"light": "Light armor build: armor penalty weighs heavily, combinations above {cap}% are left out.", "medium": "Balanced: protection and armor penalty both count, combinations above {cap}% are left out.", "heavy": "Heavy armor build: protection first, armor penalty counts little."}[build["armor"]], cap=round((cap or 0) * 100)))}'
+                 + (' ' + esc(tr('Only combinations your Strength ({s}) can wear.', s=strength)) if strength else '') + '</p>')
         h.append(f'<p><i>{esc(tr("Armor penalty doesn\'t depend on quality – quality only raises protection. Penalties of worn pieces add up. Values: resistance %/threshold."))}</i></p>')
         used = {}
-        for recipe in hints.RECIPES:
-            h.append(f'<h3>{esc(tr(recipe))}</h3><table border="1" cellspacing="0" cellpadding="3">')
+        for recipe in profile['recipes']:
+            res_list = hints.armor_combos(recipe, 3, comps, weight=profile['weight'], max_penalty=cap,
+                                          max_strength=strength)
+            h.append(f'<h3>{esc(tr(recipe))}</h3>')
+            if not res_list:
+                h.append(f'<p>{esc(tr("No combination fits this build."))}</p>')
+                continue
+            h.append('<table border="1" cellspacing="0" cellpadding="3">')
             h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in ('Components', 'Penalty', 'Strength', 'Protection')) + '</tr>')
-            for res in hints.armor_combos(recipe, 3, comps):
+            for res in res_list:
                 parts = '<br>'.join(f'{esc(tr(slot))}: <b>{esc(name)}</b>' for slot, name in res['parts'])
                 for _, name in res['parts']:
                     used[name] = comps[name]['info']
@@ -1637,6 +1728,27 @@ class HintsTab(QWidget):
         h.append('</table>')
         h.append(f'<p><i>{esc(tr("Leathers, carapaces and similar animal parts also come from skinning the creature with Skinner/Hunter; metal sheets and plates also drop as loot."))}</i></p>')
         return '\n'.join(h)
+
+
+def equipped_armor_penalty(save):
+    """Sum of the armor penalty (AI1:E) of everything worn."""
+    import hints
+    total = 0.0
+    for it in save.equipped():
+        if it.category != 'armor':
+            continue
+        if it.data is not None:
+            v = save.g.val(it.data.get('AI1:E')) if 'AI1:E' in it.data else 0
+        elif it.info:
+            try:
+                p, o = hints._item_root(it.info)
+                v = hints._val(p, o, 'AI1:E')
+            except Exception:
+                v = 0
+        else:
+            v = 0
+        total += v or 0
+    return total
 
 
 class FilteredFieldTab(QWidget):
