@@ -473,6 +473,13 @@ def locations(info):
 
 
 _zone_contents = None
+# destructible objects the game places as characters; not creatures
+OBJECT_NAMES = {'Rocks', 'Ice', 'Wall', 'Egg', 'Hive', 'Security Camera'}
+OBJECT_SUFFIXES = (' Barrel', ' Tank', ' Fuse Box', ' Crate')
+
+
+def is_object(name):
+    return name in OBJECT_NAMES or name.endswith(OBJECT_SUFFIXES)
 
 
 def zone_contents(zids):
@@ -502,7 +509,8 @@ def zone_contents(zids):
             continue
         out['merchants'] |= {store_name(s) for s in c['merchants']}
         for name, n in c['creatures']:
-            out['creatures'][name] = out['creatures'].get(name, 0) + n
+            if not is_object(name):
+                out['creatures'][name] = out['creatures'].get(name, 0) + n
         for path, kind, n in c['items']:
             out['items'][(path, kind)] = out['items'].get((path, kind), 0) + n
     items = []

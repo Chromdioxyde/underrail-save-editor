@@ -1523,6 +1523,7 @@ class WorldMapView(QGraphicsView):
         self.world = worldmap.world()
         self.page = None
         self.region = None
+        self.overlay = {}  # marker index -> [(text, QColor)] drawn on the zone
         self.cache = {}
         self.sel_items = []
         self.marks = {}
@@ -1607,6 +1608,9 @@ class WorldMapView(QGraphicsView):
             hit.setData(0, n)
             hit.setToolTip(tip)
             self.zone_items[n] = (x, y, img.width, img.height)
+            for k, (text, color) in enumerate(self.overlay.get(n, [])):
+                self.label(text, 8, x + img.width / 2, y + img.height / 2, 12 * k - 6 * (len(self.overlay[n]) - 1),
+                           color, 5.5)
         self.draw_selection()
 
     def label(self, text, size, x, y, dy, color, zvalue):
@@ -1634,6 +1638,10 @@ class WorldMapView(QGraphicsView):
                 r = self.scene_.addRect(QRectF(x, y, w, h), QPen(QColor(255, 255, 255), 3))
                 r.setZValue(4)
                 self.sel_items.append(r)
+
+    def set_overlay(self, overlay):
+        self.overlay = overlay
+        self.redraw()
 
     def set_region(self, region):
         """Show only one area (layer) of the world, None = everything."""
@@ -2057,6 +2065,12 @@ class WorldMapDialog(QDialog):
         self.area.currentIndexChanged.connect(lambda _: self.show_page(self.area.currentData()))
         bar.addWidget(QLabel(tr('Area:')))
         bar.addWidget(self.area)
+        self.show_merchants = QCheckBox(tr('Merchants'))
+        self.show_creatures = QCheckBox(tr('Creatures'))
+        self.show_creatures.setToolTip(tr('The most common characters and creatures placed in each zone.'))
+        for c in (self.show_merchants, self.show_creatures):
+            c.toggled.connect(self.update_overlay)
+            bar.addWidget(c)
         self.search = filter_box(tr('Find a zone…'), lambda _: None)
         self.search.returnPressed.connect(self.find)
         bar.addWidget(self.search, 1)
@@ -2085,8 +2099,29 @@ class WorldMapDialog(QDialog):
         super().showEvent(e)
         QTimer.singleShot(0, self.map.fit_all)
 
+    def update_overlay(self, *_):
+        """Names of merchants and the most common creatures written on the zones of the current page."""
+        import hints
+        overlay = {}
+        if (self.show_merchants.isChecked() or self.show_creatures.isChecked()) and hints.map_index_ready():
+            for n, z in enumerate(self.map.world['zones']):
+                if z['page'] != self.map.page:
+                    continue
+                c = hints.zone_contents(self.zone_ids(n))
+                lines = []
+                if self.show_merchants.isChecked():
+                    lines += [(m.split(' (')[0], QColor(120, 190, 255)) for m in c['merchants'][:3]]
+                if self.show_creatures.isChecked():
+                    lines += [(f'{name}{" ×" + str(k) if k > 1 else ""}', QColor(255, 140, 120))
+                              for name, k in c['creatures'][:2]]
+                if lines:
+                    overlay[n] = lines
+        self.map.set_overlay(overlay)
+
     def show_page(self, page, fit=True):
         self.map.set_page(page)
+        if hasattr(self, 'show_merchants'):
+            self.update_overlay()
         i = self.area.findData(page)
         if i >= 0 and i != self.area.currentIndex():
             self.area.blockSignals(True)

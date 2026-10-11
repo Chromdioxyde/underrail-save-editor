@@ -45,7 +45,8 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 
 ## World map areas (latest)
 Map pages = the global map's areas (`Z:A`, entity lists `A6:E`). Done: area pages in both dialogs.
-Open: user asked to show more info on the map itself (enemies, merchants as icons/labels); the old
+Merchants/creatures can be written on the zones (WorldMapDialog toggles; objects like rocks/barrels
+filtered via hints.is_object). Hostility isn't known (no faction data in the index). The old
 prefix-based `REGIONS`/area combobox in LocationsDialog is hidden and can be removed; check SGS inset.
 
 ## Builds

@@ -348,6 +348,8 @@ DE = {
     'Close': 'Schließen',
     '{n}× {name} added': '{n}× {name} hinzugefügt',
     'Could not add {name}: {e}': '{name} konnte nicht hinzugefügt werden: {e}',
+    'Creatures': 'Kreaturen',
+    'The most common characters and creatures placed in each zone.': 'Die häufigsten Charaktere und Kreaturen je Zone.',
     'All locations on the map…': 'Alle Fundorte auf der Karte…',
     'Where to get {item}': 'Wo bekommt man {item}',
     'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',
