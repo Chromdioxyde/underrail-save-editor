@@ -14,7 +14,8 @@ import re
 import gamedata
 import nrbf
 
-CACHE = 'worldmap_v4.json'
+CACHE = 'worldmap_v5.json'
+RENDER_VERSION = 2  # bump when the drawing changes
 # Expedition's Black Sea zones share the coordinate space with the caves, so they get their own page
 SEA_PREFIXES = ('xpbl', 'cvw')
 PAGES = ('main', 'sea')
@@ -54,9 +55,10 @@ def _build():
             m = gamedata._val(p, x.get('SEA:M'))
             f = nrbf.resolve(p, x.get('SEA:F'))
             if m and 'FloorGrid' not in m:  # editor grid, not drawn in game
-                sprite_of[entity(x).id] = len(sprites)
+                le = entity(x)
+                sprite_of[le.id] = len(sprites)
                 sprites.append({'m': m, 'f': [gamedata._val(p, f.get('X')), gamedata._val(p, f.get('Y'))],
-                                'pos': pos(x)})
+                                'pos': pos(x), 'vp': gamedata._val(p, le.get('E4:VP')) or 0})
             continue
         if x.cls == 'ZMEA':
             zids = ids(x, 'ZMEA:R')
@@ -186,8 +188,12 @@ def _render(page, path):
     width = max(a for a, b in pts) + MARGIN + 200 - left
     height = max(b for a, b in pts) + MARGIN + 200 - top
     img = Image.new('RGBA', (int(width), int(height)), (12, 12, 16, 255))
-    # back to front, lower levels first
-    for s in sorted(sprites, key=lambda s: (s['pos'][0] + s['pos'][1], s['pos'][2])):
+    # connection lines first (they lie under the zones), then back to front, lower levels first, then by the
+    # entity's draw priority (E4:VP)
+    def order(s):
+        line = 'TransitionConnection' in s['m']
+        return (not line, s['pos'][0] + s['pos'][1], s['pos'][2], s.get('vp', 0))
+    for s in sorted(sprites, key=order):
         r = sprite_image(s)
         if r:
             img.alpha_composite(r[0], (int(r[1][0] - left), int(r[1][1] - top)))
@@ -204,7 +210,7 @@ def page_image(page):
     import json
     path = os.path.join(gamedata.CACHE, f'worldmap_{page}.png')
     meta = path[:-4] + '.json'
-    stamp = [_path(), os.path.getmtime(_path())]
+    stamp = [_path(), os.path.getmtime(_path()), RENDER_VERSION]
     try:
         with open(meta) as f:
             m = json.load(f)

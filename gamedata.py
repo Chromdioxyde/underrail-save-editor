@@ -360,6 +360,13 @@ def extract_icons(vms=None, progress=None):
     vms = sorted(v for v in vms if v)
     iconset = _iconset()
     try:
+        # crafted weapons' composite visuals, registered by the game at runtime (data/weapon_icons.json)
+        with open(os.path.join(DATA_DIR, 'weapon_icons.json')) as f:
+            for vm, parts in json.load(f)['icons'].items():
+                iconset.setdefault(vm, [tuple(p) for p in parts])
+    except (OSError, ValueError, KeyError):
+        pass
+    try:
         with open(os.path.join(DATA_DIR, 'ammo_icons.json')) as f:
             ammo_cells = json.load(f)['icons']
     except (OSError, ValueError, KeyError):
