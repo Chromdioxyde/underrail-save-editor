@@ -329,6 +329,7 @@ DE = {
     'Rare': 'Selten',
     'Quest item': 'Quest-Gegenstand',
     'all subcategories': 'alle Unterkategorien',
+    'Search name, type, size, rarity, description…': 'Name, Typ, Größe, Seltenheit, Beschreibung suchen…',
     'All locations on the map…': 'Alle Fundorte auf der Karte…',
     'Where to get {item}': 'Wo bekommt man {item}',
     'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',

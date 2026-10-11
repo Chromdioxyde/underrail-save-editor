@@ -531,6 +531,36 @@ def item_details(info):
     return ', '.join(parts)
 
 
+SIZE_WORDS = {1: 'small klein kleine kleinen kleiner kleines', 2: 'medium mittel mittlere mittleren mittlerer mittleres',
+              3: 'large groß gross große großen großer großes grosse grossen'}
+
+
+def search_text(info):
+    """Everything a search can match for a library item: names, path, category and type (English and in the
+    UI language), rarity, details with size words in all forms, and the game description."""
+    if info is None:
+        return ''
+    sub = info.get('sub') or ''
+    q = gamedata.QUALITY.get(info.get('quality'), '')
+    parts = [info['name'], info['path'], info['category'], sub, tr(sub), q, tr(q) if q else '', item_details(info),
+             SIZE_WORDS.get(info.get('size'), ''), info.get('desc') or '']
+    return ' '.join(parts).lower()
+
+
+def search_match(query, text):
+    """All words of the query occur in the text; a word also matches without a German/English ending
+    ("motoren" -> "motor")."""
+    for word in query.lower().split():
+        if word in text:
+            continue
+        for end in ('en', 'er', 'es', 'em', 'e', 'n', 's'):
+            if word.endswith(end) and len(word) - len(end) >= 3 and word[:-len(end)] in text:
+                break
+        else:
+            return False
+    return True
+
+
 class AddItemDialog(QDialog):
     def __init__(self, parent, save):
         super().__init__(parent)
@@ -538,6 +568,7 @@ class AddItemDialog(QDialog):
         self.resize(980, 660)
         self.save = save
         self.db = sorted(gamedata.items().values(), key=lambda i: (i['name'].lower(), i['path'].lower()))
+        self.texts = {i['path']: search_text(i) for i in self.db}
 
         # category, then optionally a subcategory (item path folder)
         self.cat = CategoryFilter()
@@ -546,7 +577,7 @@ class AddItemDialog(QDialog):
             subs.setdefault(i['category'], set()).add(i.get('sub') or '')
         self.cat.set_categories(subs)
         self.cat.changed.connect(self.refilter)
-        self.search = filter_box(tr('Search name or path…'), self.refilter)
+        self.search = filter_box(tr('Search name, type, size, rarity, description…'), self.refilter)
         top = QHBoxLayout()
         top.addWidget(self.cat); top.addWidget(self.search, 1)
 
@@ -632,8 +663,7 @@ class AddItemDialog(QDialog):
             return
         for row in range(self.table.rowCount()):
             i = self.db[self.table.item(row, 0).data(Qt.UserRole)]
-            hide = not self.cat.matches(i['category'], i.get('sub')) or \
-                (q and q not in i['name'].lower() and q not in i['path'].lower())
+            hide = not self.cat.matches(i['category'], i.get('sub')) or (q and not search_match(q, self.texts[i['path']]))
             self.table.setRowHidden(row, bool(hide))
 
     def current(self):
@@ -1352,7 +1382,7 @@ class InventoryTab(QWidget):
             return
         for row, it in self.table.all_rows():
             hide = not self.cat.matches(it.category, (it.info or {}).get('sub')) or \
-                (q and q not in it.name.lower() and q not in it.category.lower())
+                (q and not search_match(q, f'{it.name} {it.category} '.lower() + search_text(it.info)))
             self.table.setRowHidden(row, bool(hide))
 
     def add(self):

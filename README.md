@@ -57,7 +57,8 @@ always appear as the game names them.
 - **Inventory:** weight and total weight (weight × stack) columns plus the total carried, to find what
   makes you encumbered; rarity tiers coloured like in the game (common white/plain, uncommon green, rare blue,
   unique purple, the quest-item tier gold; broken junk grey); two-level category filter
-  (category, then optionally a subcategory – all of the category by default); the game's description in the tooltip. *Add item…* shows type, rarity and details
+  (category, then optionally a subcategory – all of the category by default); the game's description in the tooltip. *Add item…* searches names, type, size, rarity, details and the game
+  description in English and German, word by word ("mittlerer Motor", "large engine"), and shows type, rarity and details
   (vehicle parts: build size small/medium/large from `VPI:S`, engine power `VEI:P`), presets durability
   (full), batteries (full) and component quality (your own item's, else 100 where quality matters).
   Selecting a weapon or armor piece compares it with what is equipped in its slot (both
