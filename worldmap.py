@@ -14,8 +14,8 @@ import re
 import gamedata
 import nrbf
 
-CACHE = 'worldmap_v6.json'
-RENDER_VERSION = 4  # bump when the drawing changes
+CACHE = 'worldmap_v7.json'
+RENDER_VERSION = 5  # bump when the drawing changes
 # Expedition's Black Sea zones share the coordinate space with the caves, so they get their own page
 SEA_PREFIXES = ('xpbl', 'cvw')
 # the global map holds separate maps ("areas", Z:A), each with its own coordinates and entity list (A6:E)
@@ -27,6 +27,24 @@ PAGES = tuple(AREA_NAMES)
 
 def _path():
     return os.path.join(gamedata.GAME, 'data', 'maps', 'world', 'globalmap.uz')
+
+
+# icon layers of the game's map markers
+PLANTS = {'mindshroom', 'lakePoppy', 'redDreamMushroom', 'caveEars', 'oozingShroom', 'gremlinStool', 'spiritMushroom',
+          'honeyStalks', 'greenWart', 'glittershroom'}
+PEOPLE = {'merchant', 'doctor', 'hermit', 'ferryman'}
+LAYERS = ('creatures', 'plants', 'people')
+
+
+def icon_layer(m, kind):
+    """'creatures', 'plants' or 'people' for icon markers, None for everything drawn into the map."""
+    if kind in PLANTS:
+        return 'plants'
+    if kind in PEOPLE or m.endswith('\\npcs'):
+        return 'people'
+    if m.endswith(('MonsterIcons', 'xpbl-Icons')):
+        return 'creatures'
+    return None
 
 
 def _build():
@@ -62,6 +80,11 @@ def _build():
                 area_of[o.id] = gamedata._val(p, a.get('E2:N'))
     zones, links, sprites = [], set(), []
     sprite_of = {}  # entity id -> sprite index
+    # map markers (DELMA:K) that are icons rather than buildings: drawn as switchable layers
+    marker_kind = {}
+    for x in p.objects.values():
+        if isinstance(x, nrbf.Obj) and x.cls == 'DELMA':
+            marker_kind[entity(x).id] = gamedata._val(p, x.get('DELMA:K'))
     for x in p.objects.values():
         if not isinstance(x, nrbf.Obj):
             continue
@@ -73,7 +96,7 @@ def _build():
                 sprite_of[le.id] = len(sprites)
                 sprites.append({'m': m, 'f': [gamedata._val(p, f.get('X')), gamedata._val(p, f.get('Y'))],
                                 'pos': pos(x), 'vp': gamedata._val(p, le.get('E4:VP')) or 0,
-                                'area': area_of.get(le.id)})
+                                'area': area_of.get(le.id), 'layer': icon_layer(m, marker_kind.get(le.id))})
             continue
         if x.cls == 'ZMEA':
             zids = ids(x, 'ZMEA:R')
@@ -219,7 +242,8 @@ def sprite_image(s):
 
 def _render(page, path, area=None):
     from PIL import Image
-    sprites = _sprites_of(page, area)
+    # icons are separate layers (see icons()), the background holds everything else
+    sprites = [sp for sp in _sprites_of(page, area) if not sp.get('layer')]
     pts = [project(*s['pos']) for s in sprites]
     left = min(a for a, b in pts) - MARGIN - 200
     top = min(b for a, b in pts) - MARGIN - 200
@@ -319,3 +343,14 @@ def area_ready(page, area):
     import re as _re
     suffix = '' if area is None else '_' + _re.sub(r'\W+', '', area.lower())
     return os.path.exists(os.path.join(gamedata.CACHE, f'worldmap_{page}{suffix}.png'))
+
+
+def icons(page, origin):
+    """Icon markers of a page: [(layer, PIL image, (x, y) on the page image)]."""
+    out = []
+    for sp in _sprites_of(page):
+        if sp.get('layer'):
+            r = sprite_image(sp)
+            if r:
+                out.append((sp['layer'], r[0], (int(r[1][0]) - origin[0], int(r[1][1]) - origin[1])))
+    return out

@@ -127,7 +127,9 @@ higher values still count. The editor allows up to 999.
 ## World map
 
 *World map* (button next to *Refresh*, *View → World map…*, Ctrl+M) opens the map on its own: one page
-per area, a zone search, optional labels with each zone's merchants and most common creatures, and for a clicked zone its merchants, characters/creatures and the items lying
+per area, a zone search, a *Layers* menu (the game's icons for creatures,
+plants and merchants/doctors as separate layers; labels from the scanned data: merchant names, most
+common creatures/characters, loot count), and for a clicked zone its merchants, characters/creatures and the items lying
 there (click an item for all its locations).
 
 The world map is the game's own: `data/maps/world/globalmap.uz` is a zone whose entities are map markers

@@ -1524,6 +1524,8 @@ class WorldMapView(QGraphicsView):
         self.page = None
         self.region = None
         self.overlay = {}  # marker index -> [(text, QColor)] drawn on the zone
+        self.layers = {'creatures', 'plants', 'people'}  # visible icon layers
+        self.icon_items = {}
         self.cache = {}
         self.sel_items = []
         self.marks = {}
@@ -1558,7 +1560,9 @@ class WorldMapView(QGraphicsView):
                 if r is not None:
                     img, (x, y) = r
                     sprites[n] = (QPixmap.fromImage(ImageQt(img)), img, x, y)
-            self.cache[key] = (QPixmap(path), sprites)
+            icons = [] if self.region else \
+                [(layer, QPixmap.fromImage(ImageQt(img)), x, y) for layer, img, (x, y) in worldmap.icons(self.page, origin)]
+            self.cache[key] = (QPixmap(path), sprites, icons)
         return self.cache[key]
 
     def redraw(self):
@@ -1570,8 +1574,16 @@ class WorldMapView(QGraphicsView):
         self.scene_.clear()
         self.sel_items = []
         self.zone_items = {}
-        pix, sprites = self.page_data()
+        pix, sprites, icons = self.page_data()
         self.scene_.addPixmap(pix)
+        # the game's own icon markers, one switchable layer each
+        self.icon_items = {}
+        for layer, ipix, x, y in icons:
+            it = self.scene_.addPixmap(ipix)
+            it.setPos(x, y)
+            it.setZValue(1.2)
+            it.setVisible(layer in self.layers)
+            self.icon_items.setdefault(layer, []).append(it)
         self.setSceneRect(QRectF(pix.rect()))
         on_page = {n: m for n, m in self.marks.items() if self.world['zones'][n]['page'] == self.page}
         focus = set()
@@ -1638,6 +1650,12 @@ class WorldMapView(QGraphicsView):
                 r = self.scene_.addRect(QRectF(x, y, w, h), QPen(QColor(255, 255, 255), 3))
                 r.setZValue(4)
                 self.sel_items.append(r)
+
+    def set_layers(self, layers):
+        self.layers = set(layers)
+        for layer, items in self.icon_items.items():
+            for it in items:
+                it.setVisible(layer in self.layers)
 
     def set_overlay(self, overlay):
         self.overlay = overlay
@@ -2066,12 +2084,26 @@ class WorldMapDialog(QDialog):
         self.area.currentIndexChanged.connect(lambda _: self.show_page(self.area.currentData()))
         bar.addWidget(QLabel(tr('Area:')))
         bar.addWidget(self.area)
-        self.show_merchants = QCheckBox(tr('Merchants'))
-        self.show_creatures = QCheckBox(tr('Creatures'))
-        self.show_creatures.setToolTip(tr('The most common characters and creatures placed in each zone.'))
-        for c in (self.show_merchants, self.show_creatures):
-            c.toggled.connect(self.update_overlay)
-            bar.addWidget(c)
+        # switchable layers: the game's icons, and labels from the scanned map data
+        from PySide6.QtWidgets import QMenu, QToolButton
+        self.layer_actions = {}
+        menu = QMenu(self)
+        menu.addSection(tr('Icons of the game'))
+        for key, label in (('creatures', 'Creatures'), ('plants', 'Plants'), ('people', 'Merchants and doctors')):
+            self.layer_actions[key] = menu.addAction(tr(label))
+        menu.addSection(tr('Labels from the game data'))
+        for key, label in (('merchant_names', 'Merchant names'), ('creature_names', 'Creatures and characters'),
+                           ('loot', 'Loot (items lying there)')):
+            self.layer_actions[key] = menu.addAction(tr(label))
+        for key, act in self.layer_actions.items():
+            act.setCheckable(True)
+            act.setChecked(key in ('creatures', 'plants', 'people'))
+            act.toggled.connect(self.update_layers)
+        layers = QToolButton()
+        layers.setText(tr('Layers'))
+        layers.setMenu(menu)
+        layers.setPopupMode(QToolButton.InstantPopup)
+        bar.addWidget(layers)
         self.search = filter_box(tr('Find a zone…'), lambda _: None)
         self.search.returnPressed.connect(self.find)
         bar.addWidget(self.search, 1)
@@ -2119,28 +2151,41 @@ class WorldMapDialog(QDialog):
         else:
             QTimer.singleShot(0, self.map.fit_all)
 
+    def update_layers(self, *_):
+        self.map.set_layers({k for k in ('creatures', 'plants', 'people') if self.layer_actions[k].isChecked()})
+        self.update_overlay()
+
     def update_overlay(self, *_):
-        """Names of merchants and the most common creatures written on the zones of the current page."""
+        """Labels from the scanned map data on the zones of the current page: merchant names, the most common
+        creatures/characters, and how many items lie there."""
         import hints
+        on = {k for k, a in self.layer_actions.items() if a.isChecked()}
         overlay = {}
-        if (self.show_merchants.isChecked() or self.show_creatures.isChecked()) and hints.map_index_ready():
+        if on & {'merchant_names', 'creature_names', 'loot'} and hints.map_index_ready():
             for n, z in enumerate(self.map.world['zones']):
                 if z['page'] != self.map.page:
                     continue
                 c = hints.zone_contents(self.zone_ids(n))
                 lines = []
-                if self.show_merchants.isChecked():
+                if 'merchant_names' in on:
                     lines += [(m.split(' (')[0], QColor(120, 190, 255)) for m in c['merchants'][:3]]
-                if self.show_creatures.isChecked():
+                if 'creature_names' in on:
                     lines += [(f'{name}{" ×" + str(k) if k > 1 else ""}', QColor(255, 140, 120))
                               for name, k in c['creatures'][:2]]
+                if 'loot' in on:
+                    fixed = sum(k for _, kind, k in c['items'] if kind != 'random loot')
+                    rnd = sum(1 for _, kind, _ in c['items'] if kind == 'random loot')
+                    parts = ([tr('{n} items', n=fixed)] if fixed else []) + \
+                        ([tr('{n} random', n=rnd)] if rnd else [])
+                    if parts:
+                        lines.append(('🎒 ' + ' · '.join(parts), QColor(255, 210, 90)))
                 if lines:
                     overlay[n] = lines
         self.map.set_overlay(overlay)
 
     def show_page(self, page, fit=True):
         self.map.set_page(page)
-        if hasattr(self, 'show_merchants'):
+        if hasattr(self, 'layer_actions'):
             self.update_overlay()
         i = self.area.findData(page)
         if i >= 0 and i != self.area.currentIndex():
