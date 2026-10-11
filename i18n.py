@@ -141,6 +141,9 @@ DE = {
     'Location unknown: not placed in any map (appears through an event or quest).':
         'Ort unbekannt: in keiner Karte platziert (erscheint durch ein Ereignis oder eine Quest).',
     'Black Sea (Expedition)': 'Schwarzes Meer (Expedition)',
+    'Zones without a place on the world map (dungeons, interiors) are greyed out in the list.':
+        'Zonen ohne Platz auf der Weltkarte (Dungeons, Innenräume) sind in der Liste ausgegraut.',
+    'Rendering the world map from the game files (once)…': 'Weltkarte wird aus den Spieldateien erstellt (einmalig)…',
     'All locations on the map…': 'Alle Fundorte auf der Karte…',
     'Where to get {item}': 'Wo bekommt man {item}',
     'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',

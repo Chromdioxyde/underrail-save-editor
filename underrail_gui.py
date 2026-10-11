@@ -1167,8 +1167,11 @@ class MapScanJob(QRunnable):
 
     def run(self):
         import hints
+        import worldmap
         try:
             hints.map_index()
+            for page in worldmap.PAGES:  # pre-render the world map pages
+                worldmap.page_image(page)
         except Exception:
             pass
         try:
@@ -1178,76 +1181,25 @@ class MapScanJob(QRunnable):
 
 
 class WorldMapView(QGraphicsView):
-    """Schematic world map: one square per zone marker of the game's global map, lines for transitions.
-    Wheel zooms, dragging pans, clicking a marker emits its index."""
-    S = 40  # pixels per grid unit (one zone)
+    """The game's world map (rendered from its own sprites), one page at a time. Marked zones are tinted
+    and labelled; the rest of the map is dimmed while anything is marked. Wheel zooms, dragging pans,
+    clicking a zone emits its marker index."""
     zone_clicked = Signal(int)
 
     def __init__(self):
         super().__init__()
-        import hints
         import worldmap
-        self.setRenderHint(QPainter.Antialiasing)
+        self.setRenderHint(QPainter.SmoothPixmapTransform)
         self.setDragMode(QGraphicsView.ScrollHandDrag)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-        self.setBackgroundBrush(QColor(24, 24, 28))
+        self.setBackgroundBrush(QColor(12, 12, 16))
         self.scene_ = QGraphicsScene(self)
         self.setScene(self.scene_)
         self.world = worldmap.world()
-        S = self.S
-        self.page_items = {p: [] for p in worldmap.PAGES}
-        zones = self.world['zones']
-        # markers that show at least one zone (inset markers whose zones are drawn elsewhere stay hidden)
-        used = {n for n in set(self.world['marker'].values())}
-        near, far = QPen(QColor(62, 62, 70), 0), QPen(QColor(48, 48, 56), 0, Qt.DashLine)
-        seen = set()
-        for a, b in self.world['links']:
-            ma, mb = worldmap.marker(a), worldmap.marker(b)
-            if ma is None or mb is None or ma == mb or (ma, mb) in seen or zones[ma]['page'] != zones[mb]['page']:
-                continue
-            seen.add((ma, mb))
-            za, zb = zones[ma], zones[mb]
-            # long jumps are elevators, trains and boats
-            pen = near if abs(za['x'] - zb['x']) + abs(za['y'] - zb['y']) <= 2.5 else far
-            line = self.scene_.addLine(za['x'] * S, za['y'] * S, zb['x'] * S, zb['y'] * S, pen)
-            line.setZValue(0)
-            self.page_items[za['page']].append(line)
-        self.marks = []
-        for n, z in enumerate(zones):
-            r = QGraphicsRectItem(-S * 0.35, -S * 0.35, S * 0.7, S * 0.7)
-            r.setPos(z['x'] * S, z['y'] * S)
-            r.setData(0, n)
-            names = sorted({hints.zone_name(i) for i in z['ids']})
-            r.setToolTip('\n'.join(names + ([z['title']] if z['title'] else [])))
-            self.scene_.addItem(r)
-            self.marks.append(r)
-            if n in used:
-                self.page_items[z['page']].append(r)
-            else:
-                r.setVisible(False)
-        # place names at the middle of compact groups of zones ("Core City", "Junkyard", ...)
-        groups = {}
-        for n, z in enumerate(zones):
-            if n in used:
-                groups.setdefault((hints.zone_name(z['ids'][0]), z['page']), []).append((z['x'], z['y']))
-        for (name, page), pts in groups.items():
-            if len(pts) < 3 or name in ('Caves', 'Lower Underrail', 'Upper Underrail', 'Black Sea'):
-                continue
-            cx, cy = sum(p[0] for p in pts) / len(pts), sum(p[1] for p in pts) / len(pts)
-            if max(abs(p[0] - cx) + abs(p[1] - cy) for p in pts) > 4:
-                continue  # too spread out for one label
-            t = QGraphicsSimpleTextItem(name)
-            f = t.font(); f.setPointSize(11); f.setBold(True); t.setFont(f)
-            t.setBrush(QColor(200, 200, 210, 150))
-            t.setPos(cx * S - t.boundingRect().width() / 2, cy * S - S * 0.9)
-            t.setZValue(3)
-            t.setAcceptedMouseButtons(Qt.NoButton)
-            self.scene_.addItem(t)
-            self.page_items[page].append(t)
-        self.labels = []
         self.page = None
-        self.set_page('main')
-        self.highlight({})
+        self.marks = {}
+        self.selected = set()
+        self.items_ = []
         self.press = None
 
     def set_page(self, page):
@@ -1255,66 +1207,98 @@ class WorldMapView(QGraphicsView):
         if page == self.page:
             return
         self.page = page
-        for p, items in self.page_items.items():
-            for it in items:
-                it.setVisible(p == page)
-        rect = QRectF()
-        for it in self.page_items[page]:
-            rect = rect.united(it.sceneBoundingRect())
-        self.setSceneRect(rect.adjusted(-self.S * 3, -self.S * 3, self.S * 3, self.S * 3))
+        self.redraw()
 
     def highlight(self, marks):
-        """marks: {marker index: (QColor, count text, name)}; all other markers are drawn dim."""
-        for t in self.labels:
-            self.scene_.removeItem(t)
-        self.labels = []
-        for n, r in enumerate(self.marks):
-            if n in marks:
-                color, text, name = marks[n]
-                r.setBrush(color); r.setPen(QPen(color.lighter(150), 0)); r.setZValue(4)
-                if text:
-                    t = QGraphicsSimpleTextItem(text, r)
-                    t.setBrush(QColor(0, 0, 0))
-                    b = t.boundingRect()
-                    t.setPos(-b.width() / 2, -b.height() / 2)
-                    t.setAcceptedMouseButtons(Qt.NoButton)
-                    self.labels.append(t)
-                if name:
-                    t = QGraphicsSimpleTextItem(name, r)
-                    t.setBrush(color.lighter(130))
-                    t.setPos(self.S * 0.4, -t.boundingRect().height() / 2)
-                    t.setAcceptedMouseButtons(Qt.NoButton)
-                    self.labels.append(t)
-            else:
-                r.setBrush(QColor(50, 50, 58)); r.setPen(QPen(QColor(90, 90, 100), 0)); r.setZValue(1)
+        """marks: {marker index: (QColor, count text, name)}"""
+        self.marks = marks
+        self.redraw()
+
+    def redraw(self):
+        import hints
+        import worldmap
+        from PIL.ImageQt import ImageQt
+        if self.page is None:
+            return
+        self.scene_.clear()
+        self.zone_items = {}
+        path, origin = worldmap.page_image(self.page)
+        pix = QPixmap(path)
+        self.scene_.addPixmap(pix)
+        self.setSceneRect(QRectF(pix.rect()))
+        on_page = {n: m for n, m in self.marks.items() if self.world['zones'][n]['page'] == self.page}
+        if on_page:
+            shade = self.scene_.addRect(QRectF(pix.rect()), QPen(Qt.NoPen), QColor(0, 0, 0, 140))
+            shade.setZValue(1)
+        for n, z in enumerate(self.world['zones']):
+            if z['page'] != self.page:
+                continue
+            r = worldmap.zone_sprite(n, origin)
+            if r is None:
+                continue
+            img, (x, y) = r
+            names = sorted({hints.zone_name(i) for i in z['ids']})
+            tip = '\n'.join(names + ([z['title']] if z['title'] else []))
+            mark = on_page.get(n)
+            if mark:
+                color, text, name = mark
+                # the zone itself, undimmed, with a coloured tint over its shape
+                sprite = self.scene_.addPixmap(QPixmap.fromImage(ImageQt(img)))
+                sprite.setPos(x, y); sprite.setZValue(2)
+                tint = img.copy()
+                tint.paste((color.red(), color.green(), color.blue(), 255), (0, 0, *img.size))
+                tint.putalpha(img.getchannel('A').point(lambda v: v * 0.55))
+                t = self.scene_.addPixmap(QPixmap.fromImage(ImageQt(tint)))
+                t.setPos(x, y); t.setZValue(3)
+                if n in self.selected:
+                    sel = self.scene_.addRect(QRectF(x, y, img.width, img.height), QPen(QColor(255, 255, 255), 3))
+                    sel.setZValue(4)
+                cx, cy = x + img.width / 2, y + img.height / 2
+                for label, size, dy in ((text, 13, 0), (name, 10, 18)):
+                    if not label:
+                        continue
+                    lt = QGraphicsSimpleTextItem(label)
+                    f = lt.font(); f.setPointSize(size - 2); f.setBold(True); lt.setFont(f)
+                    lt.setBrush(QColor(255, 255, 255))
+                    lt.setPen(QPen(QColor(0, 0, 0), 0.6))
+                    # same size on screen at any zoom level, centred on the zone
+                    lt.setFlag(QGraphicsSimpleTextItem.ItemIgnoresTransformations)
+                    b = lt.boundingRect()
+                    lt.setPos(cx, cy)
+                    lt.setTransform(lt.transform().translate(-b.width() / 2, -b.height() / 2 + dy * 0.8))
+                    lt.setZValue(5)
+                    lt.setAcceptedMouseButtons(Qt.NoButton)
+                    self.scene_.addItem(lt)
+            # invisible hit area for tooltips and clicks; marked zones lie on top
+            hit = self.scene_.addRect(QRectF(x + img.width * 0.15, y + img.height * 0.2,
+                                             img.width * 0.7, img.height * 0.6), QPen(Qt.NoPen))
+            hit.setZValue(6 if mark else 1.5)
+            hit.setData(0, n)
+            hit.setToolTip(tip)
+            self.zone_items[n] = (x, y, img.width, img.height)
 
     def select(self, indexes):
         """Outline the given markers and bring them into view."""
-        for n, r in enumerate(self.marks):
-            r.setSelected(False)
-            pen = r.pen()
-            pen.setWidthF(4 if n in indexes else 0)
-            if n in indexes:
-                pen.setColor(QColor(255, 255, 255))
-            r.setPen(pen)
+        self.selected = set(indexes)
+        self.redraw()
         if indexes:
             self.show_markers(indexes, zoom=False)
 
     def show_markers(self, indexes, zoom=True):
-        """Bring markers into view: zoom=True fits them (not closer than about 14 zones across), otherwise
-        keep the zoom level and only pan, zooming out if they don't fit."""
-        S = self.S
-        indexes = [n for n in indexes if self.world['zones'][n]['page'] == self.page]
-        if not indexes:
-            return
+        """Bring markers into view: zoom=True fits them (not closer than 1:1), otherwise keep the zoom
+        level and only pan, zooming out if they don't fit."""
         rect = QRectF()
         for n in indexes:
-            rect = rect.united(self.marks[n].sceneBoundingRect())
-        rect = rect.adjusted(-S * 2, -S * 2, S * 2, S * 2)
+            if n in self.zone_items:
+                rect = rect.united(QRectF(*self.zone_items[n]))
+        if rect.isNull():
+            return
+        rect = rect.adjusted(-150, -150, 150, 150)
         visible = self.mapToScene(self.viewport().rect()).boundingRect()
         if zoom or rect.width() > visible.width() or rect.height() > visible.height():
-            if rect.width() < S * 14 and rect.height() < S * 14:
-                rect = QRectF(rect.center() - QPointF(S * 7, S * 7), QSize(S * 14, S * 14))
+            vp = self.viewport().rect()
+            if rect.width() < vp.width() and rect.height() < vp.height():
+                rect = QRectF(rect.center() - QPointF(vp.width() / 2, vp.height() / 2), QSize(vp.width(), vp.height()))
             self.fitInView(rect, Qt.KeepAspectRatio)
         else:
             self.centerOn(rect.center())
@@ -1334,9 +1318,7 @@ class WorldMapView(QGraphicsView):
         super().mouseReleaseEvent(e)
         if self.press is not None and (e.position() - self.press).manhattanLength() < 5:
             for it in self.items(e.position().toPoint()):
-                if isinstance(it, QGraphicsSimpleTextItem) and it.parentItem() is not None:
-                    it = it.parentItem()
-                if isinstance(it, QGraphicsRectItem):
+                if isinstance(it, QGraphicsRectItem) and it.data(0) is not None:
                     self.zone_clicked.emit(it.data(0))
                     break
         self.press = None
@@ -1430,7 +1412,7 @@ class LocationsDialog(QDialog):
         crowded = len(marks) > 12
         self.map.highlight({m: (self.COLORS[k], str(c) if k != 'merchant' and c > 1 else '',
                                 ', '.join(names) if names else
-                                '' if crowded else self.map.marks[m].toolTip().split('\n')[0])
+                                '' if crowded else hints.zone_name(self.map.world['zones'][m]['ids'][0]))
                             for m, (k, c, names) in marks.items()})
         self.marked = sorted(marks)
         self.tree.currentItemChanged.connect(self.picked)
@@ -1439,7 +1421,8 @@ class LocationsDialog(QDialog):
         legend = QLabel('  '.join(f'<span style="color:{self.COLORS[k].name()}">■</span> {tr(t)}' for k, t in
                                   (('merchant', 'Merchant'), ('found', 'Found in the world'),
                                    ('creature', 'Creature'))) +
-                        '  —  ' + tr('Numbers: how many. Wheel zooms, drag pans, click a zone for its entries.'))
+                        '  —  ' + tr('Numbers: how many. Wheel zooms, drag pans, click a zone for its entries.') +
+                        ' ' + tr('Zones without a place on the world map (dungeons, interiors) are greyed out in the list.'))
         legend.setWordWrap(True)
         # one button per map page, with how many marked zones it has
         zones = self.map.world['zones']
@@ -1526,7 +1509,8 @@ class HintsTab(QWidget):
         if not self.built:  # computed on first view only
             self.built = True
             import hints
-            if not hints.map_index_ready() and not self.scanning:
+            import worldmap
+            if not (hints.map_index_ready() and worldmap.pages_ready()) and not self.scanning:
                 self.scanning = True
                 QThreadPool.globalInstance().start(MapScanJob(portrait_signals()))
             self.refresh()
@@ -1591,7 +1575,12 @@ class HintsTab(QWidget):
                 info = self.links[int(s[4:])]
             except (ValueError, IndexError):
                 return
-            LocationsDialog(self, info).exec()
+            QApplication.setOverrideCursor(Qt.WaitCursor)  # the first map render takes a while
+            try:
+                dlg = LocationsDialog(self, info)
+            finally:
+                QApplication.restoreOverrideCursor()
+            dlg.exec()
 
     def render(self):
         import html

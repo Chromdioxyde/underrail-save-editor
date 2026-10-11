@@ -65,7 +65,7 @@ always appear as the game names them.
   the map files: containers, ground, NPCs, job rewards, random container loot), for animal parts the
   zones where their creature is placed, and notes on the
   character's crafting feats. *All locations on the map…* (or *+N more*) opens a list of every source
-  with a schematic world map that marks the zones (merchants blue, spots in the world orange, creatures
+  with the game's world map that marks the zones (merchants blue, spots in the world orange, creatures
   green; click a row to find it on the map, click a zone to find its rows)
 
 Test structural changes (feats, specializations, blueprints, items, name, portrait) on a copy first.
@@ -103,14 +103,18 @@ higher values still count. The editor allows up to 999.
 
 ## World map
 
-There's no drawn world map in the game files, but `data/maps/world/globalmap.uz` is a zone whose
-entities are markers: `ZMEA` = a zone (`ZMEA:R` zone ids, `ZMEA:CN` title, position in zone-sized grid
-units), `TRSMA` = a transition between two zones. `worldmap.py` reads them; the editor draws one square
-per zone and a line per transition (dashed for long jumps such as elevators and trains). Expedition's
-Black Sea zones (`xpbl*`, `cvw*`) share the coordinate space with the caves, so they're a separate page.
-South Gate Station's levels are an inset (`ZMEA:I` = 1) and are shown at the station's outer marker.
-Dungeons and interiors without a marker are listed but greyed out. Merchants are located through the
-merchant aspect `MEA1:S` (store id) of the NPC that trades, which also gives their real name.
+The world map is the game's own: `data/maps/world/globalmap.uz` is a zone whose entities are map markers
+with sprites. `ZMEA` = a zone (`ZMEA:R` zone ids, `ZMEA:CN` title), `TRSMA` = a transition, `DELMA` =
+decoration/icon; each has a sprite aspect `SEA` (`SEA:M` = materialization under
+`data/meta/materialization/locale`, `SEA:F` = frame). The `.mu` file names the texture (`MU:T`, e.g.
+`data/locale/maps/mapzones.xnb`), frame size `MU:S`, sheet offset `MU:UO` and draw origin `MU:TO`.
+`worldmap.py` projects the entity positions isometrically (x = (X−Y)·50, y = (X+Y)·25 − Z·30), draws the
+sprites back to front and caches the result as `worldmap_main.png` / `worldmap_sea.png`. Expedition's
+Black Sea shares the coordinate space with the caves, so it's a separate page. Marked zones are drawn
+undimmed with a tint over their own sprite. South Gate Station's levels (`ZMEA:I` = 1, an inset) are
+shown at the station's outer marker; dungeons and interiors without a marker are greyed out in the list.
+Merchants are located through the merchant aspect `MEA1:S` (store id) of the NPC that trades, which
+also gives their real name.
 
 ## Save format
 

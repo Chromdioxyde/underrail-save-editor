@@ -33,7 +33,7 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 - Map index (`hints.map_index()`, cache `map_index_v5.json`) is keyed by zone id (map file name without
   the `_l<n>` layer suffix); display names come from `southunderrail.world`. Also indexes merchants
   (`MEA1:S` store id -> zones + NPC name).
-- `worldmap.py` reads `globalmap.uz` markers (see README). 76 zone ids (dungeons, DLC interiors) have no
+- `worldmap.py` renders the in-game world map from `globalmap.uz` sprites (see README). 76 zone ids (dungeons, DLC interiors) have no
   marker. `LocationsDialog` in the GUI lists all sources and marks them on `WorldMapView`.
 - Unplaced merchants (no map NPC, probably events): gc_fsh, gc_gypsy, dun_diedrick, ezra,
   jackquicksilver, oldjonas, cc_jkkquartermaster.
