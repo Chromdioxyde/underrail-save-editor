@@ -343,6 +343,8 @@ DE = {
     'Items': 'Items',
     'Nothing recorded for this zone.': 'Für diese Zone ist nichts verzeichnet.',
     'Click an item to see everywhere it can be found.': 'Klicke auf ein Item, um alle Fundorte zu sehen.',
+    'Upper Caves': 'Obere Höhlen',
+    'Lower Caves': 'Untere Höhlen',
     'All locations on the map…': 'Alle Fundorte auf der Karte…',
     'Where to get {item}': 'Wo bekommt man {item}',
     'Where': 'Wo', 'How': 'Wie', 'Count': 'Anzahl',

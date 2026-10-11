@@ -137,9 +137,9 @@ decoration/icon; each has a sprite aspect `SEA` (`SEA:M` = materialization under
 `data/locale/maps/mapzones.xnb`), frame size `MU:S`, sheet offset `MU:UO` and draw origin `MU:TO`.
 `worldmap.py` projects the entity positions isometrically (x = (X−Y)·50, y = (X+Y)·25 − Z·30), draws the
 sprites back to front and caches the result as `worldmap_main.png` / `worldmap_sea.png`. Expedition's
-Black Sea shares the coordinate space with the caves, so it's a separate page. The areas of the world
-(Upper/Lower Underrail, Caves, Deep Caverns, Foundry, … by zone id prefix, `worldmap.REGIONS`) are
-layers stacked over the same ground, so the dialog can render one area alone (*Area*), cached per area. Marked zones are drawn
+Black Sea shares the coordinate space with the caves, so it's a separate page. The file actually holds
+separate maps (`Z:A` areas: up, lu, lux, lc, dc, lup, fo, sgs, bs), each with its own coordinates and
+entity list (`A6:E`); every area is rendered as its own page. Marked zones are drawn
 undimmed with a tint over their own sprite. South Gate Station's levels (`ZMEA:I` = 1, an inset) are
 shown at the station's outer marker; dungeons and interiors without a marker are greyed out in the list.
 Merchants are located through the merchant aspect `MEA1:S` (store id) of the NPC that trades, which

@@ -1779,8 +1779,10 @@ class LocationsDialog(QDialog):
         per_page = {p: sum(1 for m in self.marked if zones[m]['page'] == p) for p in worldmap.PAGES}
         pages = QHBoxLayout()
         self.page_buttons = {}
-        for p, label in (('main', 'Underrail'), ('sea', tr('Black Sea (Expedition)'))):
-            b = QPushButton(f'{label} ({per_page[p]})')
+        for p in worldmap.PAGES:
+            if not per_page[p]:
+                continue
+            b = QPushButton(f'{tr(worldmap.AREA_NAMES[p])} ({per_page[p]})')
             b.setCheckable(True)
             b.clicked.connect(lambda _=False, p=p: (self.region.setCurrentIndex(0), self.show_page(p)))
             pages.addWidget(b)
@@ -1796,9 +1798,8 @@ class LocationsDialog(QDialog):
         for name in sorted({n for _, n in worldmap.REGIONS}, key=lambda n: tr(n)):
             self.region.addItem(tr(name) + (f' ({per_area[name]})' if name in per_area else ''), name)
         self.region.currentIndexChanged.connect(self.pick_region)
-        pages.addWidget(QLabel(tr('Area:')))
-        pages.addWidget(self.region)
-        self.start_page = 'sea' if per_page['sea'] > per_page['main'] else 'main'
+        self.region.hide()  # the areas are the map pages now
+        self.start_page = max(worldmap.PAGES, key=lambda p: per_page[p])
         self.show_page(self.start_page, fit=False)
         right = QWidget()
         rl = QVBoxLayout(right)
@@ -2029,17 +2030,10 @@ class WorldMapDialog(QDialog):
         self.map.zone_clicked.connect(self.show_zone)
         self.pages = {}
         bar = QHBoxLayout()
-        for p, label in (('main', 'Underrail'), ('sea', tr('Black Sea (Expedition)'))):
-            b = QPushButton(label)
-            b.setCheckable(True)
-            b.clicked.connect(lambda _=False, p=p: (self.area.setCurrentIndex(0), self.show_page(p)))
-            bar.addWidget(b)
-            self.pages[p] = b
         self.area = QComboBox()
-        self.area.addItem(tr('All areas'), None)
-        for name in sorted({n for _, n in worldmap.REGIONS}, key=lambda n: tr(n)):
-            self.area.addItem(tr(name), name)
-        self.area.currentIndexChanged.connect(self.pick_area)
+        for p in worldmap.PAGES:
+            self.area.addItem(tr(worldmap.AREA_NAMES[p]), p)
+        self.area.currentIndexChanged.connect(lambda _: self.show_page(self.area.currentData()))
         bar.addWidget(QLabel(tr('Area:')))
         bar.addWidget(self.area)
         self.search = filter_box(tr('Find a zone…'), lambda _: None)
@@ -2064,7 +2058,7 @@ class WorldMapDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.addWidget(split, 1)
         lay.addWidget(buttons)
-        self.show_page('main', fit=False)
+        self.show_page(self.area.currentData(), fit=False)
 
     def showEvent(self, e):
         super().showEvent(e)
@@ -2072,8 +2066,11 @@ class WorldMapDialog(QDialog):
 
     def show_page(self, page, fit=True):
         self.map.set_page(page)
-        for p, b in self.pages.items():
-            b.setChecked(p == page)
+        i = self.area.findData(page)
+        if i >= 0 and i != self.area.currentIndex():
+            self.area.blockSignals(True)
+            self.area.setCurrentIndex(i)
+            self.area.blockSignals(False)
         if fit:
             self.map.fit_all()
 
@@ -2112,8 +2109,6 @@ class WorldMapDialog(QDialog):
             return
         page = self.map.world['zones'][hits[0]]['page']
         hits = [n for n in hits if self.map.world['zones'][n]['page'] == page]
-        if self.area.currentIndex():
-            self.area.setCurrentIndex(0)
         self.show_page(page, fit=False)
         self.map.select(set(hits))
         self.map.show_markers(hits)

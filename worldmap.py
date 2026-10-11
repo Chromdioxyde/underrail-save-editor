@@ -14,11 +14,15 @@ import re
 import gamedata
 import nrbf
 
-CACHE = 'worldmap_v5.json'
-RENDER_VERSION = 3  # bump when the drawing changes
+CACHE = 'worldmap_v6.json'
+RENDER_VERSION = 4  # bump when the drawing changes
 # Expedition's Black Sea zones share the coordinate space with the caves, so they get their own page
 SEA_PREFIXES = ('xpbl', 'cvw')
-PAGES = ('main', 'sea')
+# the global map holds separate maps ("areas", Z:A), each with its own coordinates and entity list (A6:E)
+AREA_NAMES = {'up': 'Upper Underrail', 'lu': 'Lower Underrail', 'lux': 'Upper Caves', 'lc': 'Lower Caves',
+              'dc': 'Deep Caverns', 'lup': 'Lower Passages', 'fo': 'Foundry', 'sgs': 'South Gate Station',
+              'bs': 'Black Sea'}
+PAGES = tuple(AREA_NAMES)
 
 
 def _path():
@@ -46,6 +50,16 @@ def _build():
         n = o.get(f'{prefix}:Count').value if f'{prefix}:Count' in o.names else 0
         return [s.lower() for s in (gamedata._val(p, o.get(f'{prefix}:{k}')) for k in range(n)) if s]
 
+    root = p.objects[p.root]
+    area_of = {}
+    for i in range(root.get('Z:A:Count').value):
+        a = nrbf.resolve(p, root.get(f'Z:A:{i}'))
+        lst = nrbf.resolve(p, a.get('A6:E'))
+        arr = nrbf.resolve(p, lst.get('_items'))
+        for v in arr.items[:gamedata._val(p, lst.get('_size'))]:
+            o = nrbf.resolve(p, v)
+            if o is not None:
+                area_of[o.id] = gamedata._val(p, a.get('E2:N'))
     zones, links, sprites = [], set(), []
     sprite_of = {}  # entity id -> sprite index
     for x in p.objects.values():
@@ -58,7 +72,8 @@ def _build():
                 le = entity(x)
                 sprite_of[le.id] = len(sprites)
                 sprites.append({'m': m, 'f': [gamedata._val(p, f.get('X')), gamedata._val(p, f.get('Y'))],
-                                'pos': pos(x), 'vp': gamedata._val(p, le.get('E4:VP')) or 0})
+                                'pos': pos(x), 'vp': gamedata._val(p, le.get('E4:VP')) or 0,
+                                'area': area_of.get(le.id)})
             continue
         if x.cls == 'ZMEA':
             zids = ids(x, 'ZMEA:R')
@@ -66,7 +81,7 @@ def _build():
                 X, Y, Z = pos(x)
                 zones.append({'ids': zids, 'x': X, 'y': Y, 'z': Z, 'title': gamedata._val(p, x.get('ZMEA:CN')),
                               'contains': ids(x, 'ZMEA:C'), 'inset': gamedata._val(p, x.get('ZMEA:I')) == 1,
-                              'page': 'sea' if zids[0].startswith(SEA_PREFIXES) else 'main',
+                              'page': area_of.get(entity(x).id),
                               'entity': entity(x).id})
         elif x.cls == 'TRSMA':
             for a in ids(x, 'TRSMA:L1'):
@@ -162,11 +177,7 @@ def _sprites_of(page, area=None):
     zones = world()['zones']
     out = []
     for s, n in zip(world()['sprites'], _sprite_zones()):
-        if n is None:
-            pg, ar = ('sea' if 'xpbl' in s['m'].lower() else 'main'), None
-        else:
-            pg, ar = zones[n]['page'], region(zones[n]['ids'][0])
-        if pg == page and (area is None or ar == area):
+        if s.get('area') == page:
             out.append(s)
     return out
 
@@ -292,6 +303,10 @@ REGIONS = [
 
 
 def region(zid):
+    """Area (map) a zone is drawn on."""
+    m = marker(zid)
+    if m is not None and world()['zones'][m]['page'] in AREA_NAMES:
+        return AREA_NAMES[world()['zones'][m]['page']]
     zid = zid.lower()
     for prefixes, name in REGIONS:
         if zid.startswith(prefixes):

@@ -43,6 +43,11 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 - Skill damage factor (0.7/0.5) from the wiki; `c4r::a` in the exe computes (ac[x] + skill * ad[x]) * y –
   probably the real formula, not decoded yet.
 
+## World map areas (latest)
+Map pages = the global map's areas (`Z:A`, entity lists `A6:E`). Done: area pages in both dialogs.
+Open: user asked to show more info on the map itself (enemies, merchants as icons/labels); the old
+prefix-based `REGIONS`/area combobox in LocationsDialog is hidden and can be removed; check SGS inset.
+
 ## Builds
 `builds.py`: archetypes with weapon families (from `WI:WT` + visual model `WI:WVM`: k knife, s sledgehammer,
 c crowbar, '' fist, xpbls spear, xpblm sword, ep/ap energy pistol), attributes, skills, feat ids and armor
