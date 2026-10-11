@@ -54,7 +54,10 @@ always appear as the game names them.
   *Only available* hides them
 - **Specializations:** edit values (up to the game's maximum per specialization), add/remove; only
   specializations of feats the character has are offered, like in the game
-- **Inventory:** item icons, sortable (click a column header) and filterable by category; stack size, component
+- **Inventory:** selecting a weapon or armor piece compares it with what is equipped in its slot (both
+  weapon slots for weapons): damage, AP, damage per AP and your damage per AP, crit, precision,
+  Strength, range, magazine, resistances/thresholds per damage type, armor penalty, level, durability,
+  weight – differences green/red like in Diablo. Item icons, sortable (click a column header) and filterable by category; stack size, component
   quality, durability (with maximum, *Repair* / *Repair all*), battery; add items from all ~1460 game
   items, duplicate (crafted items too), remove; edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
@@ -66,7 +69,11 @@ always appear as the game names them.
   (owned ✓, unmet requirements ⚠), checks the equipped weapons and worn armor penalty, lists only its
   weapon family and weighs armor penalty by the build's armor profile (light: penalty counts a lot, max
   15 %; medium: max 40 %; heavy: protection first), limited to what the character's Strength can wear.
-  Below that: best weapons by damage per action point and the best armor/helmet/boot component
+  The *Weapons* sub-tab lists every weapon (library weapons plus the character's own, crafted ones
+  included) with all base stats and the damage per AP with the character's effective skill
+  (`damage × (1 + 0.7 × skill / 100)`, 0.5 for pistols and knives, from the game wiki); every column
+  sorts, and it filters by family (default: the build's), text, Strength and ownership.
+  *Build and armor*: best and the best armor/helmet/boot component
   combinations by protection versus armor penalty (computed with the game's formulas), with the merchants
   that sell them (fixed shipments or random stock), where they lie in the game world (scanned once from
   the map files: containers, ground, NPCs, job rewards, random container loot), for animal parts the

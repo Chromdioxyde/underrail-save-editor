@@ -42,7 +42,10 @@ Project language is English (docs, code, commit messages); the GUI additionally 
 `builds.py`: archetypes with weapon families (from `WI:WT` + visual model `WI:WVM`: k knife, s sledgehammer,
 c crowbar, '' fist, xpbls spear, xpblm sword, ep/ap energy pistol), attributes, skills, feat ids and armor
 profile; `detect(save)` scores skills + owned key feats + equipped weapon family. Worn armor penalty = sum
-of `AI1:E`. Weapon table only covers library (non-crafted) weapons – crafted weapon stats not analysed yet.
+of `AI1:E`. `itemstats.py` reads weapon/armor stats from save items and item files alike (used by the Weapons sub-tab and
+the inventory comparison). Skill damage factor from the wiki (0.7 / 0.5 light); the exe's `euf::s` returns
+`WI:SB` or 1.0/0.8/0.6 by category – not identified yet (maybe stealth/noise), Strength bonus for melee
+not modelled.
 
 ## Packaging
 - `packaging/install.sh` (per-user Linux install), `build-appimage.sh` (portable AppImage, tested on

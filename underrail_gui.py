@@ -1053,6 +1053,66 @@ class ItemTable(QTableWidget):
         return [(row, self.item_at(row)) for row in range(self.rowCount())]
 
 
+def compare_html(save, item):
+    """Stats of an item next to the equipped item(s) of its slot, with coloured differences."""
+    import html
+    import itemstats
+    esc = html.escape
+    r = itemstats.save_reader(item)
+    if r is None:
+        return ''
+    skills, strength = itemstats.character(save)
+    mine = itemstats.stats(r, skills, strength)
+    if not mine:
+        return f'<p>{esc(tr("No comparable stats for this item."))}</p>'
+    slots = itemstats.SLOT_OF_CLASS.get(r.o.cls, [])
+    others = [it for it in save.equipped() if it.slot in slots and it.obj is not item.obj]
+    other_stats = [{s.key: s for s in itemstats.stats(itemstats.save_reader(it), skills, strength)} for it in others]
+    h = [f'<h3>{esc(item.name)}</h3>']
+    if item.slot:
+        h.append(f'<p><i>{esc(tr("Equipped ({slot})", slot=tr(item.slot)))}</i></p>')
+    elif not others:
+        h.append(f'<p><i>{esc(tr("Nothing equipped in this slot."))}</i></p>')
+    h.append('<table cellspacing="0" cellpadding="3" border="1"><tr><th></th>'
+             f'<th>{esc(tr("This item"))}</th>' +
+             ''.join(f'<th>{esc(it.name)}<br><small>{esc(tr(it.slot))}</small></th>' for it in others) + '</tr>')
+    # rows of every stat any of the items has; missing protection counts as 0
+    keys = [s.key for s in mine]
+    for st in other_stats:
+        keys += [k for k in st if k not in keys]
+    keys.sort(key=itemstats.order)
+    by_key = {s.key: s for s in mine}
+    for k in keys:
+        if k not in by_key:
+            o = next(st[k] for st in other_stats if k in st)
+            zero = k.startswith(('dr_', 'dt_'))
+            by_key[k] = itemstats.Stat(k, o.label, 0 if zero else None,
+                                       ('0%' if k.startswith('dr_') else '0') if zero else '–', o.better)
+    pct = ('crit', 'precision', 'penalty') + tuple(k for k in keys if k.startswith('dr_'))
+    for s in (by_key[k] for k in keys):
+        row = f'<tr><td>{esc(tr(s.label))}</td><td align="right"><b>{esc(s.text)}</b></td>'
+        for st in other_stats:
+            o = st.get(s.key)
+            if o is None and s.key.startswith(('dr_', 'dt_')):
+                o = itemstats.Stat(s.key, s.label, 0, '0%' if s.key.startswith('dr_') else '0', s.better)
+            if o is None:
+                row += '<td></td>'
+                continue
+            cell = esc(o.text)
+            if isinstance(s.value, (int, float)) and isinstance(o.value, (int, float)) and s.better:
+                d = s.value - o.value
+                if abs(d) > 1e-9:
+                    good = d * s.better > 0
+                    txt = f'{d * 100:+.0f}%' if s.key in pct else (f'{d:+.2f}' if isinstance(d, float) and
+                                                                    d != int(d) else f'{d:+g}')
+                    cell += f' <span style="color:{"#2a2" if good else "#d33"}">({txt})</span>'
+            row += f'<td align="right">{cell}</td>'
+        h.append(row + '</tr>')
+    h.append('</table>')
+    h.append(f'<p><small>{esc(tr("Differences: this item minus the equipped one; green = better. Your damage per AP uses your effective skill from the save."))}</small></p>')
+    return '\n'.join(h)
+
+
 class InventoryTab(QWidget):
     COLS = ['Name', 'Category', 'Stack', 'Quality', 'Durability', 'Max', 'Battery', 'Max bat.', 'Crafted']
 
@@ -1083,7 +1143,16 @@ class InventoryTab(QWidget):
         il.addLayout(top); il.addWidget(self.table)
         split.addWidget(inv); split.addWidget(eq)
         split.setSizes([450, 180])
-        QVBoxLayout(self).addWidget(split)
+        # comparison of the selected item with what is equipped in its slot
+        self.compare = QTextBrowser()
+        self.compare.setPlaceholderText(tr('Select a weapon or armor piece to compare it with your equipment.'))
+        side = QSplitter()
+        side.addWidget(split)
+        side.addWidget(self.compare)
+        side.setSizes([900, 420])
+        QVBoxLayout(self).addWidget(side)
+        self.table.itemSelectionChanged.connect(lambda: self.show_compare(self.table))
+        self.equip.itemSelectionChanged.connect(lambda: self.show_compare(self.equip))
         self.build()
 
     def build(self):
@@ -1100,6 +1169,10 @@ class InventoryTab(QWidget):
         self.table.fill(items)
         self.equip.fill(self.main.save.equipped())
         self.refilter()
+
+    def show_compare(self, table):
+        sel = table.selected()
+        self.compare.setHtml(compare_html(self.main.save, sel[0]) if sel else '')
 
     def refilter(self, *_):
         q, c = self.search.text().lower(), self.cat.currentData()
@@ -1488,6 +1561,159 @@ class LocationsDialog(QDialog):
                 it.setSelected(True)
 
 
+class WeaponsPanel(QWidget):
+    """All weapons with their base stats and the character's damage per AP: library weapons plus the
+    character's own (crafted ones too). Sortable by every column, filterable by family, text, Strength
+    and ownership."""
+    COLS = [('name', 'Weapon'), ('family', 'Type'), ('damage', 'Damage'), ('ap', 'AP'), ('per_ap', 'Dmg/AP'),
+            ('your_per_ap', 'Your dmg/AP'), ('crit', 'Crit'), ('crit_dmg', 'Crit dmg'), ('precision', 'Precision'),
+            ('strength', 'Strength'), ('range', 'Range'), ('max_range', 'Max range'), ('magazine', 'Magazine'),
+            ('level', 'Level'), ('weight', 'Weight'), ('owned', 'Owned')]
+
+    def __init__(self, hints_tab):
+        super().__init__()
+        self.tab = hints_tab
+        self.family = QComboBox()
+        self.family.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.family.currentIndexChanged.connect(self.refilter)
+        self.search = filter_box(tr('Filter…'), self.refilter)
+        self.usable = QCheckBox(tr('Only usable with my Strength'))
+        self.usable.toggled.connect(self.refilter)
+        self.owned = QCheckBox(tr('Only my weapons'))
+        self.owned.toggled.connect(self.refilter)
+        where = QPushButton(tr('Where to get…'))
+        where.clicked.connect(self.where)
+        top = QHBoxLayout()
+        for w in (self.family, self.search):
+            top.addWidget(w)
+        top.addWidget(self.usable); top.addWidget(self.owned); top.addWidget(where)
+        self.table = QTableWidget(0, len(self.COLS))
+        self.table.setHorizontalHeaderLabels([tr(c) for _, c in self.COLS])
+        self.table.verticalHeader().hide()
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setIconSize(QSize(33, 33))
+        self.table.verticalHeader().setDefaultSectionSize(36)
+        self.table.doubleClicked.connect(lambda _: self.where())
+        note = QLabel(tr('Your dmg/AP = damage × (1 + 0.7 × effective skill / 100), 0.5 for pistols and knives '
+                         '(game wiki), with the effective skill stored in the save. Burst weapons count all shots; '
+                         'ammo, feats and precision are left out. ⚠ = Strength too low (less precision).'))
+        note.setWordWrap(True)
+        lay = QVBoxLayout(self)
+        lay.addLayout(top); lay.addWidget(self.table, 1); lay.addWidget(note)
+        self.rows = None
+
+    def load(self):
+        """Collect rows once: library weapons and the character's own."""
+        import builds
+        import itemstats
+        save = self.tab.main.save
+        skills, self.strength = itemstats.character(save)
+        rows, seen = [], set()
+        own = []
+        if save:
+            own = [(it, 'equipped') for it in save.equipped() if it.category == 'weapons'] + \
+                  [(it, 'inventory') for it in save.inventory() if it.category == 'weapons']
+        for it, where in own:
+            r = itemstats.save_reader(it)
+            if r is None or r.o.cls != 'WI':
+                continue
+            rows.append({'name': it.name, 'info': it.info, 'item': it, 'owned': tr(where),
+                         'family': itemstats.weapon_family(r),
+                         'stats': {s.key: s for s in itemstats.stats(r, skills, self.strength)}})
+        for info in gamedata.items().values():
+            if info['cls'] != 'WI' or info['name'] in seen:
+                continue
+            seen.add(info['name'])
+            fam = builds.library_family(info)
+            if fam is None:
+                continue  # creature weapons
+            r = itemstats.library_reader(info)
+            if r is None:
+                continue
+            rows.append({'name': info['name'], 'info': info, 'item': None, 'owned': '', 'family': fam,
+                         'stats': {s.key: s for s in itemstats.stats(r, skills, self.strength)}})
+        self.rows = rows
+        families = sorted({r['family'] for r in rows if r['family']})
+        self.family.blockSignals(True)
+        self.family.clear()
+        self.family.addItem(tr('Weapons of the build'), 'build')
+        self.family.addItem(tr('All weapons'), None)
+        for f in families:
+            self.family.addItem(tr(f), f)
+        self.family.blockSignals(False)
+        self.fill()
+
+    def fill(self):
+        t = self.table
+        t.setSortingEnabled(False)
+        t.clearContents()
+        t.setRowCount(len(self.rows))
+        for row, r in enumerate(self.rows):
+            for col, (key, _) in enumerate(self.COLS):
+                if key == 'name':
+                    cell = SortItem(r['name'])
+                    cell.setData(Qt.UserRole, row)
+                    vm = r['item'].visual if r['item'] else (r['info'] or {}).get('vm')
+                    path = gamedata.icon_path(vm)
+                    if path:
+                        cell.setIcon(QIcon(path))
+                elif key == 'family':
+                    cell = SortItem(tr(r['family'] or ''))
+                elif key == 'owned':
+                    cell = SortItem(r['owned'])
+                else:
+                    s = r['stats'].get(key)
+                    cell = SortItem(s.text if s else '', s.value if s and s.value is not None else '')
+                    cell.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                    if key == 'strength' and s and '⚠' in s.text:
+                        cell.setForeground(QColor(220, 90, 40))
+                    if key in ('per_ap', 'your_per_ap'):
+                        f = cell.font(); f.setBold(True); cell.setFont(f)
+                if r['owned']:
+                    cell.setBackground(QColor(80, 160, 255, 40))
+                t.setItem(row, col, cell)
+        t.resizeColumnsToContents()
+        t.setSortingEnabled(True)
+        t.sortItems([k for k, _ in self.COLS].index('your_per_ap'), Qt.DescendingOrder)
+        self.refilter()
+
+    def refilter(self, *_):
+        import builds
+        if self.rows is None:
+            return
+        fam = self.family.currentData()
+        if fam == 'build':
+            build = builds.BY_ID.get(self.tab.build.currentData())
+            allowed = set(build['families']) if build and build['families'] else None
+        else:
+            allowed = {fam} if fam else None
+        q = self.search.text().lower()
+        for row in range(self.table.rowCount()):
+            r = self.rows[self.table.item(row, 0).data(Qt.UserRole)]
+            s = r['stats'].get('strength')
+            hide = (allowed is not None and r['family'] not in allowed) or \
+                (q and q not in r['name'].lower() and q not in tr(r['family'] or '').lower()) or \
+                (self.usable.isChecked() and s and s.value and self.strength is not None and s.value > self.strength) or \
+                (self.owned.isChecked() and not r['owned'])
+            self.table.setRowHidden(row, bool(hide))
+
+    def where(self):
+        rows = self.table.selectionModel().selectedRows()
+        if not rows:
+            return
+        r = self.rows[self.table.item(rows[0].row(), 0).data(Qt.UserRole)]
+        if not r['info']:
+            QMessageBox.information(self, tr('Where to get…'), tr('Crafted weapons only come from crafting.'))
+            return
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            dlg = LocationsDialog(self, r['info'])
+        finally:
+            QApplication.restoreOverrideCursor()
+        dlg.exec()
+
+
 class HintsTab(QWidget):
     """Best weapons and armor combinations computed from the game data, with merchants that sell them
     and where they lie in the game world."""
@@ -1502,14 +1728,18 @@ class HintsTab(QWidget):
         self.build = QComboBox()
         self.build.setToolTip(tr('The build decides which weapons are listed and how armor penalty is weighed. '
                                  'Auto picks it from skills, feats and equipped weapons.'))
-        self.build.currentIndexChanged.connect(lambda _: self.built and self.refresh())
+        self.build.currentIndexChanged.connect(lambda _: self.built and (self.refresh(), self.weapons.refilter()))
         top = QHBoxLayout()
         top.addWidget(QLabel(tr('Build:')))
         top.addWidget(self.build)
         top.addStretch(1)
+        self.weapons = WeaponsPanel(self)
+        self.sub = QTabWidget()
+        self.sub.addTab(self.weapons, tr('Weapons'))
+        self.sub.addTab(self.view, tr('Build and armor'))
         lay = QVBoxLayout(self)
         lay.addLayout(top)
-        lay.addWidget(self.view)
+        lay.addWidget(self.sub)
         self.fill_builds()
         self.built = False
         self.scanning = False
@@ -1525,6 +1755,7 @@ class HintsTab(QWidget):
                 self.scanning = True
                 QThreadPool.globalInstance().start(MapScanJob(portrait_signals()))
             self.refresh()
+            self.weapons.load()
 
     def fill_builds(self):
         import builds
@@ -1675,25 +1906,7 @@ class HintsTab(QWidget):
         if notes:
             h.append('<ul>' + ''.join(f'<li>{esc(n)}</li>' for n in notes) + '</ul>')
 
-        h.append(f'<h2>{esc(tr("Best weapons (damage per action point)"))}</h2>')
-        rows = hints.weapons(25, set(build['families'])) if build['families'] else []
-        if not build['families']:
-            h.append(f'<p>{esc(tr("This build fights without weapons."))}</p>')
-        elif not rows:
-            h.append(f'<p>{esc(tr("The game has no fixed (non-crafted) weapons of this kind; craft them or buy the parts."))}</p>')
-        else:
-            h.append(f'<p><i>{esc(tr("Base values without ammo, feats or precision; burst weapons count all shots. Only weapons that exist as fixed items – crafted weapons are often better."))}</i></p>')
-            h.append('<table border="1" cellspacing="0" cellpadding="3">')
-            h.append('<tr>' + ''.join(f'<th>{esc(tr(x))}</th>' for x in
-                                      ('Weapon', 'Type', 'Damage', 'AP', 'Burst', 'Dmg/AP', 'Where to get')) + '</tr>')
-            for r in rows:
-                dmg = ' + '.join(f'{lo}–{hi} {hints.SHORT.get(t, t)}' for lo, hi, t in r['ranges'])
-                family = builds.library_family(r['info'])
-                h.append(f"<tr><td>{esc(r['info']['name'])}</td><td>{esc(tr(family or r['type']))}</td><td>{esc(dmg)}</td>"
-                         f"<td nowrap>{r['ap']}</td><td>{r['burst'] or '–'}</td><td nowrap><b>{r['per_ap']:.2f}</b></td>"
-                         f"<td>{self.sellers(r['info'])}</td></tr>")
-            h.append('</table>')
-
+        h.append(f'<p><i>{esc(tr("Weapons: see the Weapons tab – sortable by every stat and filtered to this build."))}</i></p>')
         comps = hints.components()
         strength = None
         if self.main.save:
