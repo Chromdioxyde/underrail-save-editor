@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Underrail save editor GUI (PySide6)."""
 import datetime
+import gc
 import os
 import re
 import sys
@@ -2805,7 +2806,7 @@ class Main(QMainWindow):
             QApplication.restoreOverrideCursor()
         if ok:
             s = self.save
-            if not (s.g.repaired or (s.info and s.info.repaired)):
+            if not self.needs_fix():
                 self.status.setStyleSheet('color: #2a2')
                 self.status.setText('✓ ' + tr('Loaded {name} – {char}, level {level}', name=os.path.basename(folder),
                                               char=s.name, level=s.level))
@@ -2897,18 +2898,27 @@ class Main(QMainWindow):
         self.update_status()
 
     def update_status(self):
-        repaired = bool(self.save and (self.save.g.repaired or (self.save.info and self.save.info.repaired)))
-        self.btn_save.setEnabled(self.dirty or repaired)
+        self.btn_save.setEnabled(self.dirty or self.needs_fix())
         self.btn_revert.setEnabled(self.dirty)
         self.status.setText(tr('Unsaved changes') if self.dirty else tr('No changes'))
+        missing = self.save.missing_feat_abilities() if self.save else []
+        if missing:
+            names = ', '.join(dict.fromkeys(gamedata.feat_abilities()['abilities'].get(a, [0, a])[1] or a
+                                            for _, a, _ in missing))
+            self.status.setText(self.status.text() + ' · ' + tr(
+                'Feats without their attack/ability: {names} – they are added when saving.', names=names))
 
     def reload(self):
         if self.save:
             self.load(self.save.folder)
 
+    def needs_fix(self):
+        """Whether the open save should be written even without edits (repaired ids, missing feat abilities)."""
+        s = self.save
+        return bool(s and (s.g.repaired or (s.info and s.info.repaired) or s.missing_feat_abilities()))
+
     def write(self):
-        repaired = self.save and (self.save.g.repaired or (self.save.info and self.save.info.repaired))
-        if not self.save or not (self.dirty or repaired):
+        if not self.save or not (self.dirty or self.needs_fix()):
             return
         # the game never rewrites a named save after creating it; only quick-/autosaves get replaced
         rolling = os.path.basename(self.save.folder).lower().startswith(('quicksave', 'autosave'))
@@ -2929,6 +2939,7 @@ class Main(QMainWindow):
                 QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
             return
         try:
+            added = self.save.sync_feat_abilities()
             bak = self.save.write()
         except Exception as e:
             QMessageBox.critical(self, tr('Save failed'), str(e))
@@ -2936,7 +2947,8 @@ class Main(QMainWindow):
         self.load(self.save.folder)
         self.refresh_list()
         self.status.setStyleSheet('color: #2a2')
-        self.status.setText('✓ ' + tr('Saved. Backup: {path}', path=bak))
+        self.status.setText('✓ ' + tr('Saved. Backup: {path}', path=bak) + (
+            ' ' + tr('Added {n} missing attack(s)/ability(ies) of feats.', n=len(added)) if added else ''))
 
     def set_language(self, code):
         i18n.choose(code)
@@ -2984,6 +2996,23 @@ class Main(QMainWindow):
             e.accept()
 
 
+def gc_on_gui_thread(app):
+    """Python's cyclic GC runs in whichever thread allocates; when a background job parsing a save triggers it,
+    it can finalize Qt widgets off the GUI thread and crash. Collect on the GUI thread only."""
+    gc.disable()
+
+    def collect():
+        # same thresholds as the automatic collector
+        n0, n1, n2 = gc.get_count()
+        if n2 > 10:
+            gc.collect(2)
+        elif n1 > 10:
+            gc.collect(1)
+        elif n0 > 700:
+            gc.collect(0)
+    QTimer(app, interval=500, timeout=collect).start()
+
+
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName('Underrail Save Editor')
@@ -2997,6 +3026,7 @@ def main():
         pool.clear()
         pool.waitForDone()
     app.aboutToQuit.connect(stop_jobs)
+    gc_on_gui_thread(app)
     w = Main()
     app.main_window = w
     w.show()

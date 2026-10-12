@@ -1,0 +1,1535 @@
+{
+ "source": "underrail.exe",
+ "feats": {
+  "as": [
+   [
+    "aimedshot",
+    "Attacks"
+   ]
+  ],
+  "blitz": [
+   [
+    "blitz",
+    "Abilities"
+   ]
+  ],
+  "bullettime": [
+   [
+    "bullettime",
+    "Abilities"
+   ]
+  ],
+  "cohesivemucusglands": [
+   [
+    "acidblobattack",
+    "Abilities"
+   ]
+  ],
+  "cookedshot": [
+   [
+    "cookedshot",
+    "Attacks"
+   ]
+  ],
+  "cripplingstrike": [
+   [
+    "cripplingstrike",
+    "Attacks"
+   ]
+  ],
+  "cutthroat": [
+   [
+    "cutthroat",
+    "Attacks"
+   ]
+  ],
+  "decapitate": [
+   [
+    "decapitate",
+    "Attacks"
+   ]
+  ],
+  "dirtykick": [
+   [
+    "dirtykick",
+    "Attacks"
+   ]
+  ],
+  "escapeartist": [
+   [
+    "escapebonds",
+    "Abilities"
+   ]
+  ],
+  "evasivemaneuvers": [
+   [
+    "evasivemaneuvers",
+    "Abilities"
+   ]
+  ],
+  "eviscerate": [
+   [
+    "eviscerate",
+    "Attacks"
+   ]
+  ],
+  "exposeweakness": [
+   [
+    "exposeweakness",
+    "Attacks"
+   ]
+  ],
+  "fend": [
+   [
+    "fend",
+    "Abilities"
+   ]
+  ],
+  "flurry": [
+   [
+    "flurry",
+    "Attacks"
+   ]
+  ],
+  "heavypunch": [
+   [
+    "heavypunch",
+    "Attacks"
+   ]
+  ],
+  "hemopsychosis": [
+   [
+    "hemopsychosis",
+    "Abilities"
+   ]
+  ],
+  "im": [
+   [
+    "execute",
+    "Attacks"
+   ]
+  ],
+  "impale": [
+   [
+    "impale",
+    "Attacks"
+   ]
+  ],
+  "kcs": [
+   [
+    "kcs",
+    "Attacks"
+   ]
+  ],
+  "laststand": [
+   [
+    "laststand",
+    "Abilities"
+   ]
+  ],
+  "locusofcontrol": [
+   [
+    "locusofcontrol",
+    "Abilities"
+   ]
+  ],
+  "pointshot": [
+   [
+    "pointshot",
+    "Attacks"
+   ]
+  ],
+  "premeditation": [
+   [
+    "premeditation",
+    "Abilities"
+   ]
+  ],
+  "psionicmania": [
+   [
+    "psionicmania",
+    "Abilities"
+   ]
+  ],
+  "pummel": [
+   [
+    "pummel",
+    "Attacks"
+   ]
+  ],
+  "quicktinkering": [
+   [
+    "quicktinkering",
+    "Abilities"
+   ]
+  ],
+  "rapidfire": [
+   [
+    "rapidfire",
+    "Attacks"
+   ]
+  ],
+  "riposte": [
+   [
+    "riposte",
+    "Attacks"
+   ]
+  ],
+  "s": [
+   [
+    "snipeattack",
+    "Attacks"
+   ]
+  ],
+  "s2": [
+   [
+    "sprint",
+    "Abilities"
+   ]
+  ],
+  "sap": [
+   [
+    "sap",
+    "Attacks"
+   ]
+  ],
+  "shieldbash": [
+   [
+    "shieldbash",
+    "Attacks"
+   ]
+  ],
+  "shootingspree": [
+   [
+    "shootingspree",
+    "Abilities"
+   ]
+  ],
+  "spearthrow": [
+   [
+    "throwspear",
+    "Attacks"
+   ],
+   [
+    "pickupthrownspear",
+    "Abilities"
+   ]
+  ],
+  "specialtactics": [
+   [
+    "specialtactics",
+    "Abilities"
+   ]
+  ],
+  "superslam": [
+   [
+    "superslam",
+    "Attacks"
+   ]
+  ],
+  "sweep": [
+   [
+    "sweep",
+    "Attacks"
+   ]
+  ],
+  "uncannydodge": [
+   [
+    "uncannydodge",
+    "Abilities"
+   ]
+  ],
+  "yell": [
+   [
+    "yell",
+    "Abilities"
+   ]
+  ]
+ },
+ "abilities": {
+  "acidblobattack": [
+   1,
+   "Acid Blob Attack"
+  ],
+  "acidspay": [
+   1,
+   "Acid Spray"
+  ],
+  "adrenalineshotconsumation": [
+   0,
+   "Adrenaline Shot"
+  ],
+  "aegisconsumation": [
+   0,
+   "Aegis"
+  ],
+  "aimedshot": [
+   1001,
+   "Aimed Shot"
+  ],
+  "antidoteconsumation": [
+   0,
+   "Antidote"
+  ],
+  "applygearbooster": [
+   0,
+   "ApplyGearBooster"
+  ],
+  "autoattack": [
+   -2147483648,
+   "Attack"
+  ],
+  "bandageconsumation": [
+   0,
+   "Bandage"
+  ],
+  "bilocation": [
+   null,
+   "Bilocation"
+  ],
+  "bioluminousswamphoneyconsumption": [
+   0,
+   "Bioluminous Swamp Honey"
+  ],
+  "blackdragonpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "blindingpoisoncaltropsthrow": [
+   0,
+   "Throw Blinding Poison Caltrops"
+  ],
+  "blindingpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "blitz": [
+   3,
+   "Blitz"
+  ],
+  "blueprintconsumation": [
+   0,
+   "Blueprint"
+  ],
+  "branding": [
+   1,
+   "Branding"
+  ],
+  "bullettime": [
+   2,
+   "Bullet Time"
+  ],
+  "bullheadconsumation": [
+   0,
+   "Bullhead"
+  ],
+  "burrowerpoisoncaltropsthrow": [
+   0,
+   "Throw Burrower Poison Caltrops"
+  ],
+  "burrowerpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "burst": [
+   1001,
+   "Burst"
+  ],
+  "catlaser": [
+   1,
+   "Cat Laser"
+  ],
+  "caveearpoisoncaltropsthrow": [
+   0,
+   "Throw Cave Ear Poison Caltrops"
+  ],
+  "caveearpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "chainsaw": [
+   3,
+   "Chainsaw"
+  ],
+  "changetrigger": [
+   2,
+   "Change Trigger"
+  ],
+  "charge": [
+   1,
+   "Charge"
+  ],
+  "chemhazegrenadethrow": [
+   0,
+   "Throw Chemhaze Grenade"
+  ],
+  "cigarconsumation": [
+   0,
+   "Cigar"
+  ],
+  "cleave": [
+   1,
+   "Cleave"
+  ],
+  "closevent": [
+   0,
+   "Close Ventilation Shaft"
+  ],
+  "coagulationshotconsumation": [
+   0,
+   "Coagulation Shot"
+  ],
+  "combatexoskeletonaura": [
+   5000,
+   "Exoskeleton Power"
+  ],
+  "compass": [
+   -2147483648,
+   "Compass"
+  ],
+  "consumingbite": [
+   1,
+   "Consuming Bite"
+  ],
+  "cookedshot": [
+   1002,
+   "Cooked Shot"
+  ],
+  "coretechtrackingdeviceactivation": [
+   0,
+   "coretechTrackingDeviceActivation"
+  ],
+  "corrosiveacidvialthrow": [
+   0,
+   "Throw Corrosive Acid Vial"
+  ],
+  "crawlerpoisoncaltropsthrow": [
+   0,
+   "Throw Crawler Poison Caltrops"
+  ],
+  "crawlerpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "crawlersting": [
+   1,
+   "Crawler Sting"
+  ],
+  "cripplingstrike": [
+   3,
+   "Crippling Strike"
+  ],
+  "cryogasgrenade": [
+   0,
+   "Throw Cryogas Grenade"
+  ],
+  "cryogenicbarrier": [
+   null,
+   "Cryogenic Barrier"
+  ],
+  "cryokinesis": [
+   null,
+   "Cryokinesis"
+  ],
+  "cryokineticorb": [
+   null,
+   "Cryokinetic Orb"
+  ],
+  "cryoshield": [
+   null,
+   "Cryo-Shield"
+  ],
+  "cryostasis": [
+   null,
+   "Cryostasis"
+  ],
+  "cutthroat": [
+   3,
+   "Cut Throat"
+  ],
+  "decapitate": [
+   5,
+   "Decapitate"
+  ],
+  "delayedentityuse": [
+   0,
+   "Use"
+  ],
+  "detonateepionelabcharges": [
+   0,
+   "DetonateEpioneLabCharges"
+  ],
+  "dfr": [
+   0,
+   "Deploy Fishing Rod"
+  ],
+  "dirtykick": [
+   2,
+   "Dirty Kick"
+  ],
+  "disarmgasgrenade": [
+   0,
+   "Disarm Gas Grenade"
+  ],
+  "disarmtrap": [
+   0,
+   "Disarm Trap"
+  ],
+  "disembark": [
+   2147483647,
+   "Disembark"
+  ],
+  "dismountdreadnought": [
+   0,
+   "Dismount Dreadnought"
+  ],
+  "disruptivefield": [
+   null,
+   "Disruptive Field"
+  ],
+  "doubleshot": [
+   1001,
+   "Double Shot"
+  ],
+  "electrictorchaura": [
+   -2147483648,
+   "Electric Lantern"
+  ],
+  "electrokinesis": [
+   null,
+   "Electrokinesis"
+  ],
+  "electrokineticimprint": [
+   null,
+   "Electrokinetic Imprint"
+  ],
+  "electromagneticburst": [
+   null,
+   "Electromagnetic Burst"
+  ],
+  "electroshockaura": [
+   -2147483648,
+   "Electroshock Aura"
+  ],
+  "emittertrackernecklaceactivation": [
+   0,
+   "emitterTrackerNecklaceActivation"
+  ],
+  "empgrenade": [
+   0,
+   "Throw EMP Grenade"
+  ],
+  "empoweredinvocation": [
+   5,
+   "Empowered Invocation"
+  ],
+  "energyshieldempowerment": [
+   -2147483647,
+   "Energy Shield Empowerment"
+  ],
+  "energysiphon": [
+   1,
+   "Energy Siphon"
+  ],
+  "enrage": [
+   null,
+   "Enrage"
+  ],
+  "entropicrecurrence": [
+   null,
+   "Entropic Recurrence"
+  ],
+  "escapebonds": [
+   2,
+   "Escape Bonds"
+  ],
+  "etherealtorchattack": [
+   0,
+   "Ethereal Torch Blast"
+  ],
+  "evasivemaneuvers": [
+   3,
+   "Evasive Maneuvers"
+  ],
+  "eviscerate": [
+   4,
+   "Eviscerate"
+  ],
+  "execute": [
+   1002,
+   "Execute"
+  ],
+  "exoskeletondrillattack": [
+   3392,
+   "Mounted Drill Attack"
+  ],
+  "exothermicaura": [
+   null,
+   "Exothermic Aura"
+  ],
+  "exposeweakness": [
+   3,
+   "Expose Weakness"
+  ],
+  "exsurge": [
+   1,
+   "Exsurge"
+  ],
+  "fend": [
+   2,
+   "Fend"
+  ],
+  "flashbangthrow": [
+   0,
+   "Throw Flashbang"
+  ],
+  "flurry": [
+   5,
+   "Flurry"
+  ],
+  "focusstimconsumation": [
+   0,
+   "Focus Stim"
+  ],
+  "foodconsumation": [
+   0,
+   "Food"
+  ],
+  "forceemission": [
+   null,
+   "Force Emission"
+  ],
+  "forcefield": [
+   null,
+   "Force Field"
+  ],
+  "forcevent": [
+   0,
+   "Force Ventilation Shaft"
+  ],
+  "fragt": [
+   0,
+   "Throw Frag"
+  ],
+  "frighten": [
+   null,
+   "Frighten"
+  ],
+  "fusioncannonattackground": [
+   1001,
+   "Attack Ground (Fusion Cannon)"
+  ],
+  "genericusejobitem": [
+   1,
+   "Use"
+  ],
+  "giantspiderleapattack": [
+   1,
+   "Giant Spider Leap Attack"
+  ],
+  "giantweaverwebshoot": [
+   1,
+   "Web Blob Attack"
+  ],
+  "grenadelauncherattackground": [
+   1001,
+   "Attack Ground (Grenade Launcher)"
+  ],
+  "hackutility": [
+   0,
+   "Hacking"
+  ],
+  "headtrapattack": [
+   1,
+   "Head Trap"
+  ],
+  "healingsalveconsumption": [
+   0,
+   "Healing Salve"
+  ],
+  "healthhypoconsumation": [
+   0,
+   "Health Hypo"
+  ],
+  "heartbreakpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "heavypunch": [
+   2,
+   "Heavy Punch"
+  ],
+  "hegrt": [
+   0,
+   "Throw HE Grenade"
+  ],
+  "helmetlanternaura": [
+   -2147483648,
+   "Headlamp Light"
+  ],
+  "hemopsychosis": [
+   4,
+   "Hemopsychosis"
+  ],
+  "herbicidegasgrenade": [
+   0,
+   "Throw Herbicide Gas Grenade"
+  ],
+  "herculesconsumation": [
+   0,
+   "Hercules"
+  ],
+  "hotwirevehicle": [
+   0,
+   "Hotwire Vehicle"
+  ],
+  "hypercerebrixconsumation": [
+   0,
+   "Hypercerebrix Bean"
+  ],
+  "hypnotize": [
+   1,
+   "Hypnotize"
+  ],
+  "impale": [
+   1,
+   "Impale"
+  ],
+  "implosion": [
+   null,
+   "Implosion"
+  ],
+  "industrialexoskeletonaura": [
+   3391,
+   "Exoskeleton Power"
+  ],
+  "infusionfocus": [
+   2147483647,
+   "Infusion: Focus"
+  ],
+  "infusionreflexes": [
+   2147483647,
+   "Infusion: Reflexes"
+  ],
+  "infusionspeed": [
+   2147483647,
+   "Infusion: Speed"
+  ],
+  "infusionstrength": [
+   2147483647,
+   "Infusion: Strength"
+  ],
+  "injectmedicine": [
+   0,
+   "Inject Medicine"
+  ],
+  "insertskerdergravecrank": [
+   0,
+   "InsertSkerderGraveCrank"
+  ],
+  "irongutconsumation": [
+   0,
+   "Irongut"
+  ],
+  "jumpingbeanconsumation": [
+   0,
+   "Jumping Bean"
+  ],
+  "jumpstarterboost": [
+   1,
+   "Jumpstarter Boost"
+  ],
+  "kcs": [
+   1002,
+   "Kneecap Shot"
+  ],
+  "laststand": [
+   2,
+   "Last Stand"
+  ],
+  "ldsing": [
+   0,
+   "Load Single Bullet"
+  ],
+  "ldsingcur": [
+   0,
+   "Load Single Bullet (Current Weapon)"
+  ],
+  "leperpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "lightfire": [
+   0,
+   "Light a Fire"
+  ],
+  "limitedtemporalincrement": [
+   null,
+   "Limited Temporal Increment"
+  ],
+  "lock": [
+   -2147483645,
+   "Lock"
+  ],
+  "lockpickutility": [
+   0,
+   "Lockpicking"
+  ],
+  "locusofcontrol": [
+   3,
+   "Locus Of Control"
+  ],
+  "mentalbreakdown": [
+   null,
+   "Mental Breakdown"
+  ],
+  "metallineenergization": [
+   -2147483647,
+   "Electroactive Flexibility"
+  ],
+  "minddartconsumation": [
+   0,
+   "Mind Dart"
+  ],
+  "minerock": [
+   0,
+   "Mine Rock"
+  ],
+  "molotovcocktail": [
+   0,
+   "Throw Molotov Cocktail"
+  ],
+  "morphinehypoconsumation": [
+   0,
+   "Morphine Hypo"
+  ],
+  "motionconsumation": [
+   0,
+   "Motion"
+  ],
+  "motorcognitivetransference": [
+   null,
+   "Motor-cognitive Transference"
+  ],
+  "nailbombthrow": [
+   0,
+   "Nail Bomb Throw"
+  ],
+  "nervosomniferconsumation": [
+   0,
+   "Nervosomnifer"
+  ],
+  "neuraloverload": [
+   null,
+   "Neural Overload"
+  ],
+  "neurovisualdisruption": [
+   null,
+   "Neurovisual Disruption"
+  ],
+  "nightvision": [
+   -2147483648,
+   "Night Vision"
+  ],
+  "openvent": [
+   0,
+   "Open Ventilation Shaft"
+  ],
+  "personalcloaking": [
+   -2147483648,
+   "Personal Cloaking"
+  ],
+  "pickpocket": [
+   -2147483647,
+   "Pickpocket"
+  ],
+  "pickupthrownspear": [
+   1,
+   "Rearm"
+  ],
+  "piercingshot": [
+   1001,
+   "Piercing Shot"
+  ],
+  "pistolburst": [
+   1002,
+   "Pistol Burst"
+  ],
+  "placeacidblobtrap": [
+   0,
+   "Place Acid Blob Trap"
+  ],
+  "placebeartrap": [
+   0,
+   "Place Bear Trap"
+  ],
+  "placeblackdragonpoisonbeartrap": [
+   0,
+   "Place Poisoned Bear Trap"
+  ],
+  "placeblindingpoisonbeartrap": [
+   0,
+   "Place Blinding Poison Bear Trap"
+  ],
+  "placec4explosivecharge": [
+   0,
+   "PlaceC4ExplosiveCharge"
+  ],
+  "placecaveearpoisonbeartrap": [
+   0,
+   "Place Poisoned Bear Trap"
+  ],
+  "placecorrosiveacidblobtrap": [
+   0,
+   "Place Corrosive Acid Blob Trap"
+  ],
+  "placecrawlerpoisonbeartrap": [
+   0,
+   "Place Poisoned Bear Trap"
+  ],
+  "placecryoliquidblobtrap": [
+   0,
+   "Place Cryoliquid Blob Trap"
+  ],
+  "placeempmine": [
+   0,
+   "Place EMP Mine"
+  ],
+  "placefragmine": [
+   0,
+   "Place Frag Mine"
+  ],
+  "placeheartbreakpoisonbeartrap": [
+   0,
+   "Place Heartbreak Poison Bear Trap"
+  ],
+  "placehemine": [
+   0,
+   "Place HE Mine"
+  ],
+  "placehoppertrap": [
+   0,
+   "Place Hopper Trap"
+  ],
+  "placeincendiaryblobtrap": [
+   0,
+   "Place Incendiary Blob Trap"
+  ],
+  "placeleperpoisonbeartrap": [
+   0,
+   "Place Leper Poison Bear Trap"
+  ],
+  "placeplasmamine": [
+   0,
+   "Place Plasma Mine"
+  ],
+  "placepoisonedbeartrap": [
+   0,
+   "Place Poisoned Bear Trap"
+  ],
+  "placepsiamplifier": [
+   0,
+   "placePsiAmplifier"
+  ],
+  "placerustingacidblobtrap": [
+   0,
+   "Place Rusting Acid Blob Trap"
+  ],
+  "placespiritpoisonbeartrap": [
+   0,
+   "Place Poisoned Bear Trap"
+  ],
+  "plasmabeam": [
+   null,
+   "Plasma Beam"
+  ],
+  "plasmathrow": [
+   0,
+   "Throw Plasma Grenade"
+  ],
+  "pointshot": [
+   1002,
+   "Point Shot"
+  ],
+  "precognition": [
+   null,
+   "Precognition"
+  ],
+  "premeditation": [
+   3,
+   "Premeditation"
+  ],
+  "pseudospatialprojection": [
+   null,
+   "Pseudo-spatial Projection"
+  ],
+  "psibeetlebrainpsi": [
+   0,
+   "Invoke Random Psi"
+  ],
+  "psiboosterconsumation": [
+   0,
+   "Psi Booster"
+  ],
+  "psicognitiveinterruption": [
+   null,
+   "Psi-cognitive Interruption"
+  ],
+  "psimentorconsumation": [
+   0,
+   "PsiMentorConsumation"
+  ],
+  "psimorphicbiocidegrenade": [
+   0,
+   "Throw Psimorphic Biocide Grenade"
+  ],
+  "psionicaccelerator": [
+   0,
+   "Psionic Accelerator"
+  ],
+  "psionicinhalantconsumation": [
+   0,
+   "Psionic Inhalant"
+  ],
+  "psionicmania": [
+   4,
+   "Psionic Mania"
+  ],
+  "psireconstructivepillconsumation": [
+   0,
+   "Psycho-neural Reconstructive Agent"
+  ],
+  "psireinvigoratorconsumation": [
+   0,
+   "Psi Reinvigorator"
+  ],
+  "psychokineticchain": [
+   null,
+   "Psychokinetic Chain"
+  ],
+  "psychosomaticpredation": [
+   null,
+   "Psychosomatic Predation"
+  ],
+  "psychotemporalcontraction": [
+   null,
+   "Psycho-temporal Contraction"
+  ],
+  "psychotemporaldilation": [
+   null,
+   "Psycho-temporal Dilation"
+  ],
+  "ptnt": [
+   0,
+   "Place TNT charge"
+  ],
+  "pummel": [
+   1,
+   "Pummel"
+  ],
+  "pyrokinesis": [
+   null,
+   "Pyrokinesis"
+  ],
+  "pyrokineticstream": [
+   null,
+   "Pyrokinetic Stream"
+  ],
+  "quickdrawattack": [
+   1002,
+   "Quick Draw"
+  ],
+  "quicktinkering": [
+   2,
+   "Quick Tinkering"
+  ],
+  "rahmslasereye": [
+   1,
+   "Third Eye"
+  ],
+  "rapidfire": [
+   1002,
+   "Rapid Fire"
+  ],
+  "rcurwep": [
+   0,
+   "Reload Current Weapon"
+  ],
+  "rcw": [
+   0,
+   "Recharge Current Weapon"
+  ],
+  "rechargeobject": [
+   0,
+   "Recharge Object"
+  ],
+  "rechargeshieldemitterfull": [
+   0,
+   "Fully Recharge Shield Emitter"
+  ],
+  "refuelfireplace": [
+   0,
+   "Refuel Fire"
+  ],
+  "regenerativemixture": [
+   0,
+   "Regenerative Mixture"
+  ],
+  "regularacidvialthrow": [
+   0,
+   "Throw Acid Vial"
+  ],
+  "regularcaltropsthrow": [
+   0,
+   "Throw Caltrops"
+  ],
+  "regularknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "releaseabramscyberneticspawn": [
+   0,
+   "releaseAbramsCyberneticSpawn"
+  ],
+  "remotescancalloverload": [
+   1,
+   "Remote Scan Call Overload"
+  ],
+  "rend": [
+   1,
+   "Rend"
+  ],
+  "repaircoilspiderweb": [
+   0,
+   "RepairCoilSpiderWeb"
+  ],
+  "repairkit": [
+   0,
+   "RepairKit"
+  ],
+  "rie": [
+   0,
+   "Recharge Item"
+  ],
+  "rigoldjunkyardcavern": [
+   0,
+   "rigOldJunkyardCavern"
+  ],
+  "riposte": [
+   4,
+   "Riposte"
+  ],
+  "rocketlauncherattackground": [
+   1001,
+   "Attack Ground (Rocket Launcher)"
+  ],
+  "rustingacidvialthrow": [
+   0,
+   "Throw Rusting Acid Vial"
+  ],
+  "rwep": [
+   0,
+   "Reload Weapon"
+  ],
+  "sap": [
+   4,
+   "Sap"
+  ],
+  "savagekingshieldbash": [
+   2,
+   "Savage Bash"
+  ],
+  "scramblecortex": [
+   0,
+   "Scramble Cortex"
+  ],
+  "searchskerdercorpse": [
+   0,
+   "SearchSkerderCorpse"
+  ],
+  "shieldbash": [
+   1,
+   "Shield Bash"
+  ],
+  "shockshurikenthrow": [
+   0,
+   "Throw Shock Shuriken"
+  ],
+  "shootacidbolt": [
+   1001,
+   "Shoot Acid Bolt"
+  ],
+  "shootblackdragonpoisonbolt": [
+   1001,
+   "Shoot Poison Bolt"
+  ],
+  "shootblindingpoisonbolt": [
+   1001,
+   "Shoot Blinding Poison Bolt"
+  ],
+  "shootbroadheadbolt": [
+   1001,
+   "Shoot Broadhead Bolt"
+  ],
+  "shootcaveearpoisonbolt": [
+   1001,
+   "Shoot Poison Bolt"
+  ],
+  "shootcorrosiveacidbolt": [
+   1001,
+   "Shoot Corrosive Acid Bolt"
+  ],
+  "shootcrawlerpoisonbolt": [
+   1001,
+   "Shoot Poison Bolt"
+  ],
+  "shootdevastatorfusioncannon": [
+   1,
+   "Shoot Fusion Cannon"
+  ],
+  "shootdreadnoughtrocket": [
+   1,
+   "Shoot Rocket"
+  ],
+  "shootglowjetskilasergun": [
+   1,
+   "Laser Bursts"
+  ],
+  "shootharp1rocket": [
+   1,
+   "Shoot Rocket"
+  ],
+  "shootheartbreakpoisonbolt": [
+   1001,
+   "Shoot Heartbreak Poison Bolt"
+  ],
+  "shootincendiarybolt": [
+   1001,
+   "Shoot Incendiary Bolt"
+  ],
+  "shootingspree": [
+   2,
+   "Shooting Spree"
+  ],
+  "shootlemurianspear": [
+   1,
+   "Shoot Lemurian Spear"
+  ],
+  "shootleperpoisonbolt": [
+   1001,
+   "Shoot Leper Poison Bolt"
+  ],
+  "shootleviatorplasmacannon": [
+   1,
+   "Shoot Plasma Cannon"
+  ],
+  "shootplasmaflare": [
+   1,
+   "Shoot Plasma Flare"
+  ],
+  "shootpoisonbolt": [
+   1001,
+   "Shoot Poison Bolt"
+  ],
+  "shootputrefyingbolt": [
+   1002,
+   "Shoot Putrefying Bolt"
+  ],
+  "shootrustingacidbolt": [
+   1001,
+   "Shoot Rusting Acid Bolt"
+  ],
+  "shootserratedbolt": [
+   1001,
+   "Shoot Serrated Bolt"
+  ],
+  "shootshockbolt": [
+   1001,
+   "Shoot Shock Bolt"
+  ],
+  "shootspiritpoisonbolt": [
+   1001,
+   "Shoot Poison Bolt"
+  ],
+  "shoottranquilizingbolt": [
+   1002,
+   "Shoot Tranquilizing Bolt"
+  ],
+  "shootvoidbolt": [
+   1001,
+   "Shoot Void Bolt"
+  ],
+  "shotgunburst": [
+   1002,
+   "Shotgun Burst"
+  ],
+  "shrc": [
+   0,
+   "Shield Recharger"
+  ],
+  "siphonblood": [
+   1,
+   "Siphon Blood"
+  ],
+  "siphonerheadbuttattack": [
+   1,
+   "Headbutt"
+  ],
+  "skerderacidbloblaunchershoot": [
+   1,
+   "Acid Blob Attack"
+  ],
+  "skerdermacehandslam": [
+   1,
+   "Mace-hand Smash"
+  ],
+  "skerdershieldhandbash": [
+   1,
+   "Shield-hand Bash"
+  ],
+  "skerderswordhandslash": [
+   1,
+   "Sword-hand Slash"
+  ],
+  "skerdertentacleshandslap": [
+   1,
+   "Tentacles-hand Slap"
+  ],
+  "snipeattack": [
+   1002,
+   "Snipe"
+  ],
+  "soldierexoskeletonwristbladestab": [
+   10,
+   "Wristblade Stab"
+  ],
+  "soundgunamplifiedwave": [
+   1001,
+   "Amplified Wave"
+  ],
+  "soundgundisruptivewave": [
+   1001,
+   "Disruptive Wave"
+  ],
+  "soundgunresonatingwave": [
+   1001,
+   "Resonating Wave"
+  ],
+  "specialtactics": [
+   2,
+   "Special Tactics"
+  ],
+  "spiritpoisonknifethrow": [
+   0,
+   "Throw Knife"
+  ],
+  "spiritpotionconsumption": [
+   0,
+   "Spirit Potion"
+  ],
+  "sprint": [
+   1,
+   "Sprint"
+  ],
+  "spyunderdoor": [
+   0,
+   "Spy"
+  ],
+  "startinterfacing": [
+   0,
+   "StartInterfacing"
+  ],
+  "stasis": [
+   null,
+   "Stasis"
+  ],
+  "statboosterconsumation": [
+   0,
+   "Stat Booster"
+  ],
+  "stealthmode": [
+   -2147483648,
+   "Stealth Mode"
+  ],
+  "stingballgrenadethrow": [
+   0,
+   "Throw Stingball Grenade"
+  ],
+  "stoptowingjetski": [
+   2,
+   "Stop Towing"
+  ],
+  "strangemedallion": [
+   0,
+   "Strange Medallion"
+  ],
+  "stunningpulse": [
+   1002,
+   "Stunning Pulse"
+  ],
+  "superslam": [
+   3,
+   "Super Slam"
+  ],
+  "supersoldierdrugconsumation": [
+   0,
+   "Supersoldier Drug"
+  ],
+  "sweep": [
+   5,
+   "Sweep"
+  ],
+  "tasertase": [
+   0,
+   "Tase"
+  ],
+  "taze": [
+   0,
+   "Taze"
+  ],
+  "tchortgoospray": [
+   1,
+   "Tchort Goo Spray"
+  ],
+  "technomedicexoskeletonrecharge": [
+   11,
+   "Equipment Wireless Recharge"
+  ],
+  "technomedicexoskeletonregenerativeinjection": [
+   11,
+   "Parafibrotic Regenerative Injection"
+  ],
+  "telekineticgrounding": [
+   null,
+   "Telekinetic Grounding"
+  ],
+  "telekineticproxy": [
+   null,
+   "Telekinetic Proxy"
+  ],
+  "telekineticpunch": [
+   null,
+   "Telekinetic Punch"
+  ],
+  "temporaldistorsion": [
+   null,
+   "Temporal Distortion"
+  ],
+  "temporaryrewind": [
+   null,
+   "Temporary Rewind"
+  ],
+  "thejuice": [
+   0,
+   "The Juice"
+  ],
+  "thermodynamicdestabilization": [
+   null,
+   "Thermodynamic Destabilization"
+  ],
+  "thirdeyeconsumation": [
+   0,
+   "Third Eye"
+  ],
+  "threadbotflamethrowerattack": [
+   1,
+   "Flamethrower"
+  ],
+  "throwbarbednet": [
+   0,
+   "Throw Net"
+  ],
+  "throwcarriedobject": [
+   1,
+   "Throw Carried Object"
+  ],
+  "throwflare": [
+   0,
+   "Throw Flare"
+  ],
+  "throwspear": [
+   1,
+   "Throw Spear"
+  ],
+  "throwstonebolas": [
+   0,
+   "Throw Stone Bolas"
+  ],
+  "tnet": [
+   0,
+   "Throw Net"
+  ],
+  "towjetski": [
+   1,
+   "Tow"
+  ],
+  "toxicgasgrenade": [
+   0,
+   "Throw Toxic Gas Grenade"
+  ],
+  "tranceconsumation": [
+   0,
+   "Trance"
+  ],
+  "twitchconsumation": [
+   0,
+   "Twitch"
+  ],
+  "udc": [
+   0,
+   "Capture"
+  ],
+  "uncannydodge": [
+   3,
+   "Uncanny Dodge"
+  ],
+  "usecharm": [
+   99,
+   "Kiss the Charm"
+  ],
+  "usesuicidebomberbelt": [
+   0,
+   "Boom!"
+  ],
+  "utilitybotmove": [
+   0,
+   "Utility Bot: Move"
+  ],
+  "utilitybotoperate": [
+   0,
+   "Utility Bot: Operate"
+  ],
+  "uwep": [
+   0,
+   "Unload Weapon"
+  ],
+  "vanish": [
+   0,
+   "Vanish"
+  ],
+  "vehiclerepairkit": [
+   0,
+   "VehicleRepairKit"
+  ],
+  "vehicleturbo": [
+   1,
+   "Turbo"
+  ],
+  "vitalitypowderconsumption": [
+   0,
+   "Vitality Powder"
+  ],
+  "wildpsionicinnervation": [
+   1,
+   "Escalated Psionic Innervation"
+  ],
+  "wirelesschargingaura": [
+   -2147483648,
+   "Wireless Charging Aura"
+  ],
+  "yell": [
+   1,
+   "Yell"
+  ]
+ }
+}

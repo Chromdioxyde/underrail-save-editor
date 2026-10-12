@@ -23,6 +23,9 @@ DE = {
         'Trotzdem speichern?',
     'Save failed': 'Speichern fehlgeschlagen',
     'Saved. Backup: {path}': 'Gespeichert. Backup: {path}',
+    'Added {n} missing attack(s)/ability(ies) of feats.': '{n} fehlende Angriffe/Fähigkeiten von Feats ergänzt.',
+    'Feats without their attack/ability: {names} – they are added when saving.':
+        'Feats ohne ihren Angriff/ihre Fähigkeit: {names} – werden beim Speichern ergänzt.',
     'Language': 'Sprache',
     'System default': 'Systemsprache',
     'The language changes once the unsaved changes are saved or discarded and the editor is restarted.':

@@ -191,6 +191,9 @@ pyinstaller --noconfirm --distpath build/dist --workpath build/work packaging/un
 
 ## Feat requirements
 
+Feats that grant an attack or ability (Snipe, Sprint, …) get it added to the character as well, as the
+game does on level-up; `data/feat_abilities.json` comes from `tools/extract_feat_abilities.py`.
+
 `data/feat_requirements.json` is generated from `underrail.exe` by `tools/extract_feat_requirements.py`
 (needs `pip install dnfile dncil`; re-run after game updates). The tool reads each feat class's
 requirement method: attribute and skill minimums (compared against base values like the game does),

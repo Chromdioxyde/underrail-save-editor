@@ -435,13 +435,79 @@ class Save:
         fr = self.shallow_copy(tmpl)
         fr.values[fr.names.index('FR:FTN')] = self.g.new_str(fid)
         seq_set(owner, 'F:F', entries + [fr])
+        for aid, name in gamedata.feat_abilities()['feats'].get(fid, []):
+            self.add_capability(name, aid)
         self.g.dirty = True
 
     def remove_feat(self, fid):
         owner = self._feat_owner()
         entries = [v for v in seq_get(owner, 'F:F') if self.val(self.obj(v).get('FR:FTN')) != fid]
         seq_set(owner, 'F:F', entries)
+        # drop what only this feat granted
+        grants = gamedata.feat_abilities()['feats']
+        others = {g for f in self.feats() for g in map(tuple, grants.get(f, []))}
+        for aid, name in grants.get(fid, []):
+            if (aid, name) not in others:
+                self.remove_capability(name, aid)
         self.g.dirty = True
+
+    # --- attacks and abilities granted by feats -------------------------------------------
+    CAPABILITY_SETS = {'Attacks': 'C1:SA', 'Abilities': 'C1:SA1'}
+
+    def _cap_set(self, name):
+        """(SortedList, [CR refs]) of the character's capability set 'Attacks' or 'Abilities'."""
+        sl = self.obj(self.obj(self.m[self.CAPABILITY_SETS[name]]).get('CS4:SL'))
+        m = dict(zip(sl.names, sl.values))
+        return sl, self.obj(m['values']).items[:m['_size'].value]
+
+    def capabilities(self, name):
+        return [self.val(self.obj(v).get('CR:CFTN')) for v in self._cap_set(name)[1]]
+
+    def missing_feat_abilities(self):
+        """[(feat id, ability id, set name)] the character's feats grant but the save lacks
+        (feats added by older editor versions only got the feat itself)."""
+        grants = gamedata.feat_abilities()['feats']
+        have = {name: set(self.capabilities(name)) for name in self.CAPABILITY_SETS}
+        return [(fid, aid, name) for fid in self.feats() for aid, name in grants.get(fid, [])
+                if aid not in have[name]]
+
+    def _cap_key(self, aid):
+        order, display = gamedata.feat_abilities()['abilities'].get(aid, [None, None])
+        return None if order is None else (order, gamedata.sort_key(display or aid))
+
+    def add_capability(self, name, aid):
+        sl, refs = self._cap_set(name)
+        if aid in self.capabilities(name):
+            return
+        tmpl = next((self.obj(v) for n in self.CAPABILITY_SETS for v in self._cap_set(n)[1]), None)
+        if tmpl is None:
+            raise ValueError('no attack or ability in this save to copy the structure from')
+        cr = self.shallow_copy(tmpl)
+        cr.values[cr.names.index('CR:CFTN')] = self.g.new_str(aid)
+        # insert before the first entry the game orders after it (order value, then display name)
+        key = self._cap_key(aid)
+        pos = len(refs)
+        for i, v in enumerate(refs):
+            k = self._cap_key(self.val(self.obj(v).get('CR:CFTN')))
+            if key is not None and k is not None and k > key:
+                pos = i
+                break
+        refs = list(refs)
+        refs.insert(pos, nrbf.Ref(cr.id))
+        self._set_sorted(sl, [(r, r) for r in refs])
+
+    def remove_capability(self, name, aid):
+        sl, refs = self._cap_set(name)
+        keep = [r for r in refs if self.val(self.obj(r).get('CR:CFTN')) != aid]
+        if len(keep) != len(refs):
+            self._set_sorted(sl, [(r, r) for r in keep])
+
+    def sync_feat_abilities(self):
+        """Adds the attacks/abilities missing for the character's feats; returns what was added."""
+        missing = self.missing_feat_abilities()
+        for _, aid, name in missing:
+            self.add_capability(name, aid)
+        return missing
 
     # --- blueprints -----------------------------------------------------------------------
     def _bp_list(self):
@@ -455,18 +521,23 @@ class Save:
         return [self.val(self.obj(v).get('IBR:IBFTN')) for v in vals]
 
     def _set_blueprints(self, entries):
-        """entries: [(name Str/Ref, IBR obj/Ref)]. The SortedList is binary-searched by the game,
-        so keys must be in .NET culture order; arrays keep their capacity (grown by doubling)."""
-        sl, m = self._bp_list()
-        entries = sorted(entries, key=lambda e: gamedata.sort_key(self.val(e[0])))
+        """entries: [(name Str/Ref, IBR obj/Ref)], kept in .NET culture order of the names."""
+        sl, _ = self._bp_list()
+        self._set_sorted(sl, sorted(entries, key=lambda e: gamedata.sort_key(self.val(e[0]))))
+
+    def _set_sorted(self, sl, entries):
+        """Rewrites a SortedList with [(key, value)] already in the game's order (it is binary-searched);
+        arrays keep their capacity (grown by doubling)."""
+        m = dict(zip(sl.names, sl.values))
         keys, vals = self.obj(m['keys']), self.obj(m['values'])
         cap = max(len(keys.items), 4)
         while cap < len(entries):
             cap *= 2
         keys.items = [e[0] for e in entries] + [None] * (cap - len(entries))
         vals.items = [e[1] for e in entries] + [None] * (cap - len(entries))
-        if vals.lens is not None:
-            vals.lens = [cap]
+        for a in (keys, vals):
+            if a.lens is not None:
+                a.lens = [cap]
         sl.values[sl.names.index('_size')] = nrbf.Prim(8, None, len(entries))
         ver = sl.get('version')
         sl.values[sl.names.index('version')] = nrbf.Prim(8, None, ver.value + 1)

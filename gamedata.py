@@ -230,6 +230,22 @@ def feat_requirements():
     return _feat_reqs
 
 
+_feat_abilities = None
+
+
+def feat_abilities():
+    """{'feats': feat id -> [[ability id, 'Attacks'|'Abilities']], 'abilities': ability id -> [order, name]},
+    extracted from underrail.exe by tools/extract_feat_abilities.py."""
+    global _feat_abilities
+    if _feat_abilities is None:
+        try:
+            with open(os.path.join(DATA_DIR, 'feat_abilities.json')) as f:
+                _feat_abilities = json.load(f)
+        except (OSError, ValueError):
+            _feat_abilities = {'feats': {}, 'abilities': {}}
+    return _feat_abilities
+
+
 def spec_rules():
     """spec key -> {'feat': feat id it belongs to, 'name', 'max': max points or None}."""
     feat_requirements()

@@ -86,6 +86,19 @@ attribute on the feat class; requirement classes recognised by their diagnostic 
 base values (Stat.S4:V) unless a requirement's "modified" flag is set; "selectable" = the feat base
 method the tooltip uses for "acquired outside leveling". `Save.feat_check()` evaluates them.
 
+## Feat attacks/abilities
+Feats like Snipe or Sprint also grant a capability: the feat's on-added method calls
+`character.<set>.Add(Registry.Get<AbilityClass>())`. Saves store them as `CR` objects (`CR:CFTN` = the
+ability class's id attribute lowercased, e.g. `snipeattack`) in two SortedLists: `C1:SA` "Attacks" and
+`C1:SA1` "Abilities" (`C1:PA` psi, `C1:QC` gear). Ordered by the ability's order value (`bh`), then its
+display name. `tools/extract_feat_abilities.py` -> `data/feat_abilities.json`. `add_feat`/`remove_feat`
+keep them in sync; saving adds the ones missing for feats added by editor versions before 2026-10-12.
+
+## Background jobs and GC
+Python's cyclic GC ran inside worker threads (save parsing) and finalized Qt widgets there -> segfault
+when the game rewrote an open save (seen with the AppImage's PySide6 6.12). `gc_on_gui_thread()` disables
+automatic GC and collects from a GUI-thread timer.
+
 ## exe analysis
 Python only: venv with `dnfile` + `dncil` (in the scratchpad, not in the repo). Item instance = class
 `coh` (field `k` = `II:D`); durability factor `coh::afc` = 0.15 + 0.85·min(1, D/max); max = `bk3::yj`
