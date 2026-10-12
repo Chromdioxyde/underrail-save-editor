@@ -1,33 +1,70 @@
-# Handoff – status 2026-10-11 (evening)
+# Handoff – status 2026-10-12
 
-Goal: GUI editor with as many features as possible (inventory, portrait, everything editable).
-Project language is English (docs, code, commit messages); the GUI additionally has a German translation.
+Underrail save editor: PySide6 GUI that edits Underrail saves (character, skills, feats, specs, inventory,
+blueprints, oddities) and gives hints (item/merchant/creature locations on the game's own world map,
+build-aware weapon/armor advice). Latest commit `daedde0`; branch `main`, no remote. README.md describes
+features and file formats; this file is the working state.
 
-## Done (tested on copies of `Saves/test` / `Saves/quicksave`, not in-game unless noted)
-- `nrbf.py`: full reader/writer, byte-identical round trip for all 64 save files (global.dat/info.dat)
-  and all 1463 `.item` files. The writer drops unreachable objects, writes changed objects with new
-  class metadata and re-emits objects whose inline parent is gone.
-- `xnb.py`: LZX decoder + DXT1/3/5 for portrait previews (cached in `~/.cache/underrail-save-editor/portraits/`).
-- `gamedata.py`: item DB (`data/rules/items`, incl. level, weapon type, battery capacity), feat/spec/
-  blueprint names and descriptions (`data/knowledge/*.k` + strings from `underrail.exe`), portrait list,
-  PNG import as custom portrait, durability formula, .NET culture sort key.
-- `underrail_save.py`: name/level (+info.dat), portrait, XP/points, current health, attributes, skills,
-  oddities, specializations, feats, blueprints, inventory (list, equipped, stack/durability/battery/
-  quality, remove, duplicate with new GUID, add from item DB with full durability).
-- `underrail_gui.py`: tabs for all of the above, sortable/filterable inventory, repair, portrait gallery.
-- `i18n.py`: English/German UI, system language by default, *Language* menu override.
-- In-game verified: spec point editing (V=M=8 allowed redistributing points); a bug with added items
-  ("An object cannot be registered twice": GUID struct written as reference) was found in-game and fixed.
+## Working with the user
+- User writes German; reply in German. Project language is English (code, short English comments, docs,
+  commit messages); GUI strings are English source keys with German in `i18n.py` – add a translation for
+  every new user-visible string. Unsupported system languages fall back to English.
+- After every change: `./packaging/install.sh` (installs to `~/.local/share/underrail-save-editor/app`),
+  then commit. Commit messages end with the Co-Authored-By / Claude-Session lines given by the harness.
+- AppImage on request: `./packaging/build-appimage.sh` -> `build/Underrail_Save_Editor-<commit>-x86_64.AppImage`;
+  user wants it copied to `$APPIMAGE_COPY_DIR/` (replace the older one there).
+- The user tests in-game and reports back. Never touch the saves listed in `PROTECTED_SAVES` (`.env.local`).
+  Test structural edits on a copy (e.g. `cp -r quicksave zz<name>`, delete it afterwards).
+- Prefers data extracted from the game over invented/schematic visuals.
+- Running-game warning applies only to quicksave/autosave (the game only rewrites those).
+
+## Paths
+- Repo `the repository`; game `$UNDERRAIL_GAME_DIR`; saves
+  `$UNDERRAIL_SAVES_DIR`.
+- Cache `~/.cache/underrail-save-editor/` (items-v5, map_index_v5, worldmap_v7, worldmap_*.png, maptex/,
+  zone_links_v1.json, icons/, thumbs/, savedetails.json); invalidated by game file mtimes.
+- Backups of written saves: `paths.BACKUP_DIR` (outside the save folder, so Steam Cloud ignores them).
+- exe analysis needs a venv with `dnfile` + `dncil` (not in the repo; recreate in the scratchpad:
+  `python3 -m venv venv && venv/bin/pip install dnfile dncil`). System python3 has PySide6 for the app.
+
+## Latest changes (2026-10-12) – awaiting in-game confirmation
+1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC
+   ran in a worker thread (DetailsJob parsing the new save) and finalized Qt widgets there -> segfault.
+   Fix: `gc_on_gui_thread(app)` in underrail_gui.py. Reproduced and verified with a script that rewrites a
+   save folder like the game (rename to "(previous)", write files) using the AppImage's Python/PySide6 6.12.
+2. Feats added by the editor didn't give their attack/ability (an added Snipe had nothing in the quick
+   menu). Now `add_feat`/`remove_feat` update the capability sets, and saving runs
+   `Save.sync_feat_abilities()` for all feats (fixes feats added by older versions). The GUI shows the
+   missing ones in the status bar after loading and enables Save. Verified on a quicksave copy (Execute
+   and Snipe added in the game's order, file re-reads); still to be confirmed in-game.
+   Details below under "Feat attacks/abilities".
 
 ## Open / next steps
-1. User tests in-game (on `test` save): name/portrait, adding feat/spec/blueprint, adding items
-   (e.g. robe), duplicate/remove items, durability/quality edits. Treat structural edits as unverified
-   until then.
-2. Item icons extracted from sprite sheets (see README); ~72 library items (plus crafted items with
-   composite visuals) use faded category placeholders.
-3. Possible additions: factions (`C1:PA1`, eATTI), psi abilities (`C1:PA`), difficulty (`TG:D`).
-4. Offered, not requested: warn about specs without their feat, spec maxima as upper bound. Real feat
-   requirements only exist in the (obfuscated) code.
+- In-game confirmation of the two fixes above.
+- Not done, offered: read the save's per-zone state (`bulk.map`, `chunk*.dat/.map` in the save folder)
+  to mark looted containers / killed NPCs on the map; format not yet examined. The map index itself
+  comes from game files and is the same for every playthrough (random loot/stock rolled per game;
+  conditional `.uzl` layers for difficulty/DLC/quests are all included).
+- Offered, not requested: maps of individual zones/dungeons (static `dun_*.uz`; needs the tile grid
+  `A6:T`/`A6:T1`, editor-marker filtering, scale calibration).
+- Windows build untested; Windows folder detection untested.
+- Vehicle frame fields `VFI:C/D/T/S/N` unknown; exe damage formula `c4r::a` not decoded (wiki formula
+  used); melee Strength bonus not modelled; no hostility/faction data in the map index.
+- The hidden region combo in `LocationsDialog` (legacy `REGIONS`/`SEA_PREFIXES` in worldmap.py) can be removed.
+- Rarity tier 5 (quest item) gold colour is our choice, not the game's.
+- Possible additions: factions (`C1:PA1`, eATTI), psi abilities (`C1:PA`), difficulty (`TG:D`).
+
+## Modules
+`nrbf.py` (.NET binary serialization reader/writer), `xnb.py` (textures), `paths.py` (folder detection,
+game_running), `gamedata.py` (game data, item DB, icons, extracted JSON loaders), `underrail_save.py`
+(Save model and edits), `underrail_gui.py` (GUI), `i18n.py`, `hints.py` (map index, locations),
+`worldmap.py` (global map rendering), `builds.py`, `itemstats.py`, `tools/extract_*.py` (exe ->
+`data/*.json`: feat requirements + ammo icons, crafted weapon icons, feat abilities), `packaging/*`.
+
+## Foundations (verified earlier)
+- `nrbf.py`: byte-identical round trip for all save files and all 1463 `.item` files; writer drops
+  unreachable objects and re-emits changed objects with new class metadata.
+- In-game verified: spec point editing; added items (after the object-id fix below).
 
 ## Hints / world map
 - Map index (`hints.map_index()`, cache `map_index_v5.json`) is keyed by zone id (map file name without
@@ -37,11 +74,6 @@ Project language is English (docs, code, commit messages); the GUI additionally 
   marker. `LocationsDialog` in the GUI lists all sources and marks them on `WorldMapView`.
 - Unplaced merchants (no map NPC, probably events): gc_fsh, gc_gypsy, dun_diedrick, ezra,
   jackquicksilver, oldjonas, cc_jkkquartermaster.
-
-## Open from the latest requests
-- Vehicle frames have more fields (VFI:C/D/T/S/N) whose meaning isn't known; only size/power are shown.
-- Skill damage factor (0.7/0.5) from the wiki; `c4r::a` in the exe computes (ac[x] + skill * ad[x]) * y –
-  probably the real formula, not decoded yet.
 
 ## World map areas (latest)
 Map pages = the global map's areas (`Z:A`, entity lists `A6:E`). Done: area pages in both dialogs.
