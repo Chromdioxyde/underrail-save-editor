@@ -296,7 +296,7 @@ DE = {
     'large': 'groß',
     'like the one you have': 'wie bei deinem vorhandenen',
     'typical value': 'typischer Wert',
-    'quality has no effect on this item': 'Qualität wirkt bei diesem Item nicht',
+    'this component has no quality': 'diese Komponente hat keine Qualität',
     'Junk': 'Schrott',
     'Common': 'Gewöhnlich',
     'Fine': 'Fein',

@@ -21,7 +21,7 @@ features and file formats; this file is the working state.
 ## Paths
 - Repo `the repository`; game `$UNDERRAIL_GAME_DIR`; saves
   `$UNDERRAIL_SAVES_DIR`.
-- Cache `~/.cache/underrail-save-editor/` (items-v5, map_index_v5, worldmap_v7, worldmap_*.png, maptex/,
+- Cache `~/.cache/underrail-save-editor/` (items-v6, map_index_v5, worldmap_v7, worldmap_*.png, maptex/,
   zone_links_v1.json, icons/, thumbs/, savedetails.json); invalidated by game file mtimes.
 - Backups of written saves: `paths.BACKUP_DIR` (outside the save folder, so Steam Cloud ignores them).
 - exe analysis needs a venv with `dnfile` + `dncil` (not in the repo; recreate in the scratchpad:

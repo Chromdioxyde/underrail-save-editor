@@ -60,7 +60,8 @@ always appear as the game names them.
   (category, then optionally a subcategory and, for vehicle parts, the build size – all by default); the game's description in the tooltip. *Add item…* stays open after adding (double-click or *Add*, with a short confirmation) and searches names, type, size, rarity, details and the game
   description in English and German, word by word ("mittlerer Motor", "large engine"), and shows type, rarity and details
   (vehicle parts: build size small/medium/large from `VPI:S`, engine power `VEI:P`), presets durability
-  (full), batteries (full) and component quality (your own item's, else 100 where quality matters).
+  (full), batteries (full) and component quality (your own item's, else 100; locked to 0 for components
+  without a quality).
   Selecting a weapon or armor piece compares it with what is equipped in its slot (both
   weapon slots for weapons): damage, AP, damage per AP and your damage per AP, crit, precision,
   Strength, range, magazine, resistances/thresholds per damage type, armor penalty, level, durability,
@@ -120,9 +121,14 @@ guns and miniguns (`WI:WT` 9/10) get double. Applies to weapons, armor, helmets,
 emitters; belts don't wear down. Checked against the world data: 99 of 130 items match exactly, almost
 all others are below (worn), two are above (probably templates changed by a game update).
 
-Component quality is `CII:QL` (0 = component without a quality value). The game doesn't cap it: stats
-scale with `Q · (0.77 + 0.35 · min(1, max(0, Q−15)/170)^1.35)`, so the bonus curve flattens at 185 but
-higher values still count. The editor allows up to 999.
+Component quality is `CII:QL`. Only components whose template adds value per quality point
+(`CI:AVPQ` > 0) have one – leathers, plates, weapon frames (pistol, SMG, rifle…), emitters and so on.
+All others (barrels, energy and chemical pistol frames, goggles/headband frames, scopes, chemicals)
+always carry 0; the game hides quality 0 in the tooltip, and a non-zero value would multiply the
+crafting skill requirement (`CSR:F` is then a per-quality factor instead of a fixed skill value). The
+editor shows and edits quality only for the former (or for a stray non-zero value). The game doesn't
+cap it: stats scale with `Q · (0.77 + 0.35 · min(1, max(0, Q−15)/170)^1.35)`, so the bonus curve
+flattens at 185 but higher values still count. The editor allows up to 999.
 
 ## World map
 

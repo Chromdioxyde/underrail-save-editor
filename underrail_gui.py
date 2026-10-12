@@ -722,15 +722,13 @@ class AddItemDialog(QDialog):
         self.note_timer.start()
 
     def default_quality(self, i):
-        """Quality for a new component: the best of the same item the character already has, else 100 for
-        components whose stats scale with quality (0 for the rest, which ignore it)."""
+        """Quality for a new component with a quality value: the best of the same item the character
+        already has, else 100."""
         have = [f.value for it in self.save.inventory() if it.path and it.path.lower() == i['path'].lower()
                 for f in it.fields() if f.name == 'Quality']
         if have and max(have) > 0:
             return max(have), tr('like the one you have')
-        if i.get('quality_scaled'):
-            return 100, tr('typical value')
-        return 0, tr('quality has no effect on this item')
+        return 100, tr('typical value')
 
     def selected(self):
         i = self.current()
@@ -749,16 +747,17 @@ class AddItemDialog(QDialog):
         self.dur.setEnabled(d is not None)
         self.dur.setValue(d or 0.0)
         self.dur_hint.setText(tr('full = {d}', d=f'{d:g}') if d is not None else tr("doesn't wear down"))
-        comp = us.INSTANCE_CLASS.get(i['cls']) == 'CII'
-        self.quality.setEnabled(comp)
-        self.quality_label.setEnabled(comp)
-        if comp:
+        has = bool(i.get('has_quality'))
+        self.quality.setEnabled(has)
+        self.quality_label.setEnabled(has)
+        if has:
             value, why = self.default_quality(i)
             self.quality.setValue(value)
             self.quality_hint.setText(why)
         else:
             self.quality.setValue(0)
-            self.quality_hint.setText('')
+            self.quality_hint.setText(tr('this component has no quality')
+                                      if us.INSTANCE_CLASS.get(i['cls']) == 'CII' else '')
 
 
 class FoldersDialog(QDialog):

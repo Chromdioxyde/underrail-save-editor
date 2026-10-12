@@ -110,8 +110,10 @@ def _build_items():
                 'battery': _val(p, o.get('I:MB')) or 0, 'vm': _val(p, o.get('I:VM')),
                 # vehicle parts: build size (VPI:S 1 small, 2 medium, 3 large) and engine power
                 'size': _val(p, o.get('VPI:S')), 'power': _val(p, o.get('VEI:P')),
-                # components whose stats scale with quality (they list stat ranges)
-                'quality_scaled': bool(_val(p, o.get('CI:SR:Count'))),
+                # components with a quality add value per quality point (CI:AVPQ); the game generates all
+                # others (weapon barrels, energy/chemical pistol frames, scopes, chemicals…) with quality 0
+                # and hides it, and a non-zero value would multiply their crafting skill requirement
+                'has_quality': (_val(p, o.get('CI:AVPQ')) or 0) > 0,
                 'sub': _subcategory(rel),
             }
     return out
@@ -122,7 +124,7 @@ def items():
     global _items
     if _items is None:
         base = os.path.join(GAME, 'data', 'rules', 'items')
-        _items = _cached('items-v5.json', [base, os.path.join(GAME, 'underrail.exe')], _build_items)
+        _items = _cached('items-v6.json', [base, os.path.join(GAME, 'underrail.exe')], _build_items)
     return _items
 
 

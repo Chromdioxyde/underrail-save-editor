@@ -229,9 +229,22 @@ class Item:
         v = self.obj.get(member)
         return Field(label, v) if isinstance(v, nrbf.Prim) else None
 
+    @property
+    def has_quality(self):
+        """Component with a quality value (see gamedata 'has_quality'); a stray non-zero value on any
+        other component still counts so it stays visible and can be reset."""
+        v = self.obj.get('CII:QL')
+        if not isinstance(v, nrbf.Prim):
+            return False
+        if self.data is not None and 'CI:AVPQ' in self.data:
+            has = (self.save.g.val(self.data.get('CI:AVPQ')) or 0) > 0
+        else:
+            has = bool(self.info and self.info.get('has_quality'))
+        return has or v.value > 0
+
     def fields(self):
         out = [self.field('II:S', 'Stack'), self.field('II:D', 'Durability'), self.field('II:B', 'Battery')]
-        if 'CII:QL' in self.obj:
+        if self.has_quality:
             out.append(self.field('CII:QL', 'Quality'))
         return [f for f in out if f]
 
@@ -799,7 +812,7 @@ class Save:
         if durability is None:
             durability = self.default_durability(info['path'])
         sets = {'II:S': int(count), 'II:D': float(durability or 0.0), 'II:B': float(info.get('battery') or 0),
-                'II:MB': 0, 'II:DR': 0.0, 'CII:QL': int(quality or 0)}
+                'II:MB': 0, 'II:DR': 0.0, 'CII:QL': int(quality or 0) if info.get('has_quality') else 0}
         for n, v in sets.items():
             if n in mv and isinstance(it.values[mv[n]], nrbf.Prim):
                 it.values[mv[n]] = nrbf.Prim(it.values[mv[n]].ptype, None, v)
