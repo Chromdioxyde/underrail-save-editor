@@ -2569,6 +2569,7 @@ class Main(QMainWindow):
         self.setWindowTitle('Underrail Save Editor')
         self.resize(1400, 850)
         self.save = None
+        self.broken = []  # locations of the open save the game can't load, see us.broken_locations
         self.dirty = False
 
         self.saves = QListWidget()
@@ -2630,6 +2631,9 @@ class Main(QMainWindow):
         revert = QAction(QIcon.fromTheme('document-revert'), tr('Revert'), self)
         revert.triggered.connect(self.reload)
         file.addAction(revert)
+        self.act_repair = QAction(tr('Repair broken locations…'), self, enabled=False)
+        self.act_repair.triggered.connect(self.repair_locations)
+        file.addAction(self.act_repair)
         file.addSeparator()
         quit_ = QAction(QIcon.fromTheme('application-exit'), tr('Quit'), self, shortcut=QKeySequence('Ctrl+Q'))
         quit_.setMenuRole(QAction.QuitRole)
@@ -2736,14 +2740,17 @@ class Main(QMainWindow):
         self.refresh_timer.start()
 
     def check_loaded_changed(self):
-        """Hint when the game overwrote the save that is open in the editor."""
+        """Follow the game when it overwrote the open save; with unsaved edits only hint at it."""
         if not self.save or self.loaded_mtime is None:
             return
         try:
             changed = os.path.getmtime(self.save.path) != self.loaded_mtime
         except OSError:
             changed = True
-        if changed:
+        if changed and not self.dirty:
+            # nothing of ours to lose: follow the game's version instead of keeping a stale copy
+            self.load(self.save.folder)
+        elif changed:
             self.status.setText(tr('This save was changed on disk (by the game?). Revert/reselect it to reload; '
                                    'saving now would overwrite the game\'s version.'))
             self.btn_revert.setEnabled(True)
@@ -2805,7 +2812,7 @@ class Main(QMainWindow):
             QApplication.restoreOverrideCursor()
         if ok:
             s = self.save
-            if not self.needs_fix():
+            if not self.needs_fix() and not self.broken:
                 self.status.setStyleSheet('color: #2a2')
                 self.status.setText('✓ ' + tr('Loaded {name} – {char}, level {level}', name=os.path.basename(folder),
                                               char=s.name, level=s.level))
@@ -2834,6 +2841,7 @@ class Main(QMainWindow):
             self.save = us.Save(folder)
         except Exception as e:
             self.save = None
+            self.broken = []
             self.title.setText(os.path.basename(folder))
             self.status.setStyleSheet('color: #d33')
             self.status.setText(tr('Could not read save: {e}', e=e))
@@ -2855,6 +2863,7 @@ class Main(QMainWindow):
         self.tabs.addTab(HintsTab(self), tr('Hints'))
         if 0 <= tab < self.tabs.count():
             self.tabs.setCurrentIndex(tab)
+        self.broken = us.broken_locations(folder)
         self.dirty = False
         self.update_status()
         fixed = s.g.repaired + (s.info.repaired if s.info else 0)
@@ -2899,7 +2908,12 @@ class Main(QMainWindow):
     def update_status(self):
         self.btn_save.setEnabled(self.dirty or self.needs_fix())
         self.btn_revert.setEnabled(self.dirty)
+        self.act_repair.setEnabled(bool(self.broken))
         self.status.setText(tr('Unsaved changes') if self.dirty else tr('No changes'))
+        if self.broken:
+            self.status.setText(self.status.text() + ' · ' + tr(
+                'The game can\'t load these locations of this save: {names}. File → Repair broken locations… '
+                'resets them.', names=', '.join(self.broken)))
         missing = self.save.missing_feat_abilities() if self.save else []
         if missing:
             names = ', '.join(dict.fromkeys(gamedata.feat_abilities()['abilities'].get(a, [0, a])[1] or a
@@ -2911,6 +2925,35 @@ class Main(QMainWindow):
         if self.save:
             self.load(self.save.folder)
 
+    def repair_locations(self):
+        """Reset locations whose stored data is unreadable (the game aborts entering them)."""
+        if not self.save or not self.broken:
+            return
+        folder = self.save.folder
+        if QMessageBox.warning(
+                self, tr('Repair broken locations'),
+                tr('The data of these locations is unreadable, the game cannot enter them: {names}.\n'
+                   'Repairing removes their stored state, so the game rebuilds them as if never visited '
+                   '(looted containers, killed enemies there are reset). A backup is made first.\nRepair?',
+                   names=', '.join(self.broken)),
+                QMessageBox.Yes | QMessageBox.No, QMessageBox.No) != QMessageBox.Yes:
+            return
+        if us.game_running() and QMessageBox.warning(
+                self, tr('Underrail is running'),
+                tr('Underrail is running and may replace this save on its own, which would undo the repair.\n'
+                   'Repair anyway?'), QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
+            return
+        try:
+            fixed, bak = us.repair_bulk(folder)
+        except Exception as e:
+            QMessageBox.critical(self, tr('Repair failed'), str(e))
+            return
+        self.broken = us.broken_locations(folder)
+        self.update_status()
+        self.status.setStyleSheet('color: #2a2')
+        self.status.setText('✓ ' + tr('Repaired {names}. Backup: {path}', names=', '.join(fixed), path=bak))
+        self.refresh_list()
+
     def needs_fix(self):
         """Whether the open save should be written even without edits (repaired ids, missing feat abilities)."""
         s = self.save
@@ -2919,24 +2962,26 @@ class Main(QMainWindow):
     def write(self):
         if not self.save or not (self.dirty or self.needs_fix()):
             return
+        try:
+            on_disk = os.path.getmtime(self.save.path)
+        except OSError:
+            on_disk = None
+        # one question at most: a save the game rewrote since loading is the more serious warning and
+        # already covers "the running game replaces it"
+        if on_disk != self.loaded_mtime:
+            if QMessageBox.warning(
+                    self, tr('Save changed on disk'),
+                    tr('The game has changed this save since you opened it. Saving overwrites those changes '
+                       '(a backup is made first).\nSave anyway?'),
+                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No) != QMessageBox.Yes:
+                return
         # the game never rewrites a named save after creating it; only quick-/autosaves get replaced
-        rolling = os.path.basename(self.save.folder).lower().startswith(('quicksave', 'autosave'))
-        if rolling and us.game_running():
+        elif os.path.basename(self.save.folder).lower().startswith(('quicksave', 'autosave')) and us.game_running():
             if QMessageBox.warning(self, tr('Underrail is running'),
                                    tr('Underrail is running and replaces quicksaves/autosaves on its own, '
                                       'which would discard these edits.\nWrite anyway?'),
                                    QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
                 return
-        try:
-            on_disk = os.path.getmtime(self.save.path)
-        except OSError:
-            on_disk = None
-        if on_disk != self.loaded_mtime and QMessageBox.warning(
-                self, tr('Save changed on disk'),
-                tr('The game has changed this save since you opened it. Saving overwrites those changes '
-                   '(a backup is made first).\nSave anyway?'),
-                QMessageBox.Yes | QMessageBox.No) != QMessageBox.Yes:
-            return
         try:
             added = self.save.sync_feat_abilities()
             bak = self.save.write()

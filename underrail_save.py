@@ -866,6 +866,74 @@ class Save:
         return bak
 
 
+_LOCALE_KEY = re.compile(r'lmaps\\(.+?)(?:_l\d+)?\.(?:uzl|uzdm|ap)$')
+
+
+def _bulk_entries(f):
+    """(key, chunk, start, length) of every entry in a parsed bulk.map."""
+    r = f.p.objects[f.p.root]
+    for i in range(f.val(r.get('BSM:I:Count'))):
+        o = f.obj(r.get(f'BSM:I:{i}:Value'))
+        v = {n[5:]: f.val(x) if not isinstance(x, nrbf.Ref) else None for n, x in zip(o.names, o.values)}
+        yield f.val(r.get(f'BSM:I:{i}:Key')), v['C'], v['S'], v['L']
+
+
+def broken_locations(folder):
+    """Locations (zone ids) whose stored state the game can't read: bulk.map points into a chunk file at bytes
+    that don't start with the data header. The game then aborts a transition with "Failed to load locale".
+    Observed after the game wrote bulk.map without the matching chunk data; the editor never touches either."""
+    try:
+        with open(os.path.join(folder, 'global.dat'), 'rb') as fh:
+            magic = fh.read(HEADER_LEN)
+        f = File(os.path.join(folder, 'bulk.map'))
+        entries = list(_bulk_entries(f))
+    except (OSError, ValueError, KeyError, AttributeError, TypeError):
+        return []
+    bad, chunks = set(), {}
+    try:
+        for key, c, start, length in entries:
+            m = _LOCALE_KEY.match(key)
+            if not m:
+                continue
+            if c not in chunks:
+                chunks[c] = open(os.path.join(folder, f'chunk{c}.dat'), 'rb')
+            chunks[c].seek(start)
+            if chunks[c].read(HEADER_LEN) != magic:
+                bad.add(m.group(1))
+    except OSError:
+        return []  # a missing chunk file is a different problem; don't guess
+    finally:
+        for fh in chunks.values():
+            fh.close()
+    return sorted(bad)
+
+
+def repair_bulk(folder):
+    """Drops every stored entry (.uzdm, .uzl layers, .ap) of the locations from broken_locations(), so the game
+    rebuilds them as if never visited. Their state (looted, killed) is lost; it was unreadable anyway.
+    The old bulk.map is backed up first. Returns (locations, backup folder)."""
+    bad = set(broken_locations(folder))
+    if not bad:
+        return [], None
+    f = File(os.path.join(folder, 'bulk.map'))
+    r = f.p.objects[f.p.root]
+    keep = []
+    for i, (key, *_) in enumerate(_bulk_entries(f)):
+        m = _LOCALE_KEY.match(key)
+        if not (m and m.group(1) in bad):
+            keep.append((r.get(f'BSM:I:{i}:Key'), r.get(f'BSM:I:{i}:Value')))
+    bak = os.path.join(BACKUPS, os.path.basename(os.path.abspath(folder)), 'bulk-' + time.strftime('%Y%m%d-%H%M%S'))
+    os.makedirs(bak)
+    shutil.copy2(f.path, bak)
+    seq_set(r, 'BSM:I', keep, parts=(':Key', ':Value'))
+    blob = f.serialize()
+    tmp = f.path + '.tmp'
+    with open(tmp, 'wb') as out:
+        out.write(blob)
+    os.replace(tmp, f.path)
+    return sorted(bad), bak
+
+
 DIFFICULTIES = ['Easy', 'Normal', 'Hard', 'Dominating', 'Custom']  # TimelapseVertigo.Rules.GameDifficulty
 DLC_NAMES = {'xpbl': 'Expedition', 'xphw': 'Heavy Duty'}
 

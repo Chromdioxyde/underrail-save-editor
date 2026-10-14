@@ -478,6 +478,23 @@ DE = {
     "This save was changed on disk (by the game?). Revert/reselect it to reload; saving now would overwrite the game's version.":
         'Dieser Spielstand wurde auf der Festplatte geändert (vom Spiel?). Mit „Verwerfen“ neu laden; '
         'Speichern würde die Version des Spiels überschreiben.',
+    'Repair broken locations…': 'Defekte Orte reparieren…',
+    'Repair broken locations': 'Defekte Orte reparieren',
+    "The game can't load these locations of this save: {names}. File → Repair broken locations… resets them.":
+        'Das Spiel kann diese Orte dieses Spielstands nicht laden: {names}. Datei → Defekte Orte reparieren… '
+        'setzt sie zurück.',
+    'The data of these locations is unreadable, the game cannot enter them: {names}.\n'
+    'Repairing removes their stored state, so the game rebuilds them as if never visited '
+    '(looted containers, killed enemies there are reset). A backup is made first.\nRepair?':
+        'Die Daten dieser Orte sind unlesbar, das Spiel kann sie nicht betreten: {names}.\n'
+        'Beim Reparieren wird ihr gespeicherter Zustand entfernt, das Spiel baut sie neu auf, als wärst du nie '
+        'dort gewesen (geplünderte Behälter, getötete Gegner dort werden zurückgesetzt). '
+        'Vorher wird ein Backup angelegt.\nReparieren?',
+    'Underrail is running and may replace this save on its own, which would undo the repair.\nRepair anyway?':
+        'Underrail läuft und kann diesen Spielstand selbst ersetzen, wodurch die Reparatur verloren ginge.\n'
+        'Trotzdem reparieren?',
+    'Repair failed': 'Reparatur fehlgeschlagen',
+    'Repaired {names}. Backup: {path}': 'Repariert: {names}. Backup: {path}',
     '(placeholder icon – the game has no icon for this item)':
         '(Platzhalter-Icon – das Spiel hat für dieses Item kein Icon)',
     'Remove items': 'Items entfernen',

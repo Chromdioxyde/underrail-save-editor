@@ -160,6 +160,13 @@ also gives their real name.
 changed/new objects get their own class metadata. `xnb.py` decodes the LZX-compressed XNB portraits
 (DXT1/3/5).
 
+Per-location state lives next to it: `bulk.map` (NRBF, `BSM:I:n:Key/Value`) indexes entries
+`lmaps\<zone>.uzdm`, `<zone>_l1.uzl`, `<zone>.ap` as chunk file / start / length; every entry in `chunk*.dat`
+starts with the same 24-byte header as `global.dat`. The game has been seen writing the index without the
+matching chunk data; entering such a location then fails with "Failed to load locale". The editor checks this
+when opening a save and *File → Repair broken locations…* drops all entries of the affected zones (backup first),
+so the game rebuilds them as never visited.
+
 The player is `TG:PC` (class `P2`). Important members:
 
 | Member | Content |
