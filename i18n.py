@@ -523,6 +523,24 @@ DE = {
     'The Faceless': 'Die Faceless',
     'Kill counters': 'Kill-Zähler',
     'Attitudes': 'Beziehungen',
+    'Checkpoints into Faceless territory': 'Kontrollpunkte ins Faceless-Gebiet',
+    'Decide at the next meeting': 'Beim nächsten Treffen entscheiden',
+    'Let you pass': 'Lassen dich durch',
+    'Turn you away': 'Schicken dich weg',
+    'Guards': 'Wachen',
+    'Mindreading at Talos Outpost': 'Gedankenlesen im Talos Outpost',
+    'let you pass': 'dich durchlassen',
+    'turn you away': 'dich wegschicken',
+    'At the first meeting the guards decide once and remember it: they let you pass if the Faceless recon near '
+    'Foundry is finished and those Faceless aren\'t hostile to you, or if the Rail Crossing mindreader left safely. '
+    'With these values they would {verdict}.':
+        'Beim ersten Treffen entscheiden die Wachen einmal und merken es sich: Sie lassen dich durch, wenn die '
+        'Faceless-Aufklärung bei Foundry abgeschlossen ist und diese Faceless dir nicht feindlich sind, oder wenn '
+        'der Gedankenleser in Rail Crossing sicher abgezogen ist. Mit diesen Werten würden sie {verdict}.',
+    'The guards already decided and only repeat it; the conditions no longer matter. Without the pass the entrance '
+    'guard at Talos Outpost attacks you.':
+        'Die Wachen haben schon entschieden und wiederholen das nur noch; die Bedingungen zählen nicht mehr. Ohne '
+        'Passierrecht greift dich die Eingangswache am Talos Outpost an.',
     'Hostile': 'Feindlich',
     'Wary': 'Misstrauisch',
     'Neutral': 'Neutral',

@@ -147,6 +147,36 @@ def outcome(score):
     return 'neutral' if score == 0 else 'hostile'
 
 
+# Checkpoint guards at the edge of Faceless territory (dc_flcheckpoint.udlg): the first meeting decides once and
+# stores the verdict; later meetings only read it. The Talos Outpost entrance guard (dc_flo_entranceguard.udlg)
+# lets you in only with the pass, otherwise he attacks.
+PASS_ALLOWED = 'faction_faceless_allowPassCaves'
+PASS_FORBIDDEN = 'faction_faceless_forbiddenPassCaves'
+CHECKPOINT_MET = 'dc_checkpointGuard_met'
+CHECKPOINT_STATES = ['open', 'allowed', 'forbidden']
+
+
+def checkpoint_state(var):
+    if var(PASS_ALLOWED):
+        return 'allowed'
+    return 'forbidden' if var(PASS_FORBIDDEN) else 'open'
+
+
+def checkpoint_verdict(var, relation):
+    """What the guards decide at the first meeting: pass if the Foundry recon quest is finished and the
+    Foundry Faceless aren't hostile to you, or if the Rail Crossing mindreader left safely."""
+    recon = bool(var('quest_fo_facelessRecon_finished')) and relation(FOUNDRY_FACELESS, PLAYER) != HOSTILE
+    return recon or bool(var('npc_rcmindreader_removed'))
+
+
+def set_checkpoint(save, state):
+    """'allowed' / 'forbidden' store a verdict; 'open' lets the next meeting decide again."""
+    save.set_var(PASS_ALLOWED, state == 'allowed')
+    save.set_var(PASS_FORBIDDEN, state == 'forbidden')
+    if state == 'open':
+        save.set_var(CHECKPOINT_MET, False)
+
+
 def faceless_attitude(var, relation, difficulty):
     """The game's calculation (job started by the Talos Outpost commander), step by step.
     var(name) -> value of a game variable (None if unset); relation(src, tgt) -> attitude or None.

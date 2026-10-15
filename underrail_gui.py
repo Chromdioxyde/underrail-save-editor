@@ -2642,10 +2642,25 @@ class FactionsTab(QWidget):
         self.result = QLabel()
         self.result.setWordWrap(True)
         self.result.setTextFormat(Qt.RichText)
+        gate = QGroupBox(tr('Checkpoints into Faceless territory'))
+        gate_form = QFormLayout(gate)
+        self.gate_combo = wheel_guarded(QComboBox())
+        for label in ('Decide at the next meeting', 'Let you pass', 'Turn you away'):
+            self.gate_combo.addItem(tr(label))
+        self.gate_combo.setCurrentIndex(factions.CHECKPOINT_STATES.index(factions.checkpoint_state(s.var)))
+        self.gate_combo.currentIndexChanged.connect(self.set_checkpoint)
+        gate_form.addRow(tr('Guards'), self.gate_combo)
+        self.gate_note = QLabel()
+        self.gate_note.setWordWrap(True)
+        gate_form.addRow(self.gate_note)
+        score_box = QGroupBox(tr('Mindreading at Talos Outpost'))
+        sl = QVBoxLayout(score_box)
+        sl.addWidget(intro)
+        sl.addLayout(form)
+        sl.addWidget(self.result)
         lay = QVBoxLayout(w)
-        lay.addWidget(intro)
-        lay.addLayout(form)
-        lay.addWidget(self.result)
+        lay.addWidget(gate)
+        lay.addWidget(score_box)
         if s.var(factions.SCORE_VAR) is not None:
             stored = QFormLayout()
             sb = wheel_guarded(QSpinBox())
@@ -2653,9 +2668,14 @@ class FactionsTab(QWidget):
             sb.setValue(s.var(factions.SCORE_VAR))
             sb.valueChanged.connect(lambda v: self.set_var(factions.SCORE_VAR, v))
             stored.addRow(tr('Score already calculated (used by the commander\'s dialog)'), sb)
-            lay.addLayout(stored)
+            sl.addLayout(stored)
         lay.addStretch()
         return w
+
+    def set_checkpoint(self, index):
+        factions.set_checkpoint(self.save, factions.CHECKPOINT_STATES[index])
+        self.main.on_change()
+        self.update_score()
 
     def update_score(self):
         s = self.save
@@ -2680,6 +2700,17 @@ class FactionsTab(QWidget):
         if spy:
             h.append(f'<p style="color: #d33">{esc(tr("You started the Tchortists\' job to scout Faceless positions: the commander calls you a spy whatever the score, unless the Thought Control check passes or the Deep Caverns Tchortists are hostile to you."))}</p>')
         self.result.setText(''.join(h))
+        state = factions.checkpoint_state(s.var)
+        if state == 'open':
+            ok = factions.checkpoint_verdict(s.var, s.relation)
+            note = tr('At the first meeting the guards decide once and remember it: they let you pass if the Faceless '
+                      'recon near Foundry is finished and those Faceless aren\'t hostile to you, or if the Rail '
+                      'Crossing mindreader left safely. With these values they would {verdict}.',
+                      verdict=tr('let you pass') if ok else tr('turn you away'))
+        else:
+            note = tr('The guards already decided and only repeat it; the conditions no longer matter. Without the '
+                      'pass the entrance guard at Talos Outpost attacks you.')
+        self.gate_note.setText(note)
 
     # --- kill counters --------------------------------------------------------------------
     def counters_page(self):

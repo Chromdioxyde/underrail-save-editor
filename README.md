@@ -71,7 +71,11 @@ always appear as the game names them.
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
 - **Oddities:** collection counters
 - **Factions:**
-  - *The Faceless*: the attitude score the Faceless commander at Talos Outpost (Deep Caverns) computes when
+  - *The Faceless*: the checkpoint guards at the edge of Faceless territory decide once, at the first meeting,
+    whether you may pass (Foundry recon finished and those Faceless not hostile to you, or the Rail Crossing
+    mindreader left safely) and only repeat that verdict afterwards; without the pass the Talos Outpost entrance
+    guard attacks. The editor shows the stored verdict and can set it, or let the next meeting decide again.
+    Then the attitude score the Faceless commander at Talos Outpost (Deep Caverns) computes when
     he has your mind read, using the game's own calculation (read from its IL). The breakdown updates live
     while you edit its inputs: Faceless kill counters (more than 10 kills set the score to -5; below that the
     loss per kill depends on the difficulty), what happened with the Foundry recon group, the Rail Crossing
