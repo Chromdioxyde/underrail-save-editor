@@ -37,6 +37,10 @@ features and file formats; this file is the working state.
   branch unless TC check passes) – the user should test the mindreading in-game.
 - Attitude enum names 1 (wary) and 3 (friendly) are inferred; 0 hostile / 2 neutral default / 4 allied are
   backed by the IL and data.
+- User report: after editing the score inputs the checkpoint guards still said "You may not pass" – the
+  checkpoint (`dc_flcheckpoint.udlg`) decides once and stores `faction_faceless_allowPassCaves` /
+  `faction_faceless_forbiddenPassCaves`. Added the *Checkpoints* section (set verdict
+  or reset `dc_checkpointGuard_met` to decide again); verified on an autosave copy, awaiting in-game test.
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC
