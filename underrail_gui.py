@@ -1293,7 +1293,12 @@ class ItemTable(QTableWidget):
         for col, name in enumerate(self.cols):
             if name in ('Stack', 'Quality', 'Durability', 'Battery'):
                 self.setColumnWidth(col, max(self.columnWidth(col), 100))
-        self.horizontalHeader().setSectionResizeMode(self.cols.index('Name'), QHeaderView.Stretch)
+        # the name keeps its width (narrow windows scroll sideways instead of squeezing it away); the last
+        # column takes up any spare room
+        name_col = self.cols.index('Name')
+        self.horizontalHeader().setSectionResizeMode(name_col, QHeaderView.Interactive)
+        self.setColumnWidth(name_col, min(self.columnWidth(name_col), 360))
+        self.horizontalHeader().setStretchLastSection(True)
         self.setSortingEnabled(self.sortable)
 
     def changed(self, f, v, cell):
@@ -1397,32 +1402,39 @@ class InventoryTab(QWidget):
         rep = QPushButton(tr('Repair')); rep.clicked.connect(lambda: self.repair(False))
         rep.setToolTip(tr('Set durability of the selected items (inventory and equipped) to full'))
         rep_all = QPushButton(tr('Repair all')); rep_all.clicked.connect(lambda: self.repair(True))
+        # filters on one row, actions on the next, so the tab stays usable in a narrow window
         top = QHBoxLayout()
         top.addWidget(self.cat); top.addWidget(self.search, 1)
+        actions = QHBoxLayout()
         for b in (add, dup, rm, rep, rep_all):
-            top.addWidget(b)
+            actions.addWidget(b)
+        actions.addStretch()
         self.table = ItemTable(self, self.COLS)
         # equipped items keep the game's slot order
         self.equip = ItemTable(self, ['Slot', 'Name', 'Weight', 'Durability', 'Max', 'Battery', 'Max bat.'],
                                sortable=False)
         self.weight = QLabel()
-        top.addWidget(self.weight)
+        actions.addWidget(self.weight)
         eq = QGroupBox(tr('Equipped'))
         QVBoxLayout(eq).addWidget(self.equip)
-        split = QSplitter(Qt.Vertical)
         inv = QWidget()
         il = QVBoxLayout(inv); il.setContentsMargins(0, 0, 0, 0)
-        il.addLayout(top); il.addWidget(self.table)
-        split.addWidget(inv); split.addWidget(eq)
-        split.setSizes([450, 180])
-        # comparison of the selected item with what is equipped in its slot
+        il.addLayout(top); il.addLayout(actions); il.addWidget(self.table)
+        # comparison of the selected item with what is equipped in its slot; below the table, next to the
+        # equipped items, so the inventory table gets the full width
         self.compare = QTextBrowser()
         self.compare.setPlaceholderText(tr('Select a weapon or armor piece to compare it with your equipment.'))
-        side = QSplitter()
-        side.addWidget(split)
-        side.addWidget(self.compare)
-        side.setSizes([900, 420])
-        QVBoxLayout(self).addWidget(side)
+        bottom = QSplitter()
+        bottom.addWidget(eq)
+        bottom.addWidget(self.compare)
+        bottom.setSizes([500, 500])
+        split = QSplitter(Qt.Vertical)
+        split.addWidget(inv)
+        split.addWidget(bottom)
+        split.setStretchFactor(0, 1)
+        split.setStretchFactor(1, 0)
+        split.setSizes([450, 260])
+        QVBoxLayout(self).addWidget(split)
         self.table.itemSelectionChanged.connect(lambda: self.show_compare(self.table))
         self.equip.itemSelectionChanged.connect(lambda: self.show_compare(self.equip))
         self.build()
