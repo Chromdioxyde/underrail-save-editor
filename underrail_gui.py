@@ -203,6 +203,9 @@ class DetailsJob(QRunnable):
 
 
 THUMB_W, THUMB_H = 224, 126  # card thumbnail (screenshots are cropped to 16:9)
+# a card: thumbnail and a text column of the same width, spacing 10, frame margins 8 plus its border (2 when
+# selected), outer margins 4
+CARD_W = 2 * THUMB_W + 10 + 2 * (8 + 2) + 2 * 4
 
 
 def thumb_path(folder):
@@ -270,15 +273,20 @@ class SaveCard(QWidget):
         self.thumb = QLabel(objectName='thumb', alignment=Qt.AlignCenter)
         self.thumb.setFixedSize(THUMB_W, THUMB_H)
         row.addWidget(self.thumb)
-        text = QVBoxLayout()
+        body = QWidget()
+        body.setFixedWidth(THUMB_W)  # text column as wide as the thumbnail; long lines wrap
+        text = QVBoxLayout(body)
+        text.setContentsMargins(0, 0, 0, 0)
         text.setSpacing(2)
         self.title = QLabel(name, objectName='title')
         self.title.setWordWrap(True)
-        self.setMinimumWidth(THUMB_W + 160)
+        self.setFixedWidth(CARD_W)
         text.addWidget(self.title)
         if info:
             when = datetime.datetime.fromtimestamp(info['mtime']).strftime('%Y-%m-%d %H:%M')
-            text.addWidget(QLabel(f"{info['name']} · {tr('Level')} {info['level']}"))
+            who = QLabel(f"{info['name']} · {tr('Level')} {info['level']}")
+            who.setWordWrap(True)
+            text.addWidget(who)
             loc = QLabel(info['location'] or '', objectName='dim')
             loc.setWordWrap(True)
             text.addWidget(loc)
@@ -288,7 +296,9 @@ class SaveCard(QWidget):
                 meta.append(f'⏱ {int(h)}h {int(h * 60) % 60:02d}m')
             if info.get('difficulty') is not None:
                 meta.append(tr(str(info['difficulty'])))
-            text.addWidget(QLabel(' · '.join(meta), objectName='dim'))
+            meta_label = QLabel(' · '.join(meta), objectName='dim')
+            meta_label.setWordWrap(True)
+            text.addWidget(meta_label)
             text.addWidget(QLabel(when, objectName='dim'))
             dlcs = ', '.join(info.get('dlcs') or []) or '–'
             self.setToolTip(tr('Game time is the in-game world clock stored in the save.') + '\n'
@@ -296,8 +306,11 @@ class SaveCard(QWidget):
         else:
             text.addWidget(QLabel(tr('(unreadable info)'), objectName='dim'))
         self.stats = QLabel()
+        self.stats.setWordWrap(True)
         self.money = QLabel(objectName='dim')
+        self.money.setWordWrap(True)
         self.unspent = QLabel(objectName='badge')
+        self.unspent.setWordWrap(True)
         self.unspent.hide()
         text.addWidget(self.stats)
         text.addWidget(self.money)
@@ -306,7 +319,7 @@ class SaveCard(QWidget):
         badge_row.addStretch()
         text.addLayout(badge_row)
         text.addStretch()
-        row.addLayout(text, 1)
+        row.addWidget(body, 0, Qt.AlignTop)
         self.set_thumb()
 
     def set_thumb(self):
@@ -2862,8 +2875,9 @@ class Main(QMainWindow):
 
         self.saves = QListWidget()
         self.saves.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        # cards always take the list's width; text wraps instead of scrolling sideways
+        # fixed width: exactly the cards plus the scrollbar, never a sideways scrollbar
         self.saves.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.saves.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.saves.setResizeMode(QListWidget.Adjust)
         self.saves.setSpacing(0)
         # the cards draw their own selection; hide the list's highlight behind them
@@ -2871,6 +2885,7 @@ class Main(QMainWindow):
         self.saves.currentItemChanged.connect(self.pick)
         self.cards = {}
         left = QWidget()
+        left.setFixedWidth(CARD_W + self.saves.verticalScrollBar().sizeHint().width() + 2 * self.saves.frameWidth())
         lv = QVBoxLayout(left)
         lv.setContentsMargins(0, 0, 0, 0)
         head = QHBoxLayout()
@@ -2906,17 +2921,12 @@ class Main(QMainWindow):
         rv.addWidget(self.tabs, 1)
         rv.addLayout(bar)
 
-        self.split = split = QSplitter()
-        split.addWidget(left)
-        split.addWidget(right)
-        # only the editor grows with the window; the save list keeps its width (still draggable)
-        split.setStretchFactor(0, 0)
-        split.setStretchFactor(1, 1)
-        split.setCollapsible(0, False)
-        split.setSizes([480, 900])
-        self.sidebar_width = None  # set from the cards once shown, then by dragging (see keep_sidebar)
-        split.splitterMoved.connect(self.sidebar_dragged)
-        self.setCentralWidget(split)
+        central = QWidget()
+        cl = QHBoxLayout(central)
+        cl.setContentsMargins(0, 0, 0, 0)
+        cl.addWidget(left)
+        cl.addWidget(right, 1)
+        self.setCentralWidget(central)
 
         file = self.menuBar().addMenu(tr('File'))
         save = QAction(QIcon.fromTheme('document-save'), tr('Save'), self, shortcut=QKeySequence.Save)
@@ -2980,32 +2990,6 @@ class Main(QMainWindow):
         elif not (gamedata.GAME and gamedata.USERDIR):
             self.status.setText(tr('Underrail was not found. Choose its folders under Settings → Game folders…'))
 
-    def showEvent(self, e):
-        super().showEvent(e)
-        QTimer.singleShot(0, self.keep_sidebar)  # after the window got its real size
-
-    def resizeEvent(self, e):
-        super().resizeEvent(e)
-        QTimer.singleShot(0, self.keep_sidebar)
-
-    def sidebar_dragged(self, *_):
-        self.sidebar_width = self.split.sizes()[0]
-
-    def keep_sidebar(self):
-        """The save list keeps one width – as wide as its cards, or where the user dragged the splitter – while
-        the window or the editor's content changes size; only a too narrow window squeezes it."""
-        if not self.isVisible():
-            return
-        if self.sidebar_width is None:
-            if not self.cards:
-                return
-            self.sidebar_width = max(c.sizeHint().width() for c in self.cards.values()) + \
-                self.saves.verticalScrollBar().sizeHint().width() + 2 * self.saves.frameWidth()
-        sizes = self.split.sizes()
-        if sizes[0] != self.sidebar_width:
-            total = sum(sizes)
-            self.split.setSizes([self.sidebar_width, max(total - self.sidebar_width, 1)])
-
     def refresh_list(self):
         current = self.save.folder if self.save else None
         self.saves.blockSignals(True)
@@ -3033,7 +3017,6 @@ class Main(QMainWindow):
         if not current and self.saves.count():
             self.saves.setCurrentRow(0)
         self.mark_selected()
-        QTimer.singleShot(0, self.keep_sidebar)
         self.watch_saves()
         self.check_loaded_changed()
         pool = QThreadPool.globalInstance()
@@ -3140,7 +3123,6 @@ class Main(QMainWindow):
                 QTimer.singleShot(5000, lambda: (self.status.setStyleSheet(''), self.update_status())
                                   if self.save is s and not self.dirty else None)
             self.flash_title()
-        QTimer.singleShot(0, self.keep_sidebar)  # new tabs may have pushed the splitter
 
     def flash_title(self):
         """Fade a highlight behind the title so a (re)loaded save is noticed."""

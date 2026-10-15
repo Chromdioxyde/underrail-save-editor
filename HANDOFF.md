@@ -45,8 +45,8 @@ features and file formats; this file is the working state.
   the dialog (map AI property `AutoDialogInit` = `dc_checkpointGuard_met`, distance 6) until that flag is
   set, and only the first-meeting branch sets it; the editor had cleared it. Now a stored verdict sets the
   flag; saves with verdict but no flag are fixed on saving (`factions.fix_checkpoint`, like feat abilities).
-- Save list keeps its width when the window grows (stretch 0, `Main.keep_sidebar` restores the card-fitted or
-  user-dragged width after resizes and loads; only a too narrow window squeezes it).
+- Save list has a fixed width (no splitter): card = thumbnail + text column of the same width (`CARD_W`), long
+  lines wrap; only the editor grows with the window.
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC
