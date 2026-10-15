@@ -41,6 +41,10 @@ features and file formats; this file is the working state.
   checkpoint (`dc_flcheckpoint.udlg`) decides once and stores `faction_faceless_allowPassCaves` /
   `faction_faceless_forbiddenPassCaves`. Added the *Checkpoints* section (set verdict
   or reset `dc_checkpointGuard_met` to decide again); verified on an autosave copy, awaiting in-game test.
+- Follow-up bug: with the pass set, the guard kept walking up and barking "You may pass." – he auto-starts
+  the dialog (map AI property `AutoDialogInit` = `dc_checkpointGuard_met`, distance 6) until that flag is
+  set, and only the first-meeting branch sets it; the editor had cleared it. Now a stored verdict sets the
+  flag; saves with verdict but no flag are fixed on saving (`factions.fix_checkpoint`, like feat abilities).
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC

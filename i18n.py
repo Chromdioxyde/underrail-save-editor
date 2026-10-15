@@ -523,6 +523,10 @@ DE = {
     'The Faceless': 'Die Faceless',
     'Kill counters': 'Kill-Zähler',
     'Attitudes': 'Beziehungen',
+    'The Faceless checkpoint guard would keep walking up to you (pass set by an older editor version) – fixed '
+    'when saving.':
+        'Die Faceless-Wache am Kontrollpunkt würde dir immer wieder hinterherlaufen (Durchgang von einer älteren '
+        'Editor-Version gesetzt) – wird beim Speichern behoben.',
     'Checkpoints into Faceless territory': 'Kontrollpunkte ins Faceless-Gebiet',
     'Decide at the next meeting': 'Beim nächsten Treffen entscheiden',
     'Let you pass': 'Lassen dich durch',

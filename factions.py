@@ -148,8 +148,10 @@ def outcome(score):
 
 
 # Checkpoint guards at the edge of Faceless territory (dc_flcheckpoint.udlg): the first meeting decides once and
-# stores the verdict; later meetings only read it. The Talos Outpost entrance guard (dc_flo_entranceguard.udlg)
-# lets you in only with the pass, otherwise he attacks.
+# stores the verdict; later meetings only read it. The guard starts that dialog on his own (map AI property
+# AutoDialogInit = dc_checkpointGuard_met, within 6 units) for as long as the "met" flag is unset, and only the
+# first-meeting branch sets it – so a stored verdict needs the flag too, or he keeps walking up and repeating it.
+# The Talos Outpost entrance guard (dc_flo_entranceguard.udlg) lets you in only with the pass, otherwise he attacks.
 PASS_ALLOWED = 'faction_faceless_allowPassCaves'
 PASS_FORBIDDEN = 'faction_faceless_forbiddenPassCaves'
 CHECKPOINT_MET = 'dc_checkpointGuard_met'
@@ -170,11 +172,25 @@ def checkpoint_verdict(var, relation):
 
 
 def set_checkpoint(save, state):
-    """'allowed' / 'forbidden' store a verdict; 'open' lets the next meeting decide again."""
+    """'allowed' / 'forbidden' store a verdict (as after the first meeting); 'open' lets the next meeting
+    decide again."""
     save.set_var(PASS_ALLOWED, state == 'allowed')
     save.set_var(PASS_FORBIDDEN, state == 'forbidden')
-    if state == 'open':
-        save.set_var(CHECKPOINT_MET, False)
+    save.set_var(CHECKPOINT_MET, state != 'open')
+
+
+def checkpoint_broken(var):
+    """A stored verdict without the "met" flag (written by the editor before 2026-10-15): the guard keeps
+    walking up and repeating it. The game always sets the flag before its verdict."""
+    return checkpoint_state(var) != 'open' and not var(CHECKPOINT_MET)
+
+
+def fix_checkpoint(save):
+    """Sets the missing "met" flag; returns whether anything changed."""
+    if not checkpoint_broken(save.var):
+        return False
+    save.set_var(CHECKPOINT_MET, True)
+    return True
 
 
 def faceless_attitude(var, relation, difficulty):

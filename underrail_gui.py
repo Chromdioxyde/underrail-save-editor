@@ -3209,6 +3209,10 @@ class Main(QMainWindow):
                                             for _, a, _ in missing))
             self.status.setText(self.status.text() + ' · ' + tr(
                 'Feats without their attack/ability: {names} – they are added when saving.', names=names))
+        if self.save and factions.checkpoint_broken(self.save.var):
+            self.status.setText(self.status.text() + ' · ' + tr(
+                'The Faceless checkpoint guard would keep walking up to you (pass set by an older editor version) '
+                '– fixed when saving.'))
 
     def reload(self):
         if self.save:
@@ -3244,9 +3248,11 @@ class Main(QMainWindow):
         self.refresh_list()
 
     def needs_fix(self):
-        """Whether the open save should be written even without edits (repaired ids, missing feat abilities)."""
+        """Whether the open save should be written even without edits (repaired ids, missing feat abilities, the
+        Faceless checkpoint flag)."""
         s = self.save
-        return bool(s and (s.g.repaired or (s.info and s.info.repaired) or s.missing_feat_abilities()))
+        return bool(s and (s.g.repaired or (s.info and s.info.repaired) or s.missing_feat_abilities()
+                           or factions.checkpoint_broken(s.var)))
 
     def write(self):
         if not self.save or not (self.dirty or self.needs_fix()):
@@ -3273,6 +3279,7 @@ class Main(QMainWindow):
                 return
         try:
             added = self.save.sync_feat_abilities()
+            factions.fix_checkpoint(self.save)
             bak = self.save.write()
         except Exception as e:
             QMessageBox.critical(self, tr('Save failed'), str(e))
