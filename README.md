@@ -46,6 +46,9 @@ always appear as the game names them.
 
 ## Features (GUI)
 
+- **Save list:** cards with screenshot, character, location, play time, HP/XP, money; updates when the game
+  saves. It closes once you pick a save, so the editor gets the whole window; *Saves* (next to the title),
+  *View → Save list* or Ctrl+L open it again.
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
   attributes, XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)

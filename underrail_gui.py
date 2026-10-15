@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComb
                                QHBoxLayout, QHeaderView, QInputDialog, QLabel, QLineEdit, QListWidget,
                                QListWidgetItem, QMainWindow, QMessageBox, QPushButton,
                                QSpinBox, QSplitter, QTableWidget, QTableWidgetItem, QTabWidget,
-                               QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+                               QTextBrowser, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from html import escape as html_escape
 
@@ -2895,8 +2895,11 @@ class Main(QMainWindow):
         # the cards draw their own selection; hide the list's highlight behind them
         self.saves.setStyleSheet('QListWidget::item:selected, QListWidget::item:hover { background: transparent; }')
         self.saves.currentItemChanged.connect(self.pick)
+        # a save picked by hand closes the list, the editor gets the whole window
+        self.saves.itemClicked.connect(self.picked_by_hand)
+        self.saves.itemActivated.connect(self.picked_by_hand)
         self.cards = {}
-        left = QWidget()
+        self.sidebar = left = QWidget()
         left.setFixedWidth(CARD_W + self.saves.verticalScrollBar().sizeHint().width() + 2 * self.saves.frameWidth())
         lv = QVBoxLayout(left)
         lv.setContentsMargins(0, 0, 0, 0)
@@ -2926,10 +2929,19 @@ class Main(QMainWindow):
         bar.addWidget(self.status, 1)
         bar.addWidget(self.btn_revert)
         bar.addWidget(self.btn_save)
+        # opens/closes the save list
+        self.sidebar_btn = QToolButton(checkable=True, checked=True)
+        self.sidebar_btn.setText(tr('Saves'))
+        self.sidebar_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.sidebar_btn.setToolTip(tr('Show or hide the save list (Ctrl+L). It closes when you pick a save.'))
+        self.sidebar_btn.toggled.connect(self.show_sidebar)
+        title_row = QHBoxLayout()
+        title_row.addWidget(self.sidebar_btn)
+        title_row.addWidget(self.title, 1)
         right = QWidget()
         rv = QVBoxLayout(right)
         rv.setContentsMargins(0, 0, 0, 0)
-        rv.addWidget(self.title)
+        rv.addLayout(title_row)
         rv.addWidget(self.tabs, 1)
         rv.addLayout(bar)
 
@@ -2960,6 +2972,11 @@ class Main(QMainWindow):
         wm = QAction(tr('World map…'), self, shortcut=QKeySequence('Ctrl+M'))
         wm.triggered.connect(self.open_world_map)
         view.addAction(wm)
+        self.act_sidebar = QAction(tr('Save list'), self, shortcut=QKeySequence('Ctrl+L'), checkable=True,
+                                   checked=True)
+        self.act_sidebar.toggled.connect(self.show_sidebar)
+        view.addAction(self.act_sidebar)
+        self.show_sidebar(True)
 
         settings = self.menuBar().addMenu(tr('Settings'))
         folders = QAction(tr('Game folders…'), self)
@@ -3093,6 +3110,19 @@ class Main(QMainWindow):
         self.select_folder(folder)
         self.mark_selected()
         self.load(folder)
+
+    def picked_by_hand(self, item):
+        # pick() already ran on the press; close the list only if that save is the open one now
+        if item and self.save and self.save.folder == item.data(Qt.UserRole):
+            self.show_sidebar(False)
+
+    def show_sidebar(self, on):
+        self.sidebar.setVisible(on)
+        for w in (self.sidebar_btn, self.act_sidebar):
+            w.blockSignals(True)
+            w.setChecked(on)
+            w.blockSignals(False)
+        self.sidebar_btn.setArrowType(Qt.LeftArrow if on else Qt.RightArrow)
 
     def select_folder(self, folder):
         self.saves.blockSignals(True)

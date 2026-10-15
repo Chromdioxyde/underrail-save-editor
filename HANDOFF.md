@@ -49,6 +49,8 @@ features and file formats; this file is the working state.
   lines wrap; only the editor grows with the window.
 - Inventory: item comparison moved below the table (next to *Equipped*), table gets the full width; toolbar in
   two rows; item tables keep the Name column's width (max 360) and scroll sideways instead of squeezing it.
+- Save list collapses after a save is picked by hand (click/Enter, `Main.picked_by_hand`); reopen via the
+  *Saves* toggle next to the title, *View → Save list* or Ctrl+L. Window minimum is then the editor's (~700 px).
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC

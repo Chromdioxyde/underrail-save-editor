@@ -518,6 +518,9 @@ DE = {
     'max stack {n}': 'max. Stapel {n}',
     'full = {d}': 'voll = {d}',
     "doesn't wear down": 'nutzt sich nicht ab',
+    'Save list': 'Spielstand-Liste',
+    'Show or hide the save list (Ctrl+L). It closes when you pick a save.':
+        'Spielstand-Liste ein- oder ausblenden (Strg+L). Sie klappt zu, sobald du einen Spielstand auswählst.',
     # factions tab
     'Factions': 'Fraktionen',
     'The Faceless': 'Die Faceless',
