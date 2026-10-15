@@ -8,9 +8,9 @@ import shutil
 import time
 import zlib
 
+import factions
 import gamedata
 import nrbf
-
 import paths
 
 
@@ -323,6 +323,8 @@ class Save:
         self.root = root
         self.pc = self.g.obj(root.get('TG:PC'))
         self.m = dict(zip(self.pc.names, self.pc.values))
+        self._vars = None
+        self._factions = None
 
     # --- basics -------------------------------------------------------------------------
     def obj(self, v):
@@ -403,6 +405,112 @@ class Save:
     def oddities(self):
         return [Field(self.val(k), v) for k, v in seq_get(self.pc, 'PC1:O', (':Key', ':Value'))
                 if isinstance(v, nrbf.Prim)]
+
+    # --- game variables (TG:GP, a PropertyCollection of P name/value objects) -------------
+    def _var_objs(self):
+        if self._vars is None:
+            gp = self.obj(self.root.get('TG:GP'))
+            objs = (self.obj(v) for v in seq_get(gp, 'PC:P'))
+            self._vars = {self.val(o.get('P:N')): o for o in objs if isinstance(o, nrbf.Obj)}
+        return self._vars
+
+    def var(self, name, default=None):
+        o = self._var_objs().get(name)
+        v = o.get('P:V') if o is not None else None
+        return v.value if isinstance(v, nrbf.Prim) else default
+
+    def set_var(self, name, value):
+        """Sets a bool or int game variable; keeps the type of an existing one, creates missing ones
+        (an unset variable reads as false/0 in the game, so false/0 needs no entry)."""
+        o = self._var_objs().get(name)
+        if o is not None:
+            old = o.get('P:V')
+            if not isinstance(old, nrbf.Prim) or old.ptype not in (1, 8):
+                raise ValueError(f'{name} is not a bool or int variable')
+            new = nrbf.Prim(old.ptype, None, bool(value) if old.ptype == 1 else int(value))
+            if new.value == old.value:
+                return
+            o.values[o.names.index('P:V')] = new
+        elif value:
+            ptype = 1 if isinstance(value, bool) else 8
+            tmpl = next((x for x in self._var_objs().values()
+                         if isinstance(x.get('P:V'), nrbf.Prim) and x.get('P:V').ptype == ptype), None)
+            if tmpl is None:
+                raise ValueError(f'no {name!r}-like variable in this save to copy the layout from')
+            o = nrbf.Obj(self.g.new_id(), 'P', tmpl.names, tmpl.lib, tmpl.bt, tmpl.extra, 1, tmpl.meta)
+            o.values = [self.g.new_str(name), nrbf.Prim(ptype, None, value if ptype == 1 else int(value))]
+            self.g.p.objects[o.id] = o
+            gp = self.obj(self.root.get('TG:GP'))
+            seq_set(gp, 'PC:P', seq_get(gp, 'PC:P') + [nrbf.Ref(o.id)])
+            self._vars[name] = o
+        else:
+            return
+        self.g.dirty = True
+
+    @property
+    def difficulty(self):
+        """GameDifficulty (0 Easy … 3 Dominating, 4 Custom) from info.dat, else global.dat."""
+        r = self._info_root()
+        if r is not None and isinstance(self.info.val(r.get('SGI:D')), int):
+            return self.info.val(r.get('SGI:D'))
+        return self.val(self.root.get('TG:D')) if 'TG:D' in self.root.names else None
+
+    # --- factions (see factions.py) ---------------------------------------------------------
+    def _faction_blob(self):
+        fs = self.obj(self.obj(self.obj(self.root.get('TG:F')).get('FSW:FS')).get('FS1:D'))
+        return fs.items  # byte[] kept as one Prim
+
+    def factions(self):
+        if self._factions is None:
+            self._factions = factions.parse(self._faction_blob().value)
+        return self._factions
+
+    def relation(self, src, tgt):
+        """Attitude of faction src toward faction tgt, or None if the save has no such relation."""
+        f = self.factions().get(src)
+        r = f.relations.get(tgt) if f else None
+        return r[0] if r else None
+
+    def set_relation(self, src, tgt, attitude):
+        rels = self.factions()[src].relations
+        if tgt in rels:
+            if rels[tgt][0] == attitude:
+                return
+            rels[tgt][0] = attitude
+        else:
+            rels[tgt] = [attitude, -1]
+        self._faction_blob().value = factions.serialize(self._factions)
+        self.g.dirty = True
+
+    def personal_attitudes(self):
+        """The character's own attitude overrides {faction id: attitude} (C1:PA1); they win over the relation
+        of the player's faction."""
+        return {self.val(k): self.val(v) for k, v in seq_get(self.pc, 'C1:PA1', (':Key', ':Value'))}
+
+    def set_personal_attitude(self, fid, attitude):
+        """attitude None removes the override."""
+        entries = seq_get(self.pc, 'C1:PA1', (':Key', ':Value'))
+        for i, (k, v) in enumerate(entries):
+            if self.val(k) == fid:
+                if attitude is None:
+                    del entries[i]
+                    seq_set(self.pc, 'C1:PA1', entries, (':Key', ':Value'))
+                else:
+                    o = self.obj(v)
+                    if o.values[0].value == attitude:
+                        return
+                    o.values[0] = nrbf.Prim(o.values[0].ptype, None, attitude)
+                break
+        else:
+            if attitude is None:
+                return
+            if not entries:
+                raise ValueError('no attitude in this save to copy the layout from')
+            c = self.shallow_copy(self.obj(entries[0][1]))
+            c.values[0] = nrbf.Prim(c.values[0].ptype, None, attitude)
+            entries.append((self.g.new_str(fid), nrbf.Ref(c.id)))
+            seq_set(self.pc, 'C1:PA1', entries, (':Key', ':Value'))
+        self.g.dirty = True
 
     # --- specializations ------------------------------------------------------------------
     def specs(self):

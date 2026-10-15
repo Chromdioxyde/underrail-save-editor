@@ -70,6 +70,19 @@ always appear as the game names them.
   items, duplicate (crafted items too), remove; edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
 - **Oddities:** collection counters
+- **Factions:**
+  - *The Faceless*: the attitude score the Faceless commander at Talos Outpost (Deep Caverns) computes when
+    he has your mind read, using the game's own calculation (read from its IL). The breakdown updates live
+    while you edit its inputs: Faceless kill counters (more than 10 kills set the score to -5; below that the
+    loss per kill depends on the difficulty), what happened with the Foundry recon group, the Rail Crossing
+    mindreader and the injured Faceless in Core City, the Thought Control check, and your attitude toward the
+    Foundry Faceless. It shows the outcome (3+ allies, 1–2 friendly, 0 neutral, below 0 hostile) and warns
+    when the Tchortists' scouting job will get you called a spy anyway. Once the score has been calculated
+    it can be edited directly.
+  - *Kill counters*: other faction kill counters the game checks (Expedition pirates and Protectorate jet ski
+    patrols, Heavy Duty exosoldiers), with what they affect.
+  - *Attitudes*: every faction's attitude toward the player and back, plus your character's own overrides;
+    filter, *Only hostile*.
 - **Hints:** tailored to a build (assault rifle, sniper, SMG, pistol, shotgun, heavy guns, crossbow,
   stealth knife, unarmed/psi monk, sledgehammer, spear, sword, throwing, psi – the archetypes players
   commonly describe in Steam guides, on underrail.info and RPG Codex). The build is detected from skills,
@@ -183,6 +196,13 @@ The player is `TG:PC` (class `P2`). Important members:
 | `PC1:BAPC`, `PC1:SPC`, `PC1:FC`, `PC1:SP` | unspent attribute/skill/feat/specialization points |
 | `PC1:O:i:Key/Value` | oddities |
 | `PC1:B` | known blueprints: .NET `SortedList` name → `IBR` (`IBR:IBFTN` = lower-case id from `data/knowledge/itemblueprints.k`). Not re-sorted on load and read by binary search → entries are inserted in .NET culture order (`gamedata.sort_key`, verified against saved lists) |
+| `C1:PA1:i:Key/Value` | the character's own attitude overrides per faction id (`eATTI`); they win over the faction relation |
+
+Game variables (quest flags, counters) are the `P` objects (`P:N` name, `P:V` value) of the property
+collection `TG:GP` (`PC:P:i`); an unset variable reads as false/0. Faction relations are `TG:F` → `FSW:FS` →
+`FS1:D`, a byte array the game writes with a `BinaryWriter` (layout in `factions.py`): per faction its id, name
+and `{target faction: attitude}`. Attitudes: 0 hostile, 2 neutral (the default without a relation), 4 allied
+(SGS toward a member); 1 and 3 aren't named in the game data – the editor calls them wary and friendly.
 
 ## Building
 

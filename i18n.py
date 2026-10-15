@@ -518,6 +518,89 @@ DE = {
     'max stack {n}': 'max. Stapel {n}',
     'full = {d}': 'voll = {d}',
     "doesn't wear down": 'nutzt sich nicht ab',
+    # factions tab
+    'Factions': 'Fraktionen',
+    'The Faceless': 'Die Faceless',
+    'Kill counters': 'Kill-Zähler',
+    'Attitudes': 'Beziehungen',
+    'Hostile': 'Feindlich',
+    'Wary': 'Misstrauisch',
+    'Neutral': 'Neutral',
+    'Friendly': 'Freundlich',
+    'Allied': 'Verbündet',
+    'At Talos Outpost (Deep Caverns) the Faceless commander has your mind read and adds up a score from how you '
+    'treated the Faceless before – the game\'s own calculation, shown here live. 3 or more: allies, 1–2: friendly, '
+    '0: neutral, below 0: hostile. Change the kill counts or what happened to reach the score you want; it only '
+    'counts before that conversation.':
+        'Im Talos Outpost (Deep Caverns) lässt der Faceless-Kommandant deine Gedanken lesen und zählt einen Wert '
+        'daraus zusammen, wie du die Faceless bisher behandelt hast – die Berechnung des Spiels, hier live. '
+        'Ab 3: Verbündete, 1–2: freundlich, 0: neutral, unter 0: feindlich. Ändere die Kill-Zahlen oder die '
+        'Ereignisse, um den gewünschten Wert zu erreichen; das zählt nur vor diesem Gespräch.',
+    'Faceless killed': 'Getötete Faceless',
+    "Faceless killed in Buzzer's shop (Rail Crossing)": 'Getötete Faceless in Buzzers Laden (Rail Crossing)',
+    'Faceless recon near Foundry finished': 'Faceless-Aufklärung bei Foundry abgeschlossen',
+    'Rail Crossing mindreader left safely': 'Gedankenleser in Rail Crossing ist sicher abgezogen',
+    'Rail Crossing mindreader died': 'Gedankenleser in Rail Crossing ist gestorben',
+    'Injured Faceless in Core City released': 'Verletzten Faceless in Core City freigelassen',
+    'Injured Faceless in Core City killed': 'Verletzten Faceless in Core City getötet',
+    'Injured Faceless in Core City attacked': 'Verletzten Faceless in Core City angegriffen',
+    'Thought Control check at the mindreading passed': 'Thought-Control-Probe beim Gedankenlesen bestanden',
+    'The game sets this when you pass the Thought Control check (120) during the mindreading; it cancels every '
+    'penalty.':
+        'Das Spiel setzt das, wenn du beim Gedankenlesen die Thought-Control-Probe (120) bestehst; '
+        'sie hebt alle Abzüge auf.',
+    'Your attitude toward the Faceless near Foundry': 'Deine Einstellung zu den Faceless bei Foundry',
+    "Score already calculated (used by the commander's dialog)":
+        'Bereits berechneter Wert (nutzt der Dialog des Kommandanten)',
+    'Faceless recon near Foundry finished and you are not hostile to them':
+        'Faceless-Aufklärung bei Foundry abgeschlossen und du bist ihnen nicht feindlich',
+    'Injured Faceless in Core City released unharmed': 'Verletzten Faceless in Core City unversehrt freigelassen',
+    'You are hostile to the Faceless near Foundry': 'Du bist den Faceless bei Foundry feindlich',
+    'More than {limit} Faceless killed ({n})': 'Mehr als {limit} Faceless getötet ({n})',
+    '{n} Faceless killed (one point per {per} after the first)':
+        '{n} Faceless getötet (ein Punkt je {per} nach dem ersten)',
+    'Nothing counts for or against you': 'Nichts zählt für oder gegen dich',
+    'Score': 'Wert',
+    'Allies – they share information and supplies': 'Verbündete – sie teilen Informationen und Vorräte',
+    'Friendly – some information and supplies': 'Freundlich – etwas Information und Vorräte',
+    'Neutral – free passage, nothing else': 'Neutral – freier Durchgang, sonst nichts',
+    'Hostile – they attack after the mindreading': 'Feindlich – sie greifen nach dem Gedankenlesen an',
+    'Faceless kills counted: {n} (both counters). More than {limit} sets the score to -5; below that one point is '
+    'lost per {per} kills after the first on this difficulty.':
+        'Gezählte Faceless-Kills: {n} (beide Zähler). Mehr als {limit} setzen den Wert auf -5; darunter kostet '
+        'auf diesem Schwierigkeitsgrad jede {per}. Tötung nach der ersten einen Punkt.',
+    "You started the Tchortists' job to scout Faceless positions: the commander calls you a spy whatever the "
+    "score, unless the Thought Control check passes or the Deep Caverns Tchortists are hostile to you.":
+        'Du hast den Auftrag der Tchortisten angenommen, Faceless-Stellungen auszukundschaften: Der Kommandant '
+        'hält dich unabhängig vom Wert für einen Spion, außer die Thought-Control-Probe gelingt oder die '
+        'Tchortisten in den Deep Caverns sind dir feindlich.',
+    'Kill counters of other factions that the game checks. The Faceless ones are on their own page.':
+        'Kill-Zähler anderer Fraktionen, die das Spiel prüft. Die der Faceless stehen auf ihrer eigenen Seite.',
+    'Effect': 'Wirkung',
+    'Pirates killed (Expedition)': 'Getötete Piraten (Expedition)',
+    "Dialogs react at 30, 50 and 60; from 50 the game skips the pirates' attack events.":
+        'Dialoge reagieren bei 30, 50 und 60; ab 50 überspringt das Spiel die Angriffs-Ereignisse der Piraten.',
+    'Protectorate jet ski patrols killed (Expedition)': 'Getötete Jetski-Patrouillen des Protectorate (Expedition)',
+    'From 10 people talk about the decimated patrols; the waterway scripts also check it.':
+        'Ab 10 reden Leute über die dezimierten Patrouillen; auch die Skripte der Wasserwege prüfen den Wert.',
+    'Exosoldiers killed (Heavy Duty)': 'Getötete Exosoldaten (Heavy Duty)',
+    'Above 0 the psi commander answers differently; from 12 the game sets "too many killed".':
+        'Über 0 antwortet der Psi-Kommandant anders; ab 12 setzt das Spiel „zu viele getötet“.',
+    'Faction': 'Fraktion',
+    'ID': 'ID',
+    'Toward you': 'Zu dir',
+    'Yours': 'Deine',
+    'Your override': 'Eigene Vorgabe',
+    'Only hostile': 'Nur feindliche',
+    'Toward you: how the faction treats the player\'s faction. Yours: the player\'s faction toward them. Your '
+    'override: your character\'s own attitude, which wins over "Yours". Make a faction peaceful by setting both '
+    'directions (and the override) to Neutral or better. People you already fought in a place may keep their own '
+    'grudge, which is stored with that place. Factions without a stored relation are Neutral.':
+        'Zu dir: wie die Fraktion die Fraktion des Spielers behandelt. Deine: die Fraktion des Spielers ihr '
+        'gegenüber. Eigene Vorgabe: die persönliche Einstellung deines Charakters, sie geht vor „Deine“. '
+        'Friedlich wird eine Fraktion, wenn beide Richtungen (und die eigene Vorgabe) mindestens Neutral sind. '
+        'Leute, mit denen du an einem Ort schon gekämpft hast, können ihren eigenen Groll behalten, der bei '
+        'diesem Ort gespeichert ist. Fraktionen ohne gespeicherte Beziehung sind neutral.',
 }
 
 # labels with a number in them, e.g. 'Quick slot 3'

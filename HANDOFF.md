@@ -1,4 +1,4 @@
-# Handoff – status 2026-10-12
+# Handoff – status 2026-10-15
 
 Underrail save editor: PySide6 GUI that edits Underrail saves (character, skills, feats, specs, inventory,
 blueprints, oddities) and gives hints (item/merchant/creature locations on the game's own world map,
@@ -27,7 +27,18 @@ features and file formats; this file is the working state.
 - exe analysis needs a venv with `dnfile` + `dncil` (not in the repo; recreate in the scratchpad:
   `python3 -m venv venv && venv/bin/pip install dnfile dncil`). System python3 has PySide6 for the app.
 
-## Latest changes (2026-10-12) – awaiting in-game confirmation
+## Latest changes (2026-10-15) – awaiting in-game confirmation
+- New *Factions* tab (`factions.py`, `FactionsTab`): Faceless attitude score at Talos Outpost (game formula
+  from IL method `dyk::ym`, job `DCFAC` started by `dc_flo_mindreader.udlg`), editable inputs (game variables
+  via `Save.var/set_var`, creates missing `P` entries), kill counters of other factions (pirates, Protectorate
+  jet skis, exosoldiers + `tooManyKilled` flag at 12), faction relations editor (`FS1:D` byte blob, byte-identical
+  round trip) and personal overrides `C1:PA1`. Verified on a quicksave copy (edits re-read after writing).
+  With the Tchortist scouting job started the commander takes the spy
+  branch unless TC check passes) – the user should test the mindreading in-game.
+- Attitude enum names 1 (wary) and 3 (friendly) are inferred; 0 hostile / 2 neutral default / 4 allied are
+  backed by the IL and data.
+
+## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC
    ran in a worker thread (DetailsJob parsing the new save) and finalized Qt widgets there -> segfault.
    Fix: `gc_on_gui_thread(app)` in underrail_gui.py. Reproduced and verified with a script that rewrites a

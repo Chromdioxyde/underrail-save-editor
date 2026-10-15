@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComb
 
 from html import escape as html_escape
 
+import factions
 import gamedata
 import i18n
 import paths
@@ -47,6 +48,16 @@ class _WheelGuard(QObject):
 _wheel_guard = None
 
 
+def wheel_guarded(w):
+    """Only a focused widget reacts to the mouse wheel (see _WheelGuard)."""
+    global _wheel_guard
+    if _wheel_guard is None:
+        _wheel_guard = _WheelGuard()
+    w.setFocusPolicy(Qt.StrongFocus)  # no focus (and no value change) just by hovering + scrolling
+    w.installEventFilter(_wheel_guard)
+    return w
+
+
 def spin_for(field, on_change, lo=0, hi=INT_MAX):
     """Spinbox bound to a Field; bold while it differs from the loaded value."""
     if field.is_float:
@@ -58,11 +69,7 @@ def spin_for(field, on_change, lo=0, hi=INT_MAX):
         sb.setRange(lo, hi)
     sb.setValue(field.value)
     sb.setFrame(False)
-    global _wheel_guard
-    if _wheel_guard is None:
-        _wheel_guard = _WheelGuard()
-    sb.setFocusPolicy(Qt.StrongFocus)  # no focus (and no value change) just by hovering + scrolling
-    sb.installEventFilter(_wheel_guard)
+    wheel_guarded(sb)
 
     def changed(v):
         on_change(field, v)
@@ -2561,6 +2568,256 @@ class FilteredFieldTab(QWidget):
             self.table.setRowHidden(row, bool(q) and q not in self.table.item(row, 0).text().lower())
 
 
+ATTITUDE_COLORS = {0: QColor(210, 50, 50), 1: QColor(220, 140, 0), 3: QColor(40, 160, 40), 4: QColor(50, 110, 230)}
+
+
+def attitude_combo(current, on_change, none_label=None):
+    """Attitude picker; with none_label the first entry stands for "no value" (index -> None)."""
+    cb = wheel_guarded(QComboBox())
+    offset = 1 if none_label else 0
+    if none_label:
+        cb.addItem(none_label)
+    for i, name in enumerate(factions.ATTITUDES):
+        cb.addItem(tr(name))
+        if i in ATTITUDE_COLORS:
+            cb.setItemData(i + offset, QBrush(ATTITUDE_COLORS[i]), Qt.ForegroundRole)
+    cb.setCurrentIndex(offset + current if current is not None else 0)
+    cb.currentIndexChanged.connect(lambda i: on_change(None if i < offset else i - offset))
+    return cb
+
+
+class FactionsTab(QWidget):
+    """The Faceless attitude calculation at Talos Outpost, faction kill counters and the attitudes between the
+    player and every faction (see factions.py)."""
+
+    def __init__(self, main):
+        super().__init__()
+        self.main = main
+        self.sub = QTabWidget()
+        self.sub.addTab(self.faceless_page(), tr('The Faceless'))
+        self.sub.addTab(self.counters_page(), tr('Kill counters'))
+        self.sub.addTab(self.attitudes_page(), tr('Attitudes'))
+        QVBoxLayout(self).addWidget(self.sub)
+        self.update_score()
+
+    @property
+    def save(self):
+        return self.main.save
+
+    def set_var(self, name, value):
+        self.save.set_var(name, value)
+        self.main.on_change()
+        self.update_score()
+
+    # --- the Faceless ---------------------------------------------------------------------
+    def faceless_page(self):
+        s = self.save
+        w = QWidget()
+        intro = QLabel(tr('At Talos Outpost (Deep Caverns) the Faceless commander has your mind read and adds up a '
+                          'score from how you treated the Faceless before – the game\'s own calculation, shown '
+                          'here live. 3 or more: allies, 1–2: friendly, 0: neutral, below 0: hostile. Change the '
+                          'kill counts or what happened to reach the score you want; it only counts before that '
+                          'conversation.'))
+        intro.setWordWrap(True)
+        form = QFormLayout()
+        for var, label in ((factions.FACELESS_KILLED, 'Faceless killed'),
+                           (factions.FACELESS_KILLED_SHOP, "Faceless killed in Buzzer's shop (Rail Crossing)")):
+            sb = wheel_guarded(QSpinBox())
+            sb.setRange(0, INT_MAX)
+            sb.setValue(s.var(var, 0))
+            sb.valueChanged.connect(lambda v, var=var: self.set_var(var, v))
+            form.addRow(tr(label), sb)
+        for var, label in factions.FACELESS_FLAGS:
+            cb = QCheckBox(tr(label))
+            cb.setChecked(bool(s.var(var)))
+            cb.toggled.connect(lambda on, var=var: self.set_var(var, on))
+            if var == factions.TC_PASSED:
+                cb.setToolTip(tr('The game sets this when you pass the Thought Control check (120) during the '
+                                 'mindreading; it cancels every penalty.'))
+            form.addRow('', cb)
+        fo = s.relation(factions.PLAYER, factions.FOUNDRY_FACELESS)
+        self.fo_combo = attitude_combo(fo if fo is not None else factions.NEUTRAL, lambda a: self.change_attitude(
+            factions.PLAYER, factions.FOUNDRY_FACELESS, a))
+        form.addRow(tr('Your attitude toward the Faceless near Foundry'), self.fo_combo)
+        self.result = QLabel()
+        self.result.setWordWrap(True)
+        self.result.setTextFormat(Qt.RichText)
+        lay = QVBoxLayout(w)
+        lay.addWidget(intro)
+        lay.addLayout(form)
+        lay.addWidget(self.result)
+        if s.var(factions.SCORE_VAR) is not None:
+            stored = QFormLayout()
+            sb = wheel_guarded(QSpinBox())
+            sb.setRange(-1000, 1000)
+            sb.setValue(s.var(factions.SCORE_VAR))
+            sb.valueChanged.connect(lambda v: self.set_var(factions.SCORE_VAR, v))
+            stored.addRow(tr('Score already calculated (used by the commander\'s dialog)'), sb)
+            lay.addLayout(stored)
+        lay.addStretch()
+        return w
+
+    def update_score(self):
+        s = self.save
+        esc = html_escape
+        score, steps, kills, spy = factions.faceless_attitude(s.var, s.relation, s.difficulty)
+        h = ['<table cellpadding="2">']
+        for label, fmt, pts, kind in steps:
+            val = f'= {pts}' if kind == '=' else f'{pts:+d}'
+            h.append(f'<tr><td>{esc(tr(label, **fmt))}</td><td align="right"><b>{val}</b></td></tr>')
+        if not steps:
+            h.append(f'<tr><td>{esc(tr("Nothing counts for or against you"))}</td><td align="right">0</td></tr>')
+        outcome = {'ally': 'Allies – they share information and supplies',
+                   'friendly': 'Friendly – some information and supplies',
+                   'neutral': 'Neutral – free passage, nothing else',
+                   'hostile': 'Hostile – they attack after the mindreading'}[factions.outcome(score)]
+        color = '#2a2' if score >= 1 else ('#d33' if score < 0 else '')
+        h.append(f'<tr><td><b>{esc(tr("Score"))}</b></td><td align="right"><b>{score}</b></td></tr></table>')
+        h.append(f'<p style="color: {color}"><b>{esc(tr(outcome))}</b></p>' if color else
+                 f'<p><b>{esc(tr(outcome))}</b></p>')
+        diff = s.difficulty
+        h.append(f'<p><small>{esc(tr("Faceless kills counted: {n} (both counters). More than {limit} sets the score to -5; below that one point is lost per {per} kills after the first on this difficulty.", n=kills, limit=factions.KILL_LIMIT, per=factions.kills_per_point(diff)))}</small></p>')
+        if spy:
+            h.append(f'<p style="color: #d33">{esc(tr("You started the Tchortists\' job to scout Faceless positions: the commander calls you a spy whatever the score, unless the Thought Control check passes or the Deep Caverns Tchortists are hostile to you."))}</p>')
+        self.result.setText(''.join(h))
+
+    # --- kill counters --------------------------------------------------------------------
+    def counters_page(self):
+        s = self.save
+        w = QWidget()
+        note = QLabel(tr('Kill counters of other factions that the game checks. The Faceless ones are on their own page.'))
+        note.setWordWrap(True)
+        t = QTableWidget(len(factions.COUNTERS), 3)
+        t.setHorizontalHeaderLabels([tr('Name'), tr('Value'), tr('Effect')])
+        t.verticalHeader().hide()
+        t.setSelectionMode(QTableWidget.NoSelection)
+        t.setEditTriggers(QTableWidget.NoEditTriggers)
+        t.setWordWrap(True)
+        for row, (var, label, effect, link) in enumerate(factions.COUNTERS):
+            t.setItem(row, 0, QTableWidgetItem(tr(label)))
+            t.item(row, 0).setToolTip(var)
+            sb = wheel_guarded(QSpinBox())
+            sb.setRange(0, INT_MAX)
+            sb.setFrame(False)
+            sb.setValue(s.var(var, 0))
+            sb.valueChanged.connect(lambda v, var=var, link=link: self.set_counter(var, v, link))
+            t.setCellWidget(row, 1, sb)
+            t.setItem(row, 2, QTableWidgetItem(tr(effect)))
+        t.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
+        t.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
+        t.setColumnWidth(1, 120)
+        t.resizeRowsToContents()
+        lay = QVBoxLayout(w)
+        lay.addWidget(note)
+        lay.addWidget(t)
+        return w
+
+    def set_counter(self, var, value, link):
+        self.save.set_var(var, value)
+        if link:
+            flag, threshold = link
+            self.save.set_var(flag, value >= threshold)
+        self.main.on_change()
+
+    # --- attitudes ------------------------------------------------------------------------
+    COLS = ['Faction', 'ID', 'Toward you', 'Yours', 'Your override']
+
+    def attitudes_page(self):
+        w = QWidget()
+        note = QLabel(tr('Toward you: how the faction treats the player\'s faction. Yours: the player\'s faction '
+                         'toward them. Your override: your character\'s own attitude, which wins over "Yours". '
+                         'Make a faction peaceful by setting both directions (and the override) to Neutral or '
+                         'better. People you already fought in a place may keep their own grudge, which is '
+                         'stored with that place. Factions without a stored relation are Neutral.'))
+        note.setWordWrap(True)
+        self.att_filter = filter_box(tr('Filter…'), lambda _: self.refilter())
+        self.hostile_only = QCheckBox(tr('Only hostile'))
+        self.hostile_only.toggled.connect(lambda _: self.refilter())
+        top = QHBoxLayout()
+        top.addWidget(self.att_filter, 1)
+        top.addWidget(self.hostile_only)
+        self.att_table = QTableWidget(0, len(self.COLS))
+        self.att_table.setHorizontalHeaderLabels([tr(c) for c in self.COLS])
+        self.att_table.verticalHeader().hide()
+        self.att_table.setSelectionMode(QTableWidget.NoSelection)
+        self.att_table.setEditTriggers(QTableWidget.NoEditTriggers)
+        hh = self.att_table.horizontalHeader()
+        hh.setSectionResizeMode(0, QHeaderView.Stretch)
+        for c in range(1, len(self.COLS)):
+            hh.setSectionResizeMode(c, QHeaderView.ResizeToContents)
+        self.fill_attitudes()
+        lay = QVBoxLayout(w)
+        lay.addWidget(note)
+        lay.addLayout(top)
+        lay.addWidget(self.att_table)
+        return w
+
+    def fill_attitudes(self):
+        s = self.save
+        rows = sorted((f for f in s.factions().values() if f.id != factions.PLAYER),
+                      key=lambda f: (f.name.lower(), f.id.lower()))
+        personal = s.personal_attitudes()
+        t = self.att_table
+        t.setRowCount(len(rows))
+        self.att_rows = []
+        for row, f in enumerate(rows):
+            t.setItem(row, 0, QTableWidgetItem(f.name))
+            t.setItem(row, 1, QTableWidgetItem(f.id))
+            toward, yours = s.relation(f.id, factions.PLAYER), s.relation(factions.PLAYER, f.id)
+            t.setCellWidget(row, 2, attitude_combo(toward if toward is not None else factions.NEUTRAL,
+                                                   lambda a, fid=f.id: self.change_attitude(fid, factions.PLAYER, a)))
+            t.setCellWidget(row, 3, attitude_combo(yours if yours is not None else factions.NEUTRAL,
+                                                   lambda a, fid=f.id: self.change_attitude(factions.PLAYER, fid, a)))
+            t.setCellWidget(row, 4, attitude_combo(personal.get(f.id), lambda a, fid=f.id: self.change_override(fid, a),
+                                                   none_label='—'))
+            self.att_rows.append(f.id)
+        self.mark_hostile()
+        self.refilter()
+
+    def hostile(self, fid):
+        s = self.save
+        own = s.personal_attitudes().get(fid)
+        yours = own if own is not None else s.relation(factions.PLAYER, fid)
+        return factions.HOSTILE in (s.relation(fid, factions.PLAYER), yours)
+
+    def mark_hostile(self):
+        for row, fid in enumerate(self.att_rows):
+            self.att_table.item(row, 0).setForeground(QBrush(ATTITUDE_COLORS[0]) if self.hostile(fid) else QBrush())
+
+    def refilter(self):
+        q = self.att_filter.text().lower()
+        only = self.hostile_only.isChecked()
+        for row, fid in enumerate(self.att_rows):
+            text = (self.att_table.item(row, 0).text() + ' ' + fid).lower()
+            self.att_table.setRowHidden(row, (bool(q) and q not in text) or (only and not self.hostile(fid)))
+
+    def change_attitude(self, src, tgt, attitude):
+        self.save.set_relation(src, tgt, attitude)
+        self.after_attitude_change(src == factions.PLAYER and tgt == factions.FOUNDRY_FACELESS)
+
+    def change_override(self, fid, attitude):
+        self.save.set_personal_attitude(fid, attitude)
+        self.after_attitude_change(False)
+
+    def after_attitude_change(self, foundry_faceless):
+        self.main.on_change()
+        self.mark_hostile()
+        if foundry_faceless:
+            self.sync_foundry_faceless()
+        self.update_score()
+
+    def sync_foundry_faceless(self):
+        """The Faceless page and the attitude table both edit player -> faceless_fo."""
+        a = self.save.relation(factions.PLAYER, factions.FOUNDRY_FACELESS)
+        combos = [self.fo_combo]
+        if factions.FOUNDRY_FACELESS in self.att_rows:
+            combos.append(self.att_table.cellWidget(self.att_rows.index(factions.FOUNDRY_FACELESS), 3))
+        for cb in combos:
+            cb.blockSignals(True)
+            cb.setCurrentIndex(a)
+            cb.blockSignals(False)
+
+
 # --- main window --------------------------------------------------------------------------
 
 class Main(QMainWindow):
@@ -2860,6 +3117,7 @@ class Main(QMainWindow):
         self.tabs.addTab(blueprints_tab(self), tr('Blueprints'))
         self.tabs.addTab(FilteredFieldTab(self, s.oddities(), label=lambda f: gamedata.split_camel(
             f.name.split('.', 1)[-1])), tr('Oddities'))
+        self.tabs.addTab(FactionsTab(self), tr('Factions'))
         self.tabs.addTab(HintsTab(self), tr('Hints'))
         if 0 <= tab < self.tabs.count():
             self.tabs.setCurrentIndex(tab)
