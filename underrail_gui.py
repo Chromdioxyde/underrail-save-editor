@@ -2906,10 +2906,16 @@ class Main(QMainWindow):
         rv.addWidget(self.tabs, 1)
         rv.addLayout(bar)
 
-        split = QSplitter()
+        self.split = split = QSplitter()
         split.addWidget(left)
         split.addWidget(right)
+        # only the editor grows with the window; the save list keeps its width (still draggable)
+        split.setStretchFactor(0, 0)
+        split.setStretchFactor(1, 1)
+        split.setCollapsible(0, False)
         split.setSizes([480, 900])
+        self.sidebar_width = None  # set from the cards once shown, then by dragging (see keep_sidebar)
+        split.splitterMoved.connect(self.sidebar_dragged)
         self.setCentralWidget(split)
 
         file = self.menuBar().addMenu(tr('File'))
@@ -2974,6 +2980,32 @@ class Main(QMainWindow):
         elif not (gamedata.GAME and gamedata.USERDIR):
             self.status.setText(tr('Underrail was not found. Choose its folders under Settings → Game folders…'))
 
+    def showEvent(self, e):
+        super().showEvent(e)
+        QTimer.singleShot(0, self.keep_sidebar)  # after the window got its real size
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        QTimer.singleShot(0, self.keep_sidebar)
+
+    def sidebar_dragged(self, *_):
+        self.sidebar_width = self.split.sizes()[0]
+
+    def keep_sidebar(self):
+        """The save list keeps one width – as wide as its cards, or where the user dragged the splitter – while
+        the window or the editor's content changes size; only a too narrow window squeezes it."""
+        if not self.isVisible():
+            return
+        if self.sidebar_width is None:
+            if not self.cards:
+                return
+            self.sidebar_width = max(c.sizeHint().width() for c in self.cards.values()) + \
+                self.saves.verticalScrollBar().sizeHint().width() + 2 * self.saves.frameWidth()
+        sizes = self.split.sizes()
+        if sizes[0] != self.sidebar_width:
+            total = sum(sizes)
+            self.split.setSizes([self.sidebar_width, max(total - self.sidebar_width, 1)])
+
     def refresh_list(self):
         current = self.save.folder if self.save else None
         self.saves.blockSignals(True)
@@ -3001,6 +3033,7 @@ class Main(QMainWindow):
         if not current and self.saves.count():
             self.saves.setCurrentRow(0)
         self.mark_selected()
+        QTimer.singleShot(0, self.keep_sidebar)
         self.watch_saves()
         self.check_loaded_changed()
         pool = QThreadPool.globalInstance()
@@ -3107,6 +3140,7 @@ class Main(QMainWindow):
                 QTimer.singleShot(5000, lambda: (self.status.setStyleSheet(''), self.update_status())
                                   if self.save is s and not self.dirty else None)
             self.flash_title()
+        QTimer.singleShot(0, self.keep_sidebar)  # new tabs may have pushed the splitter
 
     def flash_title(self):
         """Fade a highlight behind the title so a (re)loaded save is noticed."""
