@@ -1414,63 +1414,167 @@ class ItemTable(QTableWidget):
         return [(row, self.item_at(row)) for row in range(self.rowCount())]
 
 
-def compare_html(save, item):
-    """Stats of an item next to the equipped item(s) of its slot, with coloured differences."""
-    import html
+def _mix(a, b, t):
+    """Colour between a and b (t = share of b) as #rrggbb, so the card fits light and dark themes."""
+    return QColor(round(a.red() + (b.red() - a.red()) * t), round(a.green() + (b.green() - a.green()) * t),
+                  round(a.blue() + (b.blue() - a.blue()) * t)).name()
+
+
+ATTACK_KEYS = ('damage', 'ap', 'per_ap', 'your_per_ap', 'crit', 'crit_dmg', 'precision', 'range', 'max_range',
+               'magazine')
+
+
+def compare_html(save, item, pal):
+    """Item card: icon, name in its rarity colour, description, the item's own values, and its stats grouped
+    into attack / protection / general, each with the difference to what is equipped in its slot."""
     import itemstats
-    esc = html.escape
+    esc = html_escape
+    text, base = pal.text().color(), pal.base().color()
+    muted = _mix(text, base, 0.45)
+    stripe = _mix(base, text, 0.045)
+    good, bad = QColor('#2e9e44'), QColor('#d64545')
+    if base.lightness() < 128:
+        good, bad = good.lighter(135), bad.lighter(125)
+    pill = {1: (good.name(), _mix(base, good, 0.16)), -1: (bad.name(), _mix(base, bad, 0.16))}
+
+    # header: icon, name, category · rarity · level, equipped state
+    path, _ = item.icon()
+    color = rarity_color(item.rarity)
+    rarity = gamedata.QUALITY.get(item.rarity)
+    sub = [item.category or '', tr(rarity) if rarity else '']
     r = itemstats.save_reader(item)
-    if r is None:
-        return ''
+    level = r.get('I:L') if r is not None else None
+    if level:
+        sub.append(tr('Level {n}', n=level))
+    h = ['<table cellspacing="0" cellpadding="0"><tr>']
+    if path:
+        h.append(f'<td valign="middle" style="padding-right: 12px"><img src="{esc(path)}" width="56" height="56"></td>')
+    h.append(f'<td valign="middle"><span style="font-size: 15pt; font-weight: 600; color: '
+             f'{(color or text).name()}">{esc(item.name)}</span><br>'
+             f'<span style="color: {muted}">{esc(" · ".join(s for s in sub if s))}</span>')
+    if item.slot:
+        h.append(f'<br><span style="color: {muted}">{esc(tr("Equipped ({slot})", slot=tr(item.slot)))}</span>')
+    h.append('</td></tr></table>')
+    desc = item.info['desc'] if item.info else ''
+    if desc:
+        h.append(f'<p style="color: {muted}; margin-top: 10px"><i>{esc(desc)}</i></p>')
+
+    def section(title):
+        h.append(f'<p style="color: {muted}; font-size: 9pt; font-weight: 600; margin-top: 14px; '
+                 f'margin-bottom: 4px">{esc(tr(title).upper())}</p>')
+
+    def rows(lines, heads=()):
+        """lines: [(label, value text, [comparison html per equipped item])]"""
+        h.append('<table width="100%" cellspacing="0" cellpadding="5">')
+        if heads:
+            h.append('<tr><td></td><td></td>' + ''.join(
+                f'<td align="right" style="color: {muted}; font-size: 8pt">{esc(n)}</td>' for n in heads) + '</tr>')
+        for i, (label, value, comps) in enumerate(lines):
+            bg = f' bgcolor="{stripe}"' if i % 2 == 0 else ''
+            h.append(f'<tr{bg}><td style="color: {muted}">{esc(label)}</td>'
+                     f'<td align="right"><b>{value}</b></td>' +
+                     ''.join(f'<td align="right">{c}</td>' for c in comps) + '</tr>')
+        h.append('</table>')
+
+    # the item's own values (any item); weapons and armor get their stats compared below
+    equipment = r is not None and r.o.cls in itemstats.SLOT_OF_CLASS
+    num = lambda v: str(int(v)) if float(v).is_integer() else f'{v:.2f}'.rstrip('0').rstrip('.')
+    of = lambda v, mx: f'{num(v)} <span style="color: {muted}">/ {num(mx)}</span>'
+    own = []
+    for f in item.fields():
+        if f.name == 'Stack':
+            if item.max_stack > 1:
+                # a maximum in the millions is "unlimited" in practice
+                own.append((tr('Stack'), of(f.value, item.max_stack) if item.max_stack < 10**6 else num(f.value), []))
+        elif f.name == 'Durability' and item.max_durability:
+            own.append((tr('Durability'), of(f.value, item.max_durability), []))
+        elif f.name == 'Battery' and item.max_battery:
+            own.append((tr('Battery'), of(f.value, item.max_battery), []))
+        elif f.name == 'Quality':
+            own.append((tr('Quality'), num(f.value), []))
+    if item.weight is not None and not equipment:
+        own.append((tr('Weight'), num(item.weight), []))
+    if item.crafted:
+        own.append((tr('Crafted'), '✓', []))
+    if own:
+        section('Item')
+        rows(own)
+
+    if not equipment:
+        return '\n'.join(h)
     skills, strength = itemstats.character(save)
     mine = itemstats.stats(r, skills, strength)
     if not mine:
-        return f'<p>{esc(tr("No comparable stats for this item."))}</p>'
+        return '\n'.join(h)
     slots = itemstats.SLOT_OF_CLASS.get(r.o.cls, [])
     others = [it for it in save.equipped() if it.slot in slots and it.obj is not item.obj]
     other_stats = [{s.key: s for s in itemstats.stats(itemstats.save_reader(it), skills, strength)} for it in others]
-    h = [f'<h3>{esc(item.name)}</h3>']
-    if item.slot:
-        h.append(f'<p><i>{esc(tr("Equipped ({slot})", slot=tr(item.slot)))}</i></p>')
-    elif not others:
-        h.append(f'<p><i>{esc(tr("Nothing equipped in this slot."))}</i></p>')
-    h.append('<table cellspacing="0" cellpadding="3" border="1"><tr><th></th>'
-             f'<th>{esc(tr("This item"))}</th>' +
-             ''.join(f'<th>{esc(it.name)}<br><small>{esc(tr(it.slot))}</small></th>' for it in others) + '</tr>')
-    # rows of every stat any of the items has; missing protection counts as 0
+    if slots and not item.slot and not others:
+        h.append(f'<p style="color: {muted}">{esc(tr("Nothing equipped in this slot."))}</p>')
+    heads = [tr('vs. {name}', name=it.name) for it in others]
+    # every stat any of the items has; missing protection counts as 0
     keys = [s.key for s in mine]
     for st in other_stats:
         keys += [k for k in st if k not in keys]
     keys.sort(key=itemstats.order)
     by_key = {s.key: s for s in mine}
+    zero = lambda k, label, better: itemstats.Stat(k, label, 0, '0%' if k.startswith('dr_') else '0', better)
     for k in keys:
         if k not in by_key:
             o = next(st[k] for st in other_stats if k in st)
-            zero = k.startswith(('dr_', 'dt_'))
-            by_key[k] = itemstats.Stat(k, o.label, 0 if zero else None,
-                                       ('0%' if k.startswith('dr_') else '0') if zero else '–', o.better)
+            by_key[k] = zero(k, o.label, o.better) if k.startswith(('dr_', 'dt_')) else \
+                itemstats.Stat(k, o.label, None, '–', o.better)
     pct = ('crit', 'precision', 'penalty') + tuple(k for k in keys if k.startswith('dr_'))
-    for s in (by_key[k] for k in keys):
-        row = f'<tr><td>{esc(tr(s.label))}</td><td align="right"><b>{esc(s.text)}</b></td>'
+
+    def delta(s, st):
+        o = st.get(s.key)
+        if o is None and s.key.startswith(('dr_', 'dt_')):
+            o = zero(s.key, s.label, s.better)
+        if o is None:
+            return ''
+        other = f'<span style="color: {muted}">{esc(o.text)}</span>'
+        if not (isinstance(s.value, (int, float)) and isinstance(o.value, (int, float)) and s.better):
+            return other
+        d = s.value - o.value
+        if abs(d) < 1e-9:
+            return f'<span style="color: {muted}">= {esc(o.text)}</span>'
+        txt = f'{abs(d) * 100:.0f}%' if s.key in pct else (f'{abs(d):.2f}' if isinstance(d, float) and d != int(d)
+                                                           else f'{abs(d):g}')
+        fg, bg = pill[1 if d * s.better > 0 else -1]
+        arrow = '▲' if d > 0 else '▼'
+        return (f'<span style="color: {fg}; background-color: {bg}; font-weight: 600">&nbsp;{arrow} {txt}&nbsp;</span>'
+                f'&nbsp;{other}')
+
+    def line(s):
+        return (tr(s.label), esc(s.text), [delta(s, st) for st in other_stats])
+
+    attack = [line(by_key[k]) for k in keys if k in ATTACK_KEYS]
+    if attack:
+        section('Attack')
+        rows(attack, heads)
+    prot = []
+    for t in itemstats.PROTECTION_ORDER:
+        dr, dt = by_key.get(f'dr_{t}'), by_key.get(f'dt_{t}')
+        if dr is None and dt is None:
+            continue
+        label = tr(t)
+        value = f'{esc(dr.text if dr else "0%")} <span style="color: {muted}">/</span> {esc(dt.text if dt else "0")}'
+        comps = []
         for st in other_stats:
-            o = st.get(s.key)
-            if o is None and s.key.startswith(('dr_', 'dt_')):
-                o = itemstats.Stat(s.key, s.label, 0, '0%' if s.key.startswith('dr_') else '0', s.better)
-            if o is None:
-                row += '<td></td>'
-                continue
-            cell = esc(o.text)
-            if isinstance(s.value, (int, float)) and isinstance(o.value, (int, float)) and s.better:
-                d = s.value - o.value
-                if abs(d) > 1e-9:
-                    good = d * s.better > 0
-                    txt = f'{d * 100:+.0f}%' if s.key in pct else (f'{d:+.2f}' if isinstance(d, float) and
-                                                                    d != int(d) else f'{d:+g}')
-                    cell += f' <span style="color:{"#2a2" if good else "#d33"}">({txt})</span>'
-            row += f'<td align="right">{cell}</td>'
-        h.append(row + '</tr>')
-    h.append('</table>')
-    h.append(f'<p><small>{esc(tr("Differences: this item minus the equipped one; green = better. Your damage per AP uses your effective skill from the save."))}</small></p>')
+            parts = [delta(x, st) for x in (dr, dt) if x is not None]
+            comps.append('<br>'.join(p for p in parts if p))
+        prot.append((label, value, comps))
+    if prot:
+        section('Protection (resistance / threshold)')
+        rows(prot, heads)
+    general = [line(by_key[k]) for k in keys if k not in ATTACK_KEYS and not k.startswith(('dr_', 'dt_'))
+               and k != 'level']
+    if general:
+        section('General')
+        rows(general, heads)
+    if others:
+        h.append(f'<p style="color: {muted}; font-size: 8pt; margin-top: 12px">'
+                 f'{esc(tr("▲▼ difference to the equipped item, green = better. Your damage per AP uses your effective skill from the save."))}</p>')
     return '\n'.join(h)
 
 
@@ -1514,17 +1618,19 @@ class InventoryTab(QWidget):
         # comparison of the selected item with what is equipped in its slot; below the table, next to the
         # equipped items, so the inventory table gets the full width
         self.compare = QTextBrowser()
-        self.compare.setPlaceholderText(tr('Select a weapon or armor piece to compare it with your equipment.'))
+        self.compare.setPlaceholderText(tr('Select an item to see its details; weapons and armor are compared with '
+                                           'your equipment.'))
+        self.compare.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # the card wraps to the width
         bottom = QSplitter()
         bottom.addWidget(eq)
         bottom.addWidget(self.compare)
-        bottom.setSizes([500, 500])
+        bottom.setSizes([420, 580])
         split = QSplitter(Qt.Vertical)
         split.addWidget(inv)
         split.addWidget(bottom)
         split.setStretchFactor(0, 1)
-        split.setStretchFactor(1, 0)
-        split.setSizes([450, 260])
+        split.setStretchFactor(1, 1)
+        split.setSizes([400, 400])
         QVBoxLayout(self).addWidget(split)
         self.table.itemSelectionChanged.connect(lambda: self.show_compare(self.table))
         self.equip.itemSelectionChanged.connect(lambda: self.show_compare(self.equip))
@@ -1554,7 +1660,7 @@ class InventoryTab(QWidget):
 
     def show_compare(self, table):
         sel = table.selected()
-        self.compare.setHtml(compare_html(self.main.save, sel[0]) if sel else '')
+        self.compare.setHtml(compare_html(self.main.save, sel[0], self.compare.palette()) if sel else '')
 
     def refilter(self, *_):
         q = self.search.text().lower()

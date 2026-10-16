@@ -66,11 +66,13 @@ always appear as the game names them.
   (vehicle parts: build size small/medium/large from `VPI:S`, engine power `VEI:P`), presets durability
   (full), batteries (full) and component quality (your own item's, else 100; locked to 0 for components
   without a quality).
-  Selecting a weapon or armor piece compares it with what is equipped in its slot (both
-  weapon slots for weapons): damage, AP, damage per AP and your damage per AP, crit, precision,
-  Strength, range, magazine, resistances/thresholds per damage type, armor penalty, level, durability,
-  weight – differences green/red like in Diablo; the comparison sits below the table, next to the equipped
-  items. Item icons, sortable by several columns (click a header, Shift+click the next one, e.g. Name, then
+  Selecting an item shows its card below the table, next to the equipped items: icon, name in its rarity
+  colour, category, rarity, level, the game's description and its own values (stack, quality, durability,
+  battery). Weapons and armor also list their stats in groups (attack; protection as resistance / threshold
+  per damage type; general) with the difference to what is equipped in the slot (both weapon slots for
+  weapons) as green/red ▲▼ badges: damage, AP, damage per AP and your damage per AP, crit, precision,
+  Strength, range, magazine, armor penalty, durability, weight. Item icons, sortable by several columns
+  (click a header, Shift+click the next one, e.g. Name, then
   Quality) and filterable by category; stack size, component quality, durability (with maximum, *Repair* /
   *Repair all*), battery; right-click sets stack size or quality of all selected items at once (stacks are
   limited to the game's maximum per item); add items from all ~1460 game items, duplicate (crafted items

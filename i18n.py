@@ -211,12 +211,10 @@ DE = {
     'Expedition swords and machetes: combos and counters.': 'Schwerter und Macheten aus Expedition: Kombos und Konter.',
     'Throwing knives and grenades; mostly a secondary skill, often next to knives or psi.': 'Wurfmesser und Granaten; meist Zweitskill, oft neben Messern oder Psi.',
     'Psi abilities instead of weapons. Psi Empathy costs health; armor penalty slows you, so light armor or a tactical vest is usual.': 'Psi-Fähigkeiten statt Waffen. Psi Empathy kostet Lebenspunkte; Rüstungsmalus bremst, daher sind leichte Rüstung oder eine taktische Weste üblich.',
-    'Select a weapon or armor piece to compare it with your equipment.': 'Wähle eine Waffe oder ein Rüstungsteil, um es mit deiner Ausrüstung zu vergleichen.',
-    'No comparable stats for this item.': 'Für dieses Item gibt es keine vergleichbaren Werte.',
+    'Select an item to see its details; weapons and armor are compared with your equipment.':
+        'Wähle ein Item, um seine Details zu sehen; Waffen und Rüstung werden mit deiner Ausrüstung verglichen.',
     'Equipped ({slot})': 'Ausgerüstet ({slot})',
     'Nothing equipped in this slot.': 'In diesem Slot ist nichts ausgerüstet.',
-    'This item': 'Dieses Item',
-    'Differences: this item minus the equipped one; green = better. Your damage per AP uses your effective skill from the save.': 'Unterschiede: dieses Item minus das ausgerüstete; grün = besser. „Dein Schaden pro AP“ nutzt deinen effektiven Skill aus dem Spielstand.',
     'Action points': 'Aktionspunkte',
     'Damage per AP': 'Schaden pro AP',
     'Your damage per AP': 'Dein Schaden pro AP',
@@ -533,6 +531,23 @@ DE = {
     'Removed {n} item(s)': '{n} Item(s) entfernt',
     'Remove the selected items (Del); only unique and quest items ask first':
         'Markierte Items entfernen (Entf); nur bei Unique- und Quest-Items wird nachgefragt',
+    # item card
+    'Item': 'Item',
+    'Attack': 'Angriff',
+    'General': 'Allgemein',
+    'Protection (resistance / threshold)': 'Schutz (Widerstand / Schwelle)',
+    'vs. {name}': 'vs. {name}',
+    'Mechanical': 'Mechanisch',
+    'Energy': 'Energie',
+    'Heat': 'Hitze',
+    'Electricity': 'Elektrizität',
+    'Cold': 'Kälte',
+    'Acid': 'Säure',
+    'Bio': 'Bio',
+    '▲▼ difference to the equipped item, green = better. Your damage per AP uses your effective skill from the '
+    'save.':
+        '▲▼ Unterschied zum ausgerüsteten Item, grün = besser. „Dein Schaden pro AP“ nutzt deinen effektiven '
+        'Skill aus dem Spielstand.',
     # factions tab
     'Factions': 'Fraktionen',
     'The Faceless': 'Die Faceless',

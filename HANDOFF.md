@@ -55,6 +55,8 @@ features and file formats; this file is the working state.
 - Item tables: own multi-key sort (`ItemTable.sort_keys`, click = single key, Shift+click = next key, relies
   on Qt's stable sort, kept across rebuilds); right-click sets stack/quality of all selected rows through
   their spinboxes (stack clamped to `Item.max_stack`).
+- Item details: `compare_html(save, item, palette)` builds a card (icon, rarity-coloured name, description, own
+  values, grouped stats with ▲▼ difference badges); colours mixed from the widget palette for light/dark themes.
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC
