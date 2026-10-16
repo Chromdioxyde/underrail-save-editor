@@ -74,7 +74,7 @@ always appear as the game names them.
   Quality) and filterable by category; stack size, component quality, durability (with maximum, *Repair* /
   *Repair all*), battery; right-click sets stack size or quality of all selected items at once (stacks are
   limited to the game's maximum per item); add items from all ~1460 game items, duplicate (crafted items
-  too), remove; edit equipped items
+  too), remove (also with Del; only unique and quest items ask first); edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
 - **Oddities:** collection counters
 - **Factions:**

@@ -530,6 +530,9 @@ DE = {
     'New value for {n} item(s):': 'Neuer Wert für {n} Item(s):',
     '{n} item(s) were limited to their maximum stack size.':
         '{n} Item(s) wurden auf ihre maximale Stapelgröße begrenzt.',
+    'Removed {n} item(s)': '{n} Item(s) entfernt',
+    'Remove the selected items (Del); only unique and quest items ask first':
+        'Markierte Items entfernen (Entf); nur bei Unique- und Quest-Items wird nachgefragt',
     # factions tab
     'Factions': 'Fraktionen',
     'The Faceless': 'Die Faceless',

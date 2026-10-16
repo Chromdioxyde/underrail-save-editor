@@ -8,7 +8,7 @@ import sys
 
 from PySide6.QtCore import (QFileSystemWatcher, QObject, QPointF, QRectF, QRunnable, QSize, Qt, QThreadPool, QTimer,
                             Signal)
-from PySide6.QtGui import QAction, QBrush, QColor, QIcon, QKeySequence, QPainter, QPen, QPixmap
+from PySide6.QtGui import QAction, QBrush, QColor, QIcon, QKeySequence, QPainter, QPen, QPixmap, QShortcut
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QDialog, QFrame,
                                QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGraphicsRectItem,
                                QGraphicsScene, QGraphicsSimpleTextItem, QGraphicsView, QGroupBox,
@@ -1487,6 +1487,7 @@ class InventoryTab(QWidget):
         add = QPushButton(tr('Add item…')); add.clicked.connect(self.add)
         dup = QPushButton(tr('Duplicate')); dup.clicked.connect(self.duplicate)
         rm = QPushButton(tr('Remove')); rm.clicked.connect(self.remove)
+        rm.setToolTip(tr('Remove the selected items (Del); only unique and quest items ask first'))
         rep = QPushButton(tr('Repair')); rep.clicked.connect(lambda: self.repair(False))
         rep.setToolTip(tr('Set durability of the selected items (inventory and equipped) to full'))
         rep_all = QPushButton(tr('Repair all')); rep_all.clicked.connect(lambda: self.repair(True))
@@ -1498,6 +1499,8 @@ class InventoryTab(QWidget):
             actions.addWidget(b)
         actions.addStretch()
         self.table = ItemTable(self, self.COLS)
+        # Del removes the selection while the table has focus (a focused spinbox keeps Del for its digits)
+        QShortcut(QKeySequence.Delete, self.table, self.remove, context=Qt.WidgetShortcut)
         # equipped items keep the game's slot order
         self.equip = ItemTable(self, ['Slot', 'Name', 'Weight', 'Durability', 'Max', 'Battery', 'Max bat.'],
                                sortable=False)
@@ -1579,13 +1582,17 @@ class InventoryTab(QWidget):
         sel = self.table.selected()
         if not sel:
             return
-        names = ', '.join(i.name for i in sel[:5]) + ('…' if len(sel) > 5 else '')
-        if QMessageBox.question(self, tr('Remove items'), tr('Remove {names}?', names=names)) != QMessageBox.Yes:
-            return
+        # only irreplaceable items ask first: unique ones and quest items (rarity tiers 4 and 5)
+        precious = [i for i in sel if (i.rarity or 0) >= 4]
+        if precious:
+            names = ', '.join(i.name for i in precious[:5]) + ('…' if len(precious) > 5 else '')
+            if QMessageBox.question(self, tr('Remove items'), tr('Remove {names}?', names=names)) != QMessageBox.Yes:
+                return
         for it in sel:
             self.main.save.remove_item(it)
         self.main.on_change()
         self.build()
+        self.main.status.setText(tr('Removed {n} item(s)', n=len(sel)) + tr(' – unsaved'))
 
     def repair(self, everything):
         items = ([it for _, it in self.table.all_rows()] + [it for _, it in self.equip.all_rows()]) if everything \
