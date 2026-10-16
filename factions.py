@@ -234,6 +234,25 @@ def faceless_attitude(var, relation, difficulty):
     return score, steps, kills, spy
 
 
+# What the mindreading at Talos Outpost leaves behind: the commander dialog (dc_flo_commander.udlg) opens with
+# "We now know everything" once loc_dc_flo_endMindreading is set and branches on the stored score.
+MINDREADING_DONE = ['loc_dc_flo_mindreading', 'loc_dc_flo_endMindreading', 'npc_dc_flCommander_met',
+                    # the entrance guard's verdict, as he gives it to anyone with the checkpoint pass
+                    'faction_faceless_allowPassBase', 'dc_flo_entrance_met']
+
+
+def skip_mindreading(save):
+    """Stores the mindreading's outcome as the game would (score from faceless_attitude, killed count) and
+    marks it done, so the commander goes straight to his verdict. For when the mindreading scene hangs.
+    Returns the score."""
+    score, _, kills, _ = faceless_attitude(save.var, save.relation, save.difficulty)
+    save.set_var(SCORE_VAR, score)
+    save.set_var(SCORE_KILLS_VAR, kills)
+    for name in MINDREADING_DONE:
+        save.set_var(name, True)
+    return score
+
+
 # --- other faction kill counters with an effect in the game -----------------------------------------------------
 # (variable, label, effect, linked flag set while the count reaches the threshold)
 COUNTERS = [

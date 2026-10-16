@@ -57,6 +57,12 @@ features and file formats; this file is the working state.
   their spinboxes (stack clamped to `Item.max_stack`).
 - Item details: `compare_html(save, item, palette)` builds a card (icon, rarity-coloured name, description, own
   values, grouped stats with ▲▼ difference badges); colours mixed from the widget palette for light/dark themes.
+- User report: the game hangs after agreeing to the mindreading (dialog box shows only "End dialog"). The
+  commander's answer starts cutscene `Dc_Mindreading` (class `avi`): the Faceless Mindreader (entity
+  e176369b… in dc-flo_l1) walks to the player (`fk` = TTMA move action), plays animations, then opens
+  dc_flo_mindreader.udlg. The cutscene reads none of the edited variables; the hang is presumably the walk
+  never finishing (cause unknown). Workaround: *Skip the mindreading*
+  (`factions.skip_mindreading`, sets score + `MINDREADING_DONE` flags) – awaiting in-game test.
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC

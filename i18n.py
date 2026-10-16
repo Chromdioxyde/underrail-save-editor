@@ -213,6 +213,13 @@ DE = {
     'Psi abilities instead of weapons. Psi Empathy costs health; armor penalty slows you, so light armor or a tactical vest is usual.': 'Psi-Fähigkeiten statt Waffen. Psi Empathy kostet Lebenspunkte; Rüstungsmalus bremst, daher sind leichte Rüstung oder eine taktische Weste üblich.',
     'Select an item to see its details; weapons and armor are compared with your equipment.':
         'Wähle ein Item, um seine Details zu sehen; Waffen und Rüstung werden mit deiner Ausrüstung verglichen.',
+    'Skip the mindreading': 'Gedankenlesen überspringen',
+    'Stores the result above as if the mindreading had happened, so the commander goes straight to his verdict. '
+    'Use it when the mindreading scene hangs.':
+        'Speichert das Ergebnis oben, als hätte das Gedankenlesen stattgefunden, damit der Kommandant direkt zu '
+        'seinem Urteil kommt. Für den Fall, dass die Gedankenlese-Szene hängt.',
+    'Mindreading marked as done with score {n} – save, load in the game and talk to the commander.':
+        'Gedankenlesen als erledigt markiert, Wert {n} – speichern, im Spiel laden und mit dem Kommandanten reden.',
     'Equipped ({slot})': 'Ausgerüstet ({slot})',
     'Nothing equipped in this slot.': 'In diesem Slot ist nichts ausgerüstet.',
     'Action points': 'Aktionspunkte',

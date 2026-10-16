@@ -91,7 +91,9 @@ always appear as the game names them.
     mindreader and the injured Faceless in Core City, the Thought Control check, and your attitude toward the
     Foundry Faceless. It shows the outcome (3+ allies, 1–2 friendly, 0 neutral, below 0 hostile) and warns
     when the Tchortists' scouting job will get you called a spy anyway. Once the score has been calculated
-    it can be edited directly.
+    it can be edited directly. *Skip the mindreading* stores the result as if the mindreading had happened
+    (score, mindreading done, commander met, entrance guard's pass), so the commander goes straight to his
+    verdict – for when the mindreading scene hangs.
   - *Kill counters*: other faction kill counters the game checks (Expedition pirates and Protectorate jet ski
     patrols, Heavy Duty exosoldiers), with what they affect.
   - *Attitudes*: every faction's attitude toward the player and back, plus your character's own overrides;

@@ -2887,16 +2887,40 @@ class FactionsTab(QWidget):
         lay = QVBoxLayout(w)
         lay.addWidget(gate)
         lay.addWidget(score_box)
-        if s.var(factions.SCORE_VAR) is not None:
-            stored = QFormLayout()
-            sb = wheel_guarded(QSpinBox())
-            sb.setRange(-1000, 1000)
-            sb.setValue(s.var(factions.SCORE_VAR))
-            sb.valueChanged.connect(lambda v: self.set_var(factions.SCORE_VAR, v))
-            stored.addRow(tr('Score already calculated (used by the commander\'s dialog)'), sb)
-            sl.addLayout(stored)
+        # the game's result once the mindreading happened (or was skipped here); the commander's dialog uses it
+        stored = QFormLayout()
+        self.stored_score = wheel_guarded(QSpinBox())
+        self.stored_score.setRange(-1000, 1000)
+        self.stored_score.setValue(s.var(factions.SCORE_VAR, 0))
+        self.stored_score.valueChanged.connect(lambda v: self.set_var(factions.SCORE_VAR, v))
+        stored.addRow(tr('Score already calculated (used by the commander\'s dialog)'), self.stored_score)
+        self.stored_row = QWidget()
+        self.stored_row.setLayout(stored)
+        self.stored_row.setVisible(s.var(factions.SCORE_VAR) is not None or bool(s.var('loc_dc_flo_endMindreading')))
+        sl.addWidget(self.stored_row)
+        self.skip_btn = QPushButton(tr('Skip the mindreading'))
+        self.skip_btn.setToolTip(tr('Stores the result above as if the mindreading had happened, so the commander '
+                                    'goes straight to his verdict. Use it when the mindreading scene hangs.'))
+        self.skip_btn.clicked.connect(self.skip_mindreading)
+        self.skip_btn.setVisible(not s.var('loc_dc_flo_endMindreading'))
+        skip_row = QHBoxLayout()
+        skip_row.addWidget(self.skip_btn)
+        skip_row.addStretch()
+        sl.addLayout(skip_row)
         lay.addStretch()
         return w
+
+    def skip_mindreading(self):
+        score = factions.skip_mindreading(self.save)
+        self.main.on_change()
+        self.stored_score.blockSignals(True)
+        self.stored_score.setValue(score)
+        self.stored_score.blockSignals(False)
+        self.stored_row.show()
+        self.skip_btn.hide()
+        self.update_score()
+        self.main.status.setText(tr('Mindreading marked as done with score {n} – save, load in the game and talk '
+                                    'to the commander.', n=score))
 
     def set_checkpoint(self, index):
         factions.set_checkpoint(self.save, factions.CHECKPOINT_STATES[index])
