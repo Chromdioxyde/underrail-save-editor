@@ -519,8 +519,17 @@ DE = {
     'full = {d}': 'voll = {d}',
     "doesn't wear down": 'nutzt sich nicht ab',
     'Save list': 'Spielstand-Liste',
-    'Show or hide the save list (Ctrl+L). It closes when you pick a save.':
-        'Spielstand-Liste ein- oder ausblenden (Strg+L). Sie klappt zu, sobald du einen Spielstand auswählst.',
+    'Show or hide the save list (Ctrl+L)': 'Spielstand-Liste ein- oder ausblenden (Strg+L)',
+    'Close the save list after picking a save': 'Spielstand-Liste nach Auswahl eines Spielstands zuklappen',
+    'Click: sort by this column, again to reverse. Shift+click: sort by this column next, e.g. Name, then '
+    'Shift+click Quality.':
+        'Klick: nach dieser Spalte sortieren, nochmal: umkehren. Umschalt+Klick: danach nach dieser Spalte '
+        'sortieren, z. B. Name, dann Umschalt+Klick auf Qualität.',
+    'Set stack size of selected items…': 'Anzahl der markierten Items setzen…',
+    'Set quality of selected items…': 'Qualität der markierten Items setzen…',
+    'New value for {n} item(s):': 'Neuer Wert für {n} Item(s):',
+    '{n} item(s) were limited to their maximum stack size.':
+        '{n} Item(s) wurden auf ihre maximale Stapelgröße begrenzt.',
     # factions tab
     'Factions': 'Fraktionen',
     'The Faceless': 'Die Faceless',

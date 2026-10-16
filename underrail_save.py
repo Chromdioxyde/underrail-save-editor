@@ -299,6 +299,13 @@ class Item:
         return mb or None
 
     @property
+    def max_stack(self):
+        """Largest stack the game allows (I:MS of the embedded or library item data); 1 = not stackable."""
+        if self.data is not None and 'I:MS' in self.data:
+            return self.save.g.val(self.data.get('I:MS')) or 1
+        return self.info['stack'] if self.info else 1
+
+    @property
     def max_durability(self):
         """Full durability as the game computes it, or None for items that don't wear down."""
         f = self.save.g

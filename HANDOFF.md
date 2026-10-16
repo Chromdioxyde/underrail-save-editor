@@ -49,8 +49,12 @@ features and file formats; this file is the working state.
   lines wrap; only the editor grows with the window.
 - Inventory: item comparison moved below the table (next to *Equipped*), table gets the full width; toolbar in
   two rows; item tables keep the Name column's width (max 360) and scroll sideways instead of squeezing it.
-- Save list collapses after a save is picked by hand (click/Enter, `Main.picked_by_hand`); reopen via the
-  *Saves* toggle next to the title, *View → Save list* or Ctrl+L. Window minimum is then the editor's (~700 px).
+- Save list: full-height handle (`SidebarSplitter`/`SidebarHandle`, arrow, click toggles, drag works) instead of
+  a title button; closes after a save is picked by hand unless *Settings → Close the save list after picking a
+  save* is off (QSettings `sidebar/autoclose`); also *View → Save list* / Ctrl+L.
+- Item tables: own multi-key sort (`ItemTable.sort_keys`, click = single key, Shift+click = next key, relies
+  on Qt's stable sort, kept across rebuilds); right-click sets stack/quality of all selected rows through
+  their spinboxes (stack clamped to `Item.max_stack`).
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC

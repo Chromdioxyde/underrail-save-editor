@@ -14,8 +14,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComb
                                QGraphicsScene, QGraphicsSimpleTextItem, QGraphicsView, QGroupBox,
                                QHBoxLayout, QHeaderView, QInputDialog, QLabel, QLineEdit, QListWidget,
                                QListWidgetItem, QMainWindow, QMessageBox, QPushButton,
-                               QSpinBox, QSplitter, QTableWidget, QTableWidgetItem, QTabWidget,
-                               QTextBrowser, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+                               QSpinBox, QSplitter, QSplitterHandle, QTableWidget, QTableWidgetItem, QTabWidget,
+                               QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from html import escape as html_escape
 
@@ -1226,21 +1226,109 @@ class SortItem(QTableWidgetItem):
 
 
 class ItemTable(QTableWidget):
-    """Sortable item table; rows remember their Item via the first column."""
+    """Sortable item table; rows remember their Item via the first column.
+    Sorting: a click sorts by that column (again: reverse), Shift+click adds the column as the next key, so
+    "Name, then Quality" is a click on Name and a Shift+click on Quality. The right-click menu sets stack size
+    or quality of all selected items at once."""
+
+    BULK = [('Stack', 'Set stack size of selected items…'), ('Quality', 'Set quality of selected items…')]
 
     def __init__(self, tab, cols, sortable=True):
         super().__init__(0, len(cols))
         self.tab, self.cols, self.sortable = tab, cols, sortable
+        self.sort_keys = []  # [(column, Qt.SortOrder)], primary first
         self.setHorizontalHeaderLabels([tr(c) for c in cols])
         self.verticalHeader().hide()
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.horizontalHeader().setSortIndicatorShown(sortable)
+        hh = self.horizontalHeader()
+        hh.setSortIndicatorShown(sortable)
+        if sortable:
+            hh.setSectionsClickable(True)
+            hh.sectionClicked.connect(self.header_clicked)
+            hh.setToolTip(tr('Click: sort by this column, again to reverse. Shift+click: sort by this column '
+                             'next, e.g. Name, then Shift+click Quality.'))
         self.setIconSize(QSize(33, 33))
         self.verticalHeader().setDefaultSectionSize(36)
+        if any(c in cols for c, _ in self.BULK):
+            self.setContextMenuPolicy(Qt.CustomContextMenu)
+            self.customContextMenuRequested.connect(self.context_menu)
+
+    # --- sorting by several columns -------------------------------------------------------
+    def header_clicked(self, col):
+        shift = bool(QApplication.keyboardModifiers() & Qt.ShiftModifier)
+        keys = self.sort_keys
+        pos = next((i for i, (c, _) in enumerate(keys) if c == col), None)
+        flip = lambda o: Qt.DescendingOrder if o == Qt.AscendingOrder else Qt.AscendingOrder
+        if pos is not None and (shift or pos == 0):
+            keys[pos] = (col, flip(keys[pos][1]))
+        elif shift and keys:
+            keys.append((col, Qt.AscendingOrder))
+        else:
+            self.sort_keys = [(col, Qt.AscendingOrder)]
+        self.apply_sort()
+
+    def apply_sort(self):
+        """Qt's sort is stable, so sorting by the keys from last to first orders by all of them."""
+        for col, order in reversed(self.sort_keys):
+            self.sortItems(col, order)
+        hh = self.horizontalHeader()
+        if self.sort_keys:
+            hh.setSortIndicator(*self.sort_keys[0])
+        else:
+            hh.setSortIndicator(-1, Qt.AscendingOrder)
+        # number the keys in the headers when there are several (the primary one also has Qt's arrow)
+        many = len(self.sort_keys) > 1
+        for col, name in enumerate(self.cols):
+            label = tr(name)
+            pos = next((i for i, (c, _) in enumerate(self.sort_keys) if c == col), None)
+            if many and pos is not None:
+                arrow = '' if pos == 0 else (' ▲' if self.sort_keys[pos][1] == Qt.AscendingOrder else ' ▼')
+                label += f' ({pos + 1}{arrow})'
+            self.horizontalHeaderItem(col).setText(label)
+
+    # --- editing several items at once ----------------------------------------------------
+    def context_menu(self, pos):
+        from PySide6.QtWidgets import QMenu
+        rows = sorted({i.row() for i in self.selectionModel().selectedRows()})
+        if not rows:
+            return
+        menu = QMenu(self)
+        for name, label in self.BULK:
+            if name not in self.cols:
+                continue
+            spins = [w for w in (self.cellWidget(r, self.cols.index(name)) for r in rows) if w is not None]
+            act = menu.addAction(tr(label) + f' ({len(spins)})')
+            act.setEnabled(bool(spins))
+            act.triggered.connect(lambda _=False, n=name, s=spins, r=rows: self.bulk_set(n, s, r))
+        menu.exec(self.viewport().mapToGlobal(pos))
+
+    def bulk_set(self, name, spins, rows):
+        first = spins[0]
+        hi = max(s.maximum() for s in spins)
+        if name == 'Stack':
+            hi = max(self.item_at(r).max_stack for r in rows)
+        value, ok = QInputDialog.getInt(self, tr(dict(self.BULK)[name]).rstrip('…'),
+                                        tr('New value for {n} item(s):', n=len(spins)), int(first.value()), 0, hi)
+        if not ok:
+            return
+        clamped = 0
+        for r in rows:
+            sb = self.cellWidget(r, self.cols.index(name))
+            if sb is None:
+                continue
+            v = value
+            if name == 'Stack':
+                # never more than the game allows per stack (not stackable = 1)
+                v = max(1, min(value, self.item_at(r).max_stack))
+            v = min(v, sb.maximum())
+            clamped += v != value
+            sb.setValue(v)  # same path as typing it: saves, marks the change, updates weights
+        if clamped:
+            self.tab.main.status.setText(self.tab.main.status.text() + ' · ' + tr(
+                '{n} item(s) were limited to their maximum stack size.', n=clamped))
 
     def fill(self, items):
-        self.setSortingEnabled(False)
         # drop old rows first, otherwise stale cell widgets linger after a rebuild
         self.clearContents()
         self.setRowCount(0)
@@ -1299,7 +1387,7 @@ class ItemTable(QTableWidget):
         self.horizontalHeader().setSectionResizeMode(name_col, QHeaderView.Interactive)
         self.setColumnWidth(name_col, min(self.columnWidth(name_col), 360))
         self.horizontalHeader().setStretchLastSection(True)
-        self.setSortingEnabled(self.sortable)
+        self.apply_sort()  # rebuilt rows keep the chosen order
 
     def changed(self, f, v, cell):
         cell.set_key(v)
@@ -2876,6 +2964,60 @@ class FactionsTab(QWidget):
 
 # --- main window --------------------------------------------------------------------------
 
+class SidebarHandle(QSplitterHandle):
+    """Full-height handle next to the save list with an arrow in the middle: a click opens/closes the list,
+    dragging works as on any splitter."""
+
+    def __init__(self, orientation, splitter, toggle):
+        super().__init__(orientation, splitter)
+        self.toggle = toggle
+        self.press = None
+        self.setAttribute(Qt.WA_Hover)
+        self.setToolTip(tr('Show or hide the save list (Ctrl+L)'))
+
+    def is_open(self):
+        return self.splitter().sizes()[0] > 0
+
+    def paintEvent(self, e):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        pal = self.palette()
+        hover = self.underMouse()
+        # a visible strip (button colour) so the handle is found without knowing it is there
+        p.fillRect(self.rect(), pal.highlight().color().lighter(170) if hover else pal.button().color())
+        p.setPen(QPen(pal.mid().color()))
+        p.drawLine(0, 0, 0, self.height())
+        p.drawLine(self.width() - 1, 0, self.width() - 1, self.height())
+        # arrow pointing where the list goes: left closes it, right opens it
+        cx, cy, s = self.width() / 2, self.height() / 2, 4
+        sign = -1 if self.is_open() else 1
+        tip = QPointF(cx + sign * s, cy)
+        back = cx - sign * s
+        p.setPen(Qt.NoPen)
+        p.setBrush(pal.highlight() if hover else pal.windowText())
+        p.drawPolygon([QPointF(back, cy - 2 * s), QPointF(back, cy + 2 * s), tip])
+
+    def mousePressEvent(self, e):
+        self.press = e.position()
+        super().mousePressEvent(e)
+
+    def mouseReleaseEvent(self, e):
+        super().mouseReleaseEvent(e)
+        if self.press is not None and (e.position() - self.press).manhattanLength() < 4:
+            self.toggle()
+        self.press = None
+
+
+class SidebarSplitter(QSplitter):
+    def __init__(self, toggle):
+        super().__init__()
+        self.toggle = toggle
+        self.setHandleWidth(12)
+
+    def createHandle(self):
+        return SidebarHandle(self.orientation(), self, self.toggle)
+
+
 class Main(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -2929,28 +3071,23 @@ class Main(QMainWindow):
         bar.addWidget(self.status, 1)
         bar.addWidget(self.btn_revert)
         bar.addWidget(self.btn_save)
-        # opens/closes the save list
-        self.sidebar_btn = QToolButton(checkable=True, checked=True)
-        self.sidebar_btn.setText(tr('Saves'))
-        self.sidebar_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        self.sidebar_btn.setToolTip(tr('Show or hide the save list (Ctrl+L). It closes when you pick a save.'))
-        self.sidebar_btn.toggled.connect(self.show_sidebar)
-        title_row = QHBoxLayout()
-        title_row.addWidget(self.sidebar_btn)
-        title_row.addWidget(self.title, 1)
         right = QWidget()
         rv = QVBoxLayout(right)
         rv.setContentsMargins(0, 0, 0, 0)
-        rv.addLayout(title_row)
+        rv.addWidget(self.title)
         rv.addWidget(self.tabs, 1)
         rv.addLayout(bar)
 
-        central = QWidget()
-        cl = QHBoxLayout(central)
-        cl.setContentsMargins(0, 0, 0, 0)
-        cl.addWidget(left)
-        cl.addWidget(right, 1)
-        self.setCentralWidget(central)
+        # the save list keeps a fixed width; the full-height handle next to it opens/closes it (click or drag)
+        self.split = SidebarSplitter(self.toggle_sidebar)
+        self.split.addWidget(left)
+        self.split.addWidget(right)
+        self.split.setCollapsible(0, True)
+        self.split.setCollapsible(1, False)
+        self.split.setStretchFactor(0, 0)
+        self.split.setStretchFactor(1, 1)
+        self.split.splitterMoved.connect(lambda *_: self.sidebar_changed())
+        self.setCentralWidget(self.split)
 
         file = self.menuBar().addMenu(tr('File'))
         save = QAction(QIcon.fromTheme('document-save'), tr('Save'), self, shortcut=QKeySequence.Save)
@@ -2976,12 +3113,15 @@ class Main(QMainWindow):
                                    checked=True)
         self.act_sidebar.toggled.connect(self.show_sidebar)
         view.addAction(self.act_sidebar)
-        self.show_sidebar(True)
 
         settings = self.menuBar().addMenu(tr('Settings'))
         folders = QAction(tr('Game folders…'), self)
         folders.triggered.connect(self.choose_folders)
         settings.addAction(folders)
+        self.act_autoclose = QAction(tr('Close the save list after picking a save'), self, checkable=True,
+                                     checked=i18n.settings().value('sidebar/autoclose', True, type=bool))
+        self.act_autoclose.toggled.connect(lambda on: i18n.settings().setValue('sidebar/autoclose', on))
+        settings.addAction(self.act_autoclose)
 
         menu = self.menuBar().addMenu(tr('Language'))
         current = i18n.chosen()
@@ -3113,16 +3253,28 @@ class Main(QMainWindow):
 
     def picked_by_hand(self, item):
         # pick() already ran on the press; close the list only if that save is the open one now
-        if item and self.save and self.save.folder == item.data(Qt.UserRole):
+        if item and self.save and self.save.folder == item.data(Qt.UserRole) and self.act_autoclose.isChecked():
             self.show_sidebar(False)
 
+    def sidebar_open(self):
+        return self.split.sizes()[0] > 0
+
     def show_sidebar(self, on):
-        self.sidebar.setVisible(on)
-        for w in (self.sidebar_btn, self.act_sidebar):
-            w.blockSignals(True)
-            w.setChecked(on)
-            w.blockSignals(False)
-        self.sidebar_btn.setArrowType(Qt.LeftArrow if on else Qt.RightArrow)
+        total = sum(self.split.sizes())
+        width = self.sidebar.minimumWidth() if on else 0
+        self.split.setSizes([width, max(total - width, 1)])
+        self.sidebar_changed()
+
+    def toggle_sidebar(self):
+        self.show_sidebar(not self.sidebar_open())
+
+    def sidebar_changed(self):
+        """Keep the menu check and the handle's arrow in step with the list (also after dragging)."""
+        on = self.sidebar_open()
+        self.act_sidebar.blockSignals(True)
+        self.act_sidebar.setChecked(on)
+        self.act_sidebar.blockSignals(False)
+        self.split.handle(1).update()
 
     def select_folder(self, folder):
         self.saves.blockSignals(True)

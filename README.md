@@ -47,8 +47,9 @@ always appear as the game names them.
 ## Features (GUI)
 
 - **Save list:** cards with screenshot, character, location, play time, HP/XP, money; updates when the game
-  saves. It closes once you pick a save, so the editor gets the whole window; *Saves* (next to the title),
-  *View → Save list* or Ctrl+L open it again.
+  saves. The full-height handle next to it (arrow in the middle) opens and closes it by click or drag, as do
+  *View → Save list* and Ctrl+L; by default it closes once you pick a save (*Settings → Close the save list
+  after picking a save*).
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
   attributes, XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)
@@ -68,9 +69,12 @@ always appear as the game names them.
   Selecting a weapon or armor piece compares it with what is equipped in its slot (both
   weapon slots for weapons): damage, AP, damage per AP and your damage per AP, crit, precision,
   Strength, range, magazine, resistances/thresholds per damage type, armor penalty, level, durability,
-  weight – differences green/red like in Diablo. Item icons, sortable (click a column header) and filterable by category; stack size, component
-  quality, durability (with maximum, *Repair* / *Repair all*), battery; add items from all ~1460 game
-  items, duplicate (crafted items too), remove; edit equipped items
+  weight – differences green/red like in Diablo; the comparison sits below the table, next to the equipped
+  items. Item icons, sortable by several columns (click a header, Shift+click the next one, e.g. Name, then
+  Quality) and filterable by category; stack size, component quality, durability (with maximum, *Repair* /
+  *Repair all*), battery; right-click sets stack size or quality of all selected items at once (stacks are
+  limited to the game's maximum per item); add items from all ~1460 game items, duplicate (crafted items
+  too), remove; edit equipped items
 - **Blueprints:** learn/forget known crafting blueprints (all 117 from the game data), *Learn all*
 - **Oddities:** collection counters
 - **Factions:**
