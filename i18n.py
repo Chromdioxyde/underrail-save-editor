@@ -85,9 +85,12 @@ DE = {
         'Bekannte Baupläne. Bauplan-Items im Inventar sind davon unabhängig.',
     # specs
     'Add': 'Hinzufügen',
-    'Add:': 'Hinzufügen:',
-    'Remove selected': 'Auswahl entfernen',
-    '{n} specializations, {points} points total': '{n} Spezialisierungen, insgesamt {points} Punkte',
+    'Specialization': 'Spezialisierung',
+    'Points': 'Punkte',
+    'Full': 'Voll',
+    'Feat': 'Feat',
+    '{n} specializations, {points} points total, {full} full':
+        '{n} Spezialisierungen, insgesamt {points} Punkte, {full} voll',
     # inventory
     'Category': 'Kategorie',
     'Stack': 'Anzahl',
@@ -429,9 +432,7 @@ DE = {
     'Leathers, carapaces and similar animal parts also come from skinning the creature with Skinner/Hunter; metal sheets and plates also drop as loot.':
         'Leder, Panzer und ähnliche Tierteile bekommt man auch durch Häuten der Kreatur (Skinner/Hunter); Metallbleche '
         'und -platten gibt es auch als Beute.',
-    'Feat · max': 'Feat · Max',
     'feat missing': 'Feat fehlt',
-    'All specializations of your feats are already present': 'Alle Spezialisierungen deiner Feats sind bereits vorhanden',
     '{n} specializations are hidden because the character lacks their feat.':
         '{n} Spezialisierungen sind ausgeblendet, weil dem Charakter der zugehörige Feat fehlt.',
     "Specializations marked ⚠ belong to a feat the character doesn't have; the game only uses them together with the feat.":

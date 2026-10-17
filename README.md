@@ -58,8 +58,10 @@ always appear as the game names them.
 - **Feats:** all feats with descriptions, add/remove via checkbox; feats whose requirements your
   character doesn't meet (or that can't be picked when leveling up) are marked with the reasons, and
   *Only available* hides them
-- **Specializations:** edit values (up to the game's maximum per specialization), add/remove; only
-  specializations of feats the character has are offered, like in the game
+- **Specializations:** like the game's character screen, every specialization of the character's feats is
+  listed (grouped by feat), so a newly added feat brings its specializations along; columns name, points,
+  feat, maximum; full ones are green with ✓. The save only stores specializations with points: raising one
+  from 0 adds it, lowering it to 0 removes it. Values go up to the game's maximum per specialization.
 - **Inventory:** weight and total weight (weight × stack) columns plus the total carried, to find what
   makes you encumbered; rarity tiers coloured like in the game (common white/plain, uncommon green, rare blue,
   unique purple, the quest-item tier gold; broken junk grey); category filter in steps

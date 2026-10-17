@@ -1087,37 +1087,39 @@ def blueprints_tab(main):
 
 
 class SpecsTab(QWidget):
-    """Specializations. Following the game's rules, a spec belongs to a feat and is only available
-    while the character has that feat; each spec has a maximum number of points."""
+    """Specializations. Following the game's rules, a spec belongs to a feat and is only available while the
+    character has that feat; each spec has a maximum number of points. Like the game's character screen, every
+    spec of the character's feats is listed; the save only stores specs with points, so raising one from 0
+    adds it and lowering it to 0 removes it."""
+
+    COLS = ['Specialization', 'Points', 'Feat', 'Max']
 
     def __init__(self, main):
         super().__init__()
         self.main = main
         self.db = gamedata.specs()
         self.rules = gamedata.spec_rules()
-        lay = QVBoxLayout(self)
-        self.lay = lay
-        self.table = None
         self.total = QLabel()
-        add = QHBoxLayout()
-        self.combo = QComboBox()
-        self.combo.setEditable(True)
-        self.combo.setInsertPolicy(QComboBox.NoInsert)
-        self.combo.currentIndexChanged.connect(self.describe)
-        self.value = QSpinBox(); self.value.setRange(0, 100); self.value.setValue(1)
-        btn = QPushButton(tr('Add'))
-        btn.clicked.connect(self.add)
-        rm = QPushButton(tr('Remove selected'))
-        rm.clicked.connect(self.remove)
-        add.addWidget(QLabel(tr('Add:'))); add.addWidget(self.combo, 1); add.addWidget(self.value); add.addWidget(btn)
-        add.addWidget(rm)
+        self.table = QTableWidget(0, len(self.COLS))
+        self.table.setHorizontalHeaderLabels([tr(c) for c in self.COLS])
+        self.table.verticalHeader().hide()
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setSelectionMode(QTableWidget.SingleSelection)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        hh = self.table.horizontalHeader()
+        hh.setSectionResizeMode(0, QHeaderView.Stretch)
+        hh.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        hh.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.table.setColumnWidth(1, 120)
+        self.table.itemSelectionChanged.connect(self.describe)
         self.desc = QLabel(wordWrap=True)
         self.note = QLabel(wordWrap=True)
-        self.build()
+        lay = QVBoxLayout(self)
         lay.addWidget(self.total)
-        lay.addLayout(add)
+        lay.addWidget(self.table, 1)
         lay.addWidget(self.desc)
         lay.addWidget(self.note)
+        self.build()
 
     def spec_max(self, key):
         return (self.rules.get(key) or {}).get('max')
@@ -1128,43 +1130,39 @@ class SpecsTab(QWidget):
     def build(self):
         s = self.main.save
         owned = set(s.feats())
-        fields = s.specs()
-        for f in fields:
-            f.info = self.db.get(f.name, (None, None))[1]
-
-        def info(f):
-            feat, mx = self.spec_feat(f.name), self.spec_max(f.name)
-            text = gamedata.feat_name(feat) if feat else '?'
-            if mx is not None:
-                text += f' · max {mx}'
-            if feat and feat not in owned:
-                text = '⚠ ' + text + ' – ' + tr('feat missing')
-            return text
-        table = FieldTable(self.main, fields, 0, 100, tr('Feat · max'), info,
-                           label=lambda f: gamedata.split_camel(f.name), after=self.update_total,
-                           hi_of=lambda f: self.spec_max(f.name) if self.spec_max(f.name) is not None else 100)
-        table.setSelectionMode(QTableWidget.SingleSelection)
-        table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        if self.table is not None:
-            self.lay.replaceWidget(self.table, table)
-            self.table.deleteLater()
-        else:
-            self.lay.insertWidget(0, table, 1)
-        self.table = table
-        have = {f.name for f in fields}
-        self.combo.clear()
-        hidden = 0
-        for key, (name, _) in sorted(self.db.items(), key=lambda x: x[1][0].lower()):
-            if key in have:
-                continue
+        stored = {f.name: f for f in s.specs()}
+        keys = set(stored) | {k for k in self.db if self.spec_feat(k) in owned}
+        hidden = sum(1 for k in self.db if k not in keys)
+        # grouped by feat, then by name, as the game lists them under their feat
+        name = lambda k: self.db[k][0] if k in self.db else gamedata.split_camel(k)
+        self.keys = sorted(keys, key=lambda k: (gamedata.feat_name(self.spec_feat(k) or '').lower(), name(k).lower()))
+        self.fields = stored
+        t = self.table
+        t.setRowCount(0)
+        t.setRowCount(len(self.keys))
+        for row, key in enumerate(self.keys):
+            f = stored.get(key)
+            it = QTableWidgetItem(name(key))
+            if self.db.get(key):
+                it.setToolTip(self.db[key][1])
+            t.setItem(row, 0, it)
+            mx = self.spec_max(key)
+            sb = wheel_guarded(QSpinBox())
+            sb.setFrame(False)
+            value = f.value if f else 0
+            # never clamp a value the save already has above the maximum
+            sb.setRange(0, max(mx, value) if mx is not None else 100)
+            sb.setValue(value)
+            sb.valueChanged.connect(lambda v, k=key: self.changed(k, v))
+            t.setCellWidget(row, 1, sb)
             feat = self.spec_feat(key)
+            fi = QTableWidgetItem(gamedata.feat_name(feat) if feat else '?')
             if feat and feat not in owned:
-                hidden += 1  # the game only unlocks a spec together with its feat
-                continue
-            self.combo.addItem(name, key)
-        self.combo.lineEdit().setPlaceholderText(
-            tr('All specializations of your feats are already present') if not self.combo.count() else '')
-        orphaned = [f.name for f in fields if self.spec_feat(f.name) and self.spec_feat(f.name) not in owned]
+                fi.setText('⚠ ' + fi.text() + ' – ' + tr('feat missing'))
+            t.setItem(row, 2, fi)
+            t.setItem(row, 3, QTableWidgetItem('' if mx is None else str(mx)))
+            self.mark(row)
+        orphaned = [k for k in stored if self.spec_feat(k) and self.spec_feat(k) not in owned]
         notes = [tr('{n} specializations are hidden because the character lacks their feat.', n=hidden)] if hidden else []
         if orphaned:
             notes.append(tr('Specializations marked ⚠ belong to a feat the character doesn\'t have; the game '
@@ -1173,38 +1171,59 @@ class SpecsTab(QWidget):
         self.update_total()
         self.describe()
 
+    def mark(self, row):
+        """Full specs (points = maximum) in green with ✓, so they stand out from the ones with room left."""
+        key = self.keys[row]
+        mx = self.spec_max(key)
+        value = self.table.cellWidget(row, 1).value()
+        full = mx is not None and value >= mx
+        green = QColor(40, 160, 40) if self.palette().base().color().lightness() >= 128 else QColor(110, 210, 110)
+        brush = QBrush(green) if full else QBrush()
+        for col in (0, 3):
+            it = self.table.item(row, col)
+            it.setForeground(brush)
+            f = it.font()
+            f.setBold(full)
+            it.setFont(f)
+        self.table.item(row, 3).setText('' if mx is None else (f'{mx} ✓' if full else str(mx)))
+        self.table.item(row, 3).setToolTip(tr('Full') if full else '')
+
+    def changed(self, key, v):
+        s = self.main.save
+        f = self.fields.get(key)
+        if f is None and v > 0:
+            try:
+                s.add_spec(key, v)
+            except ValueError as e:  # a save without any specialization has no structure to copy
+                QMessageBox.warning(self, tr('Change failed'), str(e))
+                sb = self.table.cellWidget(self.keys.index(key), 1)
+                sb.blockSignals(True); sb.setValue(0); sb.blockSignals(False)
+                return
+            self.fields[key] = next(x for x in s.specs() if x.name == key)
+        elif f is not None and v == 0:
+            s.remove_spec(key)  # the game keeps only specs with points
+            del self.fields[key]
+        elif f is not None:
+            s.set(f, v)
+        self.main.on_change()
+        self.mark(self.keys.index(key))
+        self.update_total()
+
     def showEvent(self, e):
         # feats may have been added or removed on the feats tab
         super().showEvent(e)
         self.build()
 
     def update_total(self):
-        fields = self.table.fields
-        self.total.setText(tr('{n} specializations, {points} points total', n=len(fields),
-                              points=sum(f.value for f in fields)))
+        full = sum(1 for k in self.keys if self.spec_max(k) is not None and
+                   (self.fields[k].value if k in self.fields else 0) >= self.spec_max(k))
+        self.total.setText(tr('{n} specializations, {points} points total, {full} full', n=len(self.keys),
+                              points=sum(f.value for f in self.fields.values()), full=full))
 
     def describe(self, *_):
-        key = self.combo.currentData()
-        self.desc.setText(self.db.get(key, ('', ''))[1] if key else '')
-        mx = self.spec_max(key) if key else None
-        self.value.setMaximum(mx if mx is not None else 100)
-
-    def add(self):
-        key = self.combo.currentData()
-        if not key:
-            return
-        self.main.save.add_spec(key, self.value.value())
-        self.main.on_change()
-        self.build()
-
-    def remove(self):
         rows = self.table.selectionModel().selectedRows()
-        if not rows:
-            return
-        f = self.table.fields[rows[0].row()]
-        self.main.save.remove_spec(f.name)
-        self.main.on_change()
-        self.build()
+        key = self.keys[rows[0].row()] if rows else None
+        self.desc.setText(self.db.get(key, ('', ''))[1] if key else '')
 
 
 class SortItem(QTableWidgetItem):
