@@ -48,8 +48,8 @@ always appear as the game names them.
 
 - **Save list:** cards with screenshot, character, location, play time, HP/XP, money; updates when the game
   saves. The full-height handle next to it (arrow in the middle) opens and closes it by click or drag, as do
-  *View → Save list* and Ctrl+L; by default it closes once you pick a save (*Settings → Close the save list
-  after picking a save*).
+  *View → Save list* and Ctrl+L; it slides in and out. By default it closes once you pick a save (*View* or
+  *Settings → Close the save list after picking a save*).
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
   attributes, XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)

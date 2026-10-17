@@ -3105,15 +3105,12 @@ class SidebarHandle(QSplitterHandle):
     """Full-height handle next to the save list with an arrow in the middle: a click opens/closes the list,
     dragging works as on any splitter."""
 
-    def __init__(self, orientation, splitter, toggle):
+    def __init__(self, orientation, splitter, toggle, is_open):
         super().__init__(orientation, splitter)
-        self.toggle = toggle
+        self.toggle, self.is_open = toggle, is_open
         self.press = None
         self.setAttribute(Qt.WA_Hover)
         self.setToolTip(tr('Show or hide the save list (Ctrl+L)'))
-
-    def is_open(self):
-        return self.splitter().sizes()[0] > 0
 
     def paintEvent(self, e):
         p = QPainter(self)
@@ -3146,13 +3143,15 @@ class SidebarHandle(QSplitterHandle):
 
 
 class SidebarSplitter(QSplitter):
-    def __init__(self, toggle):
+    """toggle() opens/closes the first widget, is_open() says where it is going (also while it slides)."""
+
+    def __init__(self, toggle, is_open):
         super().__init__()
-        self.toggle = toggle
+        self.toggle, self.is_open = toggle, is_open
         self.setHandleWidth(12)
 
     def createHandle(self):
-        return SidebarHandle(self.orientation(), self, self.toggle)
+        return SidebarHandle(self.orientation(), self, self.toggle, self.is_open)
 
 
 class Main(QMainWindow):
@@ -3179,7 +3178,10 @@ class Main(QMainWindow):
         self.saves.itemActivated.connect(self.picked_by_hand)
         self.cards = {}
         self.sidebar = left = QWidget()
-        left.setFixedWidth(CARD_W + self.saves.verticalScrollBar().sizeHint().width() + 2 * self.saves.frameWidth())
+        self.sidebar_width = CARD_W + self.saves.verticalScrollBar().sizeHint().width() + 2 * self.saves.frameWidth()
+        left.setFixedWidth(self.sidebar_width)
+        self.sidebar_target = True  # where the list is going (open/closed), also while it slides
+        self.sidebar_anim = None
         lv = QVBoxLayout(left)
         lv.setContentsMargins(0, 0, 0, 0)
         head = QHBoxLayout()
@@ -3219,14 +3221,14 @@ class Main(QMainWindow):
         rv.addLayout(bar)
 
         # the save list keeps a fixed width; the full-height handle next to it opens/closes it (click or drag)
-        self.split = SidebarSplitter(self.toggle_sidebar)
+        self.split = SidebarSplitter(self.toggle_sidebar, self.sidebar_open)
         self.split.addWidget(left)
         self.split.addWidget(right)
         self.split.setCollapsible(0, True)
         self.split.setCollapsible(1, False)
         self.split.setStretchFactor(0, 0)
         self.split.setStretchFactor(1, 1)
-        self.split.splitterMoved.connect(lambda *_: self.sidebar_changed())
+        self.split.splitterMoved.connect(self.sidebar_dragged)
         self.setCentralWidget(self.split)
 
         file = self.menuBar().addMenu(tr('File'))
@@ -3262,6 +3264,7 @@ class Main(QMainWindow):
                                      checked=i18n.settings().value('sidebar/autoclose', True, type=bool))
         self.act_autoclose.toggled.connect(lambda on: i18n.settings().setValue('sidebar/autoclose', on))
         settings.addAction(self.act_autoclose)
+        view.addAction(self.act_autoclose)  # also next to "Save list", where one looks for it
 
         menu = self.menuBar().addMenu(tr('Language'))
         current = i18n.chosen()
@@ -3397,16 +3400,47 @@ class Main(QMainWindow):
             self.show_sidebar(False)
 
     def sidebar_open(self):
-        return self.split.sizes()[0] > 0
+        return self.sidebar_target
 
-    def show_sidebar(self, on):
-        total = sum(self.split.sizes())
-        width = self.sidebar.minimumWidth() if on else 0
-        self.split.setSizes([width, max(total - width, 1)])
-        self.sidebar_changed()
+    def show_sidebar(self, on, animate=True):
+        """Open/close the save list; it slides so you see where it goes."""
+        from PySide6.QtCore import QEasingCurve, QVariantAnimation
+        if self.sidebar_anim is not None:
+            self.sidebar_anim.stop()
+            self.sidebar_anim = None
+        self.sidebar_target = on
+        sizes = self.split.sizes()
+        total = sum(sizes)
+        target = self.sidebar_width if on else 0
+
+        def place(w):
+            self.split.setSizes([int(w), max(total - int(w), 1)])
+
+        def done():
+            self.sidebar.setFixedWidth(self.sidebar_width)
+            place(target)
+            self.sidebar_anim = None
+            self.sidebar_changed()
+
+        if not animate or not self.isVisible() or sizes[0] == target:
+            done()
+            return
+        # the list needs to pass through in-between widths while it slides
+        self.sidebar.setMinimumWidth(0)
+        anim = QVariantAnimation(self, startValue=sizes[0], endValue=target, duration=220)
+        anim.setEasingCurve(QEasingCurve.OutCubic if on else QEasingCurve.InCubic)
+        anim.valueChanged.connect(place)
+        anim.finished.connect(done)
+        self.sidebar_anim = anim
+        self.sidebar_changed()  # arrow and menu show the new state right away
+        anim.start()
 
     def toggle_sidebar(self):
         self.show_sidebar(not self.sidebar_open())
+
+    def sidebar_dragged(self, *_):
+        self.sidebar_target = self.split.sizes()[0] > 0
+        self.sidebar_changed()
 
     def sidebar_changed(self):
         """Keep the menu check and the handle's arrow in step with the list (also after dragging)."""
