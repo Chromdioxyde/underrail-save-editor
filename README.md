@@ -28,12 +28,13 @@ installation, so what you see looks and reads like the game itself.
   combinations your Strength can carry, and every merchant, container and creature that has what you need,
   marked on the game's own world map.
 - 🛡 **Safe by default** – an automatic backup before every change, and saves stay byte-for-byte identical
-  except for what you edited. The game can keep running while you edit.
-- 🐧 **Linux, Steam Deck and Windows** – finds Steam (including SD cards and Flatpak), Proton and GOG
-  installations by itself. English and German interface.
-- 🛡 **Safe by default** – an automatic backup before every change, and saves stay byte-for-byte identical
   except for what you edited. The game can keep running while you edit. Saves where a location fails to
   load ("Failed to load locale") can be repaired.
+- 🐧 **Linux, Steam Deck and Windows** – finds Steam (including SD cards and Flatpak), Proton and GOG
+  installations by itself. English and German interface.
+
+## Getting started
+
 
 1. Download the latest release:
    - **Linux / Steam Deck:** the `.AppImage` – make it executable and double-click it (on the Steam Deck in
