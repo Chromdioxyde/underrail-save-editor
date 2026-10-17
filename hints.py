@@ -1,7 +1,7 @@
 """Gameplay hints computed from the game's own data: weapon damage per action point, armor component
 combinations rated by protection versus armor penalty, and which merchants sell what.
 
-Formulas (read from underrail.exe, see README):
+Formulas (read from underrail.exe, see docs/TECHNICAL.md):
   * weapon: average damage of all damage ranges x burst shots (WI:EB) / base action points (WI:AP)
   * armor component per damage type: threshold = C + Q*V, resistance = A + B*Q (Q = quality), each times
     the slot factor of the recipe; armor penalty = sum of component E x factor (quality-independent)

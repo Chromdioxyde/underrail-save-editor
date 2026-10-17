@@ -2,8 +2,8 @@
 
 Underrail save editor: PySide6 GUI that edits Underrail saves (character, skills, feats, specs, inventory,
 blueprints, oddities) and gives hints (item/merchant/creature locations on the game's own world map,
-build-aware weapon/armor advice). Latest commit `daedde0`; branch `main`, no remote. README.md describes
-features and file formats; this file is the working state.
+build-aware weapon/armor advice). Branch `main`, remote `origin`. README.md describes
+the features for users, docs/TECHNICAL.md the file formats and game data; this file is the working state.
 
 ## Working with the user
 - User writes German; reply in German. Project language is English (code, short English comments, docs,
@@ -118,7 +118,7 @@ emitter icons (`extract_crafted_icons.py`), feat abilities, feat/spec descriptio
 - Map index (`hints.map_index()`, cache `map_index_v5.json`) is keyed by zone id (map file name without
   the `_l<n>` layer suffix); display names come from `southunderrail.world`. Also indexes merchants
   (`MEA1:S` store id -> zones + NPC name).
-- `worldmap.py` renders the in-game world map from `globalmap.uz` sprites (see README). 76 zone ids (dungeons, DLC interiors) have no
+- `worldmap.py` renders the in-game world map from `globalmap.uz` sprites (see docs/TECHNICAL.md). 76 zone ids (dungeons, DLC interiors) have no
   marker. `LocationsDialog` in the GUI lists all sources and marks them on `WorldMapView`.
 - Unplaced merchants (no map NPC, probably events): gc_fsh, gc_gypsy, dun_diedrick, ezra,
   jackquicksilver, oldjonas, cc_jkkquartermaster.
