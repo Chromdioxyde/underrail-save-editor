@@ -35,7 +35,6 @@ installation, so what you see looks and reads like the game itself.
 
 ## Getting started
 
-
 1. Download the latest release:
    - **Linux / Steam Deck:** the `.AppImage` – make it executable and double-click it (on the Steam Deck in
      Desktop Mode: right-click → Properties → Permissions → executable). Works on SteamOS 3, Ubuntu 22.04,
