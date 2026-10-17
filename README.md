@@ -34,10 +34,11 @@ Without installing: `./underrail_gui.py`.
 
 ## Usage
 
-**Quit Underrail before saving**, otherwise the game may overwrite the save. Every save made by the editor
-first backs up the original to `~/.local/share/underrail-save-editor/backups/<save>/<timestamp>/`; to
-roll back, copy both files from there back into the save folder. Try bigger changes (feats, items, name,
-portrait) on a copy of a save first.
+The game can keep running while you edit. Load the save in the game afterwards to see the changes; the game's
+next quicksave or autosave replaces an edited quicksave/autosave. Every save made by the editor first backs up
+the original to `~/.local/share/underrail-save-editor/backups/<save>/<timestamp>/`; to roll back, copy both
+files from there back into the save folder. Try bigger changes (feats, items, name, portrait) on a copy of a
+save first.
 
 The editor is available in English and German (*Language* menu; follows the system language by default).
 Game terms (items, feats, skills) always appear as the game names them.
