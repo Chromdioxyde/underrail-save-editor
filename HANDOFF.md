@@ -2,7 +2,8 @@
 
 Underrail save editor: PySide6 GUI that edits Underrail saves (character, skills, feats, specs, inventory,
 blueprints, oddities) and gives hints (item/merchant/creature locations on the game's own world map,
-build-aware weapon/armor advice). Branch `main`, remote `origin`. README.md describes
+build-aware weapon/armor advice). Branch `main`; remotes `origin` (private NAS) and `github`
+(public, github.com/Chromdioxyde/underrail-save-editor, GitHub Actions build + releases). README.md describes
 the features for users, docs/TECHNICAL.md the file formats and game data; this file is the working state.
 
 ## Working with the user
@@ -10,7 +11,8 @@ the features for users, docs/TECHNICAL.md the file formats and game data; this f
   commit messages); GUI strings are English source keys with German in `i18n.py` – add a translation for
   every new user-visible string. Unsupported system languages fall back to English.
 - After every change: `./packaging/install.sh` (installs to `~/.local/share/underrail-save-editor/app`),
-  then commit. Commit messages end with the Co-Authored-By / Claude-Session lines given by the harness.
+  then commit and push to both remotes (`git push origin main && git push github main`). Releases: set
+  `VERSION` in `version.py`, push tag `vX.Y.Z` to `github` (see docs/TECHNICAL.md).
 - AppImage on request: `./packaging/build-appimage.sh` -> `build/Underrail_Save_Editor-<commit>-x86_64.AppImage`;
   it copies the result to `$APPIMAGE_COPY_DIR` (replacing the older one) when set in `.env.local`.
 - The user tests in-game and reports back. Never touch the saves listed in `PROTECTED_SAVES` (`.env.local`).
