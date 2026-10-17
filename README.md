@@ -160,7 +160,7 @@ flattens at 185 but higher values still count. The editor allows up to 999.
 
 ## World map
 
-*World map* (button next to *Refresh*, *View → World map…*, Ctrl+M) opens the map on its own: one page
+*World map* (button right of the save's title, *View → World map…*, Ctrl+M) opens the map on its own: one page
 per area, a zone search, a *Layers* menu (the game's icons for creatures,
 plants and merchants/doctors as separate layers; labels from the scanned data: merchant names, most
 common creatures/characters, loot count), and for a clicked zone its merchants, characters/creatures and the items lying
