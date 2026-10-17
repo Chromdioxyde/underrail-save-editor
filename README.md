@@ -1,124 +1,150 @@
 # Underrail Save Editor
 
-> **Unofficial fan project.** This editor is not made, endorsed or supported by Stygian Software, the
-> developer of Underrail, and is not affiliated with them in any way. Underrail and its assets belong to
-> Stygian Software. Back up your saves; use at your own risk.
+**Respec a build that went wrong, try out a feat before you commit to it, top up your crafting components,
+or unstick a quest – without starting a new run.**
 
-Save game editor for Underrail with a graphical interface: change your character, feats, specializations,
-inventory, blueprints and faction standings, and look up builds, gear and where to find items. Names, icons
-and values come straight from your Underrail installation. Runs on Linux (incl. Steam Deck) and Windows.
+A save editor for [Underrail](https://www.stygiansoftware.com/underrail/) and its expansions, with a full
+graphical interface. Every item, feat, icon and description comes straight from your own game
+installation, so what you see looks and reads like the game itself.
 
-How it works inside (save format, game data, building): [docs/TECHNICAL.md](docs/TECHNICAL.md).
+![Inventory with the item comparison card](docs/screenshots/inventory.png)
 
-## Download and run
+> Unofficial fan project – not made, endorsed or supported by Stygian Software and not affiliated with
+> them. Underrail and its assets belong to Stygian Software.
 
-- **Linux / Steam Deck:** the AppImage bundles everything it needs. Make it executable and run it
-  (on the Steam Deck: Desktop Mode, right-click → Properties → Permissions → executable, then double-click).
-  Needs SteamOS 3, Ubuntu 22.04, Debian 12, Fedora 35 or newer.
-- **Windows:** unzip `UnderrailSaveEditor-…-windows-x64.zip` and start `UnderrailSaveEditor.exe`.
+## Highlights
 
-The game and save folders are found automatically (Steam incl. SD cards and Flatpak Steam, GOG on Windows).
-If nothing is found, choose them under *Settings → Game folders…*.
+- 🧬 **Rebuild your character** – attributes, skills, level, XP, unspent points, name and portrait
+  (including your own pictures).
+- 🎯 **All 239 feats with the game's icons and descriptions** – add or remove any of them; the editor shows
+  what each one requires and flags the ones your character wouldn't qualify for.
+- 🎒 **A real inventory manager** – add any of the ~1460 items in the game, change stack sizes, component
+  quality, durability and batteries, repair everything with one click, and compare any weapon or armor with
+  what you have equipped.
+- 🛠 **Blueprints and oddities** – learn every crafting blueprint at once, or set your collection counters.
+- 🎭 **Faction standings** – see exactly how the Faceless will judge you before you meet them, adjust kill
+  counters the game reacts to, and check every faction's attitude toward you.
+- 🧭 **Build advisor and item finder** – the best weapons for your build and skill, the best armor
+  combinations your Strength can carry, and every merchant, container and creature that has what you need,
+  marked on the game's own world map.
+- 🛡 **Safe by default** – an automatic backup before every change, and saves stay byte-for-byte identical
+  except for what you edited. The game can keep running while you edit.
+- 🐧 **Linux, Steam Deck and Windows** – finds Steam (including SD cards and Flatpak), Proton and GOG
+  installations by itself. English and German interface.
+- 🛡 **Safe by default** – an automatic backup before every change, and saves stay byte-for-byte identical
+  except for what you edited. The game can keep running while you edit. Saves where a location fails to
+  load ("Failed to load locale") can be repaired.
 
-## Install from source (Linux)
+1. Download the latest release:
+   - **Linux / Steam Deck:** the `.AppImage` – make it executable and double-click it (on the Steam Deck in
+     Desktop Mode: right-click → Properties → Permissions → executable). Works on SteamOS 3, Ubuntu 22.04,
+     Debian 12, Fedora 35 and newer.
+   - **Windows:** unzip `UnderrailSaveEditor-…-windows-x64.zip` and start `UnderrailSaveEditor.exe`.
+2. Pick a save from the list on the left. Your game and save folders are found automatically; if not,
+   point the editor to them under *Settings → Game folders…*.
+3. Make your changes and press **Save**, then load the save in the game.
+
+Every save made by the editor first copies the original to
+`~/.local/share/underrail-save-editor/backups/<save>/<timestamp>/` – copy those files back into the save
+folder to undo. Quicksaves and autosaves get replaced by the game's next quicksave/autosave, so edit a named
+save if you want to keep the result, and try big changes on a copy first.
+
+<details>
+<summary>Run from source (Linux)</summary>
 
 Needs Python 3, PySide6 and Pillow (on Arch-based systems: `sudo pacman -S pyside6 python-pillow`).
 
 ```
-./packaging/install.sh      # per-user, no root; re-run to update
+./packaging/install.sh      # per-user install with an application menu entry; re-run to update
 ./packaging/uninstall.sh    # removes the app, keeps backups
 ```
 
-This adds the `underrail-save-editor` command to `~/.local/bin` and an entry to the application menu.
-Without installing: `./underrail_gui.py`.
+Or start it straight from the checkout with `./underrail_gui.py`.
+</details>
 
-## Usage
+## A closer look
 
-The game can keep running while you edit. Load the save in the game afterwards to see the changes; the game's
-next quicksave or autosave replaces an edited quicksave/autosave. Every save made by the editor first backs up
-the original to `~/.local/share/underrail-save-editor/backups/<save>/<timestamp>/`; to roll back, copy both
-files from there back into the save folder. Try bigger changes (feats, items, name, portrait) on a copy of a
-save first.
+### Your character
 
-The editor is available in English and German (*Language* menu; follows the system language by default).
-Game terms (items, feats, skills) always appear as the game names them.
+All your saves at a glance, with screenshot, location, play time and money. Pick one and edit the basics.
 
-## Features
-
-- **Save list:** every save with its screenshot, character, location, play time, health, XP and money;
-  updates when the game saves. Open/close it with the handle at its edge, *View → Save list* or Ctrl+L.
-- **Character:** name, level, portrait (all game portraits, or import your own picture – restart the game
-  to see it), attributes, XP, unspent points, health.
-- **Skills:** all skill values.
-- **Feats:** every feat with its icon and description; add or remove with a checkbox. Shows what each feat
-  requires and marks the ones your character doesn't qualify for. Feats that grant an ability (Snipe,
-  Sprint, …) bring it along.
-- **Specializations:** like the game's character screen – every specialization of your feats with its points
-  and maximum.
-- **Inventory:** items with icons, rarity colours, weight and stats; sort, filter, change stack size, quality,
-  durability and battery, repair, duplicate or remove items, and edit equipped gear. Selecting an item shows
-  a card that compares it with what you have equipped. *Add item…* adds any of the game's ~1460 items.
-- **Blueprints:** learn or forget crafting blueprints, or learn all.
-- **Oddities:** collection counters.
-- **Factions:**
-  - *The Faceless*: whether the checkpoint guards let you pass, and a live preview of the score the
-    Faceless commander computes when he reads your mind, with everything that feeds into it; *Skip the
-    mindreading* for when that scene hangs.
-  - *Kill counters* the game reacts to (Expedition pirates and jet ski patrols, Heavy Duty exosoldiers).
-  - *Attitudes* of every faction toward you and back.
-- **Hints:** pick a build (or let the editor detect it) and see its key attributes, skills and feats, the
-  best weapons for your skill, the best armor combinations for your Strength, and where to buy or find
-  everything.
-- **World map:** the game's own world map with merchants, creatures and loot per zone (button next to the
-  save title, or Ctrl+M); *where to find* lists for any item are shown on it too.
-- **Repair broken locations:** fixes saves where entering a location fails with "Failed to load locale"
-  (*File → Repair broken locations…*).
-
-## Screenshots
-
-Taken with the first save of a playthrough (South Gate Station, level 1).
-
-**Save list and character**
 ![Save list and character](docs/screenshots/save-list-character.png)
+
+### Feats and specializations
+
+Every feat with its icon, the game's own description and its requirements. Search names and descriptions,
+or show only the feats your character can take right now. Specializations work like the character screen
+in the game.
+
+![Feats](docs/screenshots/feats.png)
+
+![Specializations](docs/screenshots/specializations.png)
+
+### Inventory
+
+Sort and filter your gear, edit stacks, quality and durability, and select any weapon or armor to see how
+it stacks up against what you have equipped. *Add item…* searches all of the game's items by name, type,
+rarity or description.
+
+![Add item](docs/screenshots/add-item.png)
+
+### Blueprints
+
+Learn or forget any crafting blueprint – or all of them.
+
+![Blueprints](docs/screenshots/blueprints.png)
+
+### Factions
+
+The Faceless decide how they treat you from what you did earlier in the game. The editor shows that
+verdict as the game calculates it, lets you change what feeds into it, and can skip the mindreading scene
+if it hangs.
+
+![Factions: the Faceless](docs/screenshots/factions-faceless.png)
+
+### Build advisor
+
+Choose a build – or let the editor recognise yours – and see its key attributes, skills and feats, every
+weapon of its family ranked by damage per action point with your skill, and the best armor combinations
+with where to buy or find each part.
+
+![Hints: weapons](docs/screenshots/hints-weapons.png)
+
+![Hints: build and armor](docs/screenshots/hints-build-and-armor.png)
+
+### World map and item finder
+
+The game's own world map, with merchants, creatures and loot for every zone, and your current location
+marked. Looking for a specific item? The finder lists every merchant, container and creature that has it
+and highlights them on the map.
+
+![World map](docs/screenshots/world-map.png)
+
+![Where to find an item](docs/screenshots/item-locations.png)
+
+<details>
+<summary>More screenshots</summary>
 
 **Skills**
 ![Skills](docs/screenshots/skills.png)
 
-**Feats** – game icons, filled-in descriptions, requirements
-![Feats](docs/screenshots/feats.png)
-
-**Specializations**
-![Specializations](docs/screenshots/specializations.png)
-
-**Inventory** – item card with the comparison to the equipped weapons
-![Inventory](docs/screenshots/inventory.png)
-
-**Add item**
-![Add item](docs/screenshots/add-item.png)
-
-**Blueprints**
-![Blueprints](docs/screenshots/blueprints.png)
-
 **Oddities**
 ![Oddities](docs/screenshots/oddities.png)
 
-**Factions** – the Faceless (checkpoints, mindreading score), kill counters, attitudes
-![Factions: the Faceless](docs/screenshots/factions-faceless.png)
+**Factions: kill counters**
 ![Factions: kill counters](docs/screenshots/factions-kill-counters.png)
+
+**Factions: attitudes**
 ![Factions: attitudes](docs/screenshots/factions-attitudes.png)
 
-**Hints** – weapons for the build, build and armor combinations
-![Hints: weapons](docs/screenshots/hints-weapons.png)
-![Hints: build and armor](docs/screenshots/hints-build-and-armor.png)
-
-**World map**
-![World map](docs/screenshots/world-map.png)
-
-**Where to find an item**
-![Item locations](docs/screenshots/item-locations.png)
-
-**Help → About**
+**About**
 ![About](docs/screenshots/about.png)
+</details>
+
+## Under the hood
+
+Curious how the save format works, where the game data comes from, or how to build the AppImage and the
+Windows version? See [docs/TECHNICAL.md](docs/TECHNICAL.md).
 
 ## License
 
