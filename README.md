@@ -79,8 +79,7 @@ into its `CustomPortraits` folder. Restart Underrail afterwards; custom portrait
 
 ![Portrait picker: three custom portraits first (custom1, custom2, jcd), then the game's own](docs/screenshots/portraits.png)
 
-*The first three are custom portraits – a silhouette with a transparent background and two imported
-pictures – followed by the game's own.*
+*The first three are custom portraits from the `CustomPortraits` folder, followed by the game's own.*
 
 What makes a good portrait, following the
 [official wiki](https://stygiansoftware.com/wiki/index.php?title=Character_creation#Custom_portraits):
