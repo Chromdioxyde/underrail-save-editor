@@ -1159,6 +1159,15 @@ class SpecsTab(QWidget):
         hh.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         hh.setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.table.setColumnWidth(1, 120)
+        # columns can be dragged into another order; the order is remembered
+        hh.setSectionsMovable(True)
+        hh.setToolTip(tr('Drag a column header to change the column order.'))
+        order = i18n.settings().value('specs/columns', [], type=list)
+        if sorted(int(c) for c in order) == list(range(len(self.COLS))):
+            for visual, logical in enumerate(int(c) for c in order):
+                hh.moveSection(hh.visualIndex(logical), visual)
+        hh.sectionMoved.connect(lambda *_: i18n.settings().setValue(
+            'specs/columns', [hh.logicalIndex(v) for v in range(hh.count())]))
         self.table.itemSelectionChanged.connect(self.describe)
         self.desc = QLabel(wordWrap=True)
         self.note = QLabel(wordWrap=True)

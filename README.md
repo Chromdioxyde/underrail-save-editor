@@ -61,7 +61,8 @@ always appear as the game names them.
   when leveling up) are marked with the reasons, and *Only available* hides them
 - **Specializations:** like the game's character screen, every specialization of the character's feats is
   listed (grouped by feat), so a newly added feat brings its specializations along; columns name, points,
-  feat, maximum; full ones are green with ✓. The save only stores specializations with points: raising one
+  feat, maximum (drag a header to reorder them; the order is remembered); full ones are green with ✓. The
+  save only stores specializations with points: raising one
   from 0 adds it, lowering it to 0 removes it. Values go up to the game's maximum per specialization.
 - **Inventory:** weight and total weight (weight × stack) columns plus the total carried, to find what
   makes you encumbered; rarity tiers coloured like in the game (common white/plain, uncommon green, rare blue,

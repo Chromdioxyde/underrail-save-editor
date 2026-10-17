@@ -84,6 +84,7 @@ DE = {
     'Specialization': 'Spezialisierung',
     'Points': 'Punkte',
     'Full': 'Voll',
+    'Drag a column header to change the column order.': 'Spaltenkopf ziehen, um die Spaltenreihenfolge zu ändern.',
     'Feat': 'Feat',
     '{n} specializations, {points} points total, {full} full':
         '{n} Spezialisierungen, insgesamt {points} Punkte, {full} voll',
