@@ -29,7 +29,7 @@ mkdir -p "$APP_DIR/assets" "$BACKUP_DIR" "$BIN_DIR" "$ICON_DIR" "$DESKTOP_DIR"
 # replace program files, keep nothing stale from older versions
 rm -f "$APP_DIR"/*.py
 install -m 644 ./*.py "$APP_DIR/"
-chmod 755 "$APP_DIR/underrail_gui.py" "$APP_DIR/underrail_spec.py"
+chmod 755 "$APP_DIR/underrail_gui.py"
 install -m 644 assets/underrail-save-editor.svg "$APP_DIR/assets/"
 install -m 644 LICENSE "$APP_DIR/"
 mkdir -p "$APP_DIR/data"
@@ -47,11 +47,8 @@ cat > "$BIN_DIR/underrail-save-editor" <<EOF
 #!/bin/sh
 exec python3 "$APP_DIR/underrail_gui.py" "\$@"
 EOF
-cat > "$BIN_DIR/underrail-spec" <<EOF
-#!/bin/sh
-exec python3 "$APP_DIR/underrail_spec.py" "\$@"
-EOF
-chmod 755 "$BIN_DIR/underrail-save-editor" "$BIN_DIR/underrail-spec"
+chmod 755 "$BIN_DIR/underrail-save-editor"
+rm -f "$BIN_DIR/underrail-spec"  # command-line launcher of older versions
 
 install -m 644 assets/underrail-save-editor.svg "$ICON_DIR/underrail-save-editor.svg"
 install -m 644 packaging/underrail-save-editor.desktop "$DESKTOP_DIR/underrail-save-editor.desktop"

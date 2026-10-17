@@ -29,8 +29,8 @@ Needs Python 3, PySide6 and Pillow (on Arch-based systems: `sudo pacman -S pysid
 ./packaging/uninstall.sh    # removes the app, keeps backups
 ```
 
-This adds `underrail-save-editor` (GUI) and `underrail-spec` (command line) to `~/.local/bin` and an
-entry to the application menu. Without installing: `./underrail_gui.py`.
+This adds the `underrail-save-editor` command to `~/.local/bin` and an entry to the application menu.
+Without installing: `./underrail_gui.py`.
 
 ## Usage
 
@@ -41,14 +41,6 @@ portrait) on a copy of a save first.
 
 The editor is available in English and German (*Language* menu; follows the system language by default).
 Game terms (items, feats, skills) always appear as the game names them.
-
-Command line, for specializations only:
-
-```
-underrail-spec quicksave list                   # list specializations
-underrail-spec quicksave set GunNutDamage=8     # set a specialization
-underrail-spec quicksave unspent 2              # unspent specialization points
-```
 
 ## Features
 
