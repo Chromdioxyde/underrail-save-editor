@@ -382,6 +382,15 @@ class Save:
         r = self._info_root()
         return self.info.val(r.get('SGI:L')) if r is not None else None
 
+    def game_version(self):
+        """Version of the game that wrote the save (info.dat SGI:V, a System.Version), e.g. '1.3.1.2'."""
+        r = self._info_root()
+        v = self.info.obj(r.get('SGI:V')) if r is not None and 'SGI:V' in r.names else None
+        if not isinstance(v, nrbf.Obj):
+            return None
+        parts = [self.info.val(x) for x in v.values]
+        return '.'.join(str(p) for p in parts if isinstance(p, int) and p >= 0) or None
+
     def points(self):
         return [Field(label, self.m[k]) for k, label in POINT_FIELDS if k in self.m]
 

@@ -3274,6 +3274,12 @@ class Main(QMainWindow):
             menu.addAction(act)
         self.lang_actions = menu.actions()
 
+        help_ = self.menuBar().addMenu(tr('Help'))
+        about = QAction(tr('About…'), self)
+        about.setMenuRole(QAction.AboutRole)
+        about.triggered.connect(self.about)
+        help_.addAction(about)
+
         # watch the save folders so new/overwritten saves show up without a manual refresh;
         # the game writes several files per save, so changes are debounced
         self.watcher = QFileSystemWatcher(self)
@@ -3673,6 +3679,23 @@ class Main(QMainWindow):
         self.status.setStyleSheet('color: #2a2')
         self.status.setText('✓ ' + tr('Saved. Backup: {path}', path=bak) + (
             ' ' + tr('Added {n} missing attack(s)/ability(ies) of feats.', n=len(added)) if added else ''))
+
+    def about(self):
+        import version
+        esc = html_escape
+        commit = version.commit()
+        rows = [(tr('Editor version'), version.VERSION + (f' ({commit})' if commit else '')),
+                (tr('Made for game version'), version.TARGET_GAME_VERSION)]
+        saved = self.save.game_version() if self.save else None
+        if saved:
+            note = '' if saved == version.TARGET_GAME_VERSION else ' ⚠ ' + tr('differs – some values may not match')
+            rows.append((tr('Game version of the open save'), saved + note))
+        table = ''.join(f'<tr><td style="padding-right: 12px">{esc(k)}</td><td><b>{esc(v)}</b></td></tr>'
+                        for k, v in rows)
+        QMessageBox.about(self, tr('About Underrail Save Editor'), (
+            f'<h3>Underrail Save Editor</h3><table>{table}</table>'
+            f'<p>{esc(tr("Created by {author}.", author=version.AUTHOR))}</p>'
+            f'<p><small>{esc(tr("Underrail is a game by Stygian Software; this editor is an unofficial fan project and not affiliated with them. Built with Python, PySide6 (Qt) and Pillow."))}</small></p>'))
 
     def set_language(self, code):
         i18n.choose(code)

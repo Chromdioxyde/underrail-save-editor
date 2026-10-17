@@ -2,3 +2,4 @@ __pycache__/
 # save backups made while running from the checkout (personal save games)
 /backups/
 /build/
+/commit.txt

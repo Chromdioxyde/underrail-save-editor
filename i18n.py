@@ -220,6 +220,19 @@ DE = {
         'seinem Urteil kommt. Für den Fall, dass die Gedankenlese-Szene hängt.',
     'Mindreading marked as done with score {n} – save, load in the game and talk to the commander.':
         'Gedankenlesen als erledigt markiert, Wert {n} – speichern, im Spiel laden und mit dem Kommandanten reden.',
+    # about
+    'Help': 'Hilfe',
+    'About…': 'Über…',
+    'About Underrail Save Editor': 'Über Underrail Save Editor',
+    'Editor version': 'Editor-Version',
+    'Made for game version': 'Gemacht für Spielversion',
+    'Game version of the open save': 'Spielversion des geöffneten Spielstands',
+    'differs – some values may not match': 'weicht ab – manche Werte stimmen evtl. nicht',
+    'Created by {author}.': 'Erstellt von {author}.',
+    'Underrail is a game by Stygian Software; this editor is an unofficial fan project and not affiliated with '
+    'them. Built with Python, PySide6 (Qt) and Pillow.':
+        'Underrail ist ein Spiel von Stygian Software; dieser Editor ist ein inoffizielles Fanprojekt und steht in '
+        'keiner Verbindung zu ihnen. Gebaut mit Python, PySide6 (Qt) und Pillow.',
     'Equipped ({slot})': 'Ausgerüstet ({slot})',
     'Nothing equipped in this slot.': 'In diesem Slot ist nichts ausgerüstet.',
     'Action points': 'Aktionspunkte',

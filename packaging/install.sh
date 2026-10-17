@@ -33,6 +33,8 @@ chmod 755 "$APP_DIR/underrail_gui.py" "$APP_DIR/underrail_spec.py"
 install -m 644 assets/underrail-save-editor.svg "$APP_DIR/assets/"
 mkdir -p "$APP_DIR/data"
 install -m 644 data/*.json "$APP_DIR/data/"
+# the build's commit, shown in Help → About (no git in the installed copy)
+git rev-parse --short HEAD > "$APP_DIR/commit.txt" 2>/dev/null || rm -f "$APP_DIR/commit.txt"
 
 # backups made while running from the repo checkout (copied, never overwritten)
 if [ -d backups ]; then
