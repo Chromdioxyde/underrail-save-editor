@@ -1,5 +1,9 @@
 # Underrail Save Editor
 
+> **Unofficial fan project.** This editor is not made, endorsed or supported by Stygian Software, the
+> developer of Underrail, and is not affiliated with them in any way. Underrail and its assets belong to
+> Stygian Software. Back up your saves; use at your own risk.
+
 Save game editor for Underrail (Steam/Proton on Linux) with a GUI (PySide6) and a small CLI.
 Requires Python 3, PySide6 and Pillow. Game data (item names, feats, portraits) is read directly from
 the Underrail installation.
@@ -125,6 +129,52 @@ always appear as the game names them.
   green; click a row to find it on the map, click a zone to find its rows)
 
 Test structural changes (feats, specializations, blueprints, items, name, portrait) on a copy first.
+## Screenshots
+
+Taken with the first save of a playthrough (South Gate Station, level 1).
+
+**Save list and character**
+![Save list and character](docs/screenshots/save-list-character.png)
+
+**Skills**
+![Skills](docs/screenshots/skills.png)
+
+**Feats** – game icons, filled-in descriptions, requirements
+![Feats](docs/screenshots/feats.png)
+
+**Specializations**
+![Specializations](docs/screenshots/specializations.png)
+
+**Inventory** – item card with the comparison to the equipped weapons
+![Inventory](docs/screenshots/inventory.png)
+
+**Add item**
+![Add item](docs/screenshots/add-item.png)
+
+**Blueprints**
+![Blueprints](docs/screenshots/blueprints.png)
+
+**Oddities**
+![Oddities](docs/screenshots/oddities.png)
+
+**Factions** – the Faceless (checkpoints, mindreading score), kill counters, attitudes
+![Factions: the Faceless](docs/screenshots/factions-faceless.png)
+![Factions: kill counters](docs/screenshots/factions-kill-counters.png)
+![Factions: attitudes](docs/screenshots/factions-attitudes.png)
+
+**Hints** – weapons for the build, build and armor combinations
+![Hints: weapons](docs/screenshots/hints-weapons.png)
+![Hints: build and armor](docs/screenshots/hints-build-and-armor.png)
+
+**World map**
+![World map](docs/screenshots/world-map.png)
+
+**Where to find an item**
+![Item locations](docs/screenshots/item-locations.png)
+
+**Help → About**
+![About](docs/screenshots/about.png)
+
 
 ## Custom portraits
 
