@@ -229,6 +229,14 @@ DE = {
     'Game version of the open save': 'Spielversion des geöffneten Spielstands',
     'differs – some values may not match': 'weicht ab – manche Werte stimmen evtl. nicht',
     'Created by {author}.': 'Erstellt von {author}.',
+    'License': 'Lizenz',
+    'This program is free software: you can redistribute it and/or modify it under the terms of the GNU General '
+    'Public License as published by the Free Software Foundation, either version 3 of the License, or (at your '
+    'option) any later version. It is distributed WITHOUT ANY WARRANTY; see the license for details.':
+        'Dieses Programm ist freie Software: Du kannst es unter den Bedingungen der GNU General Public License, wie '
+        'von der Free Software Foundation veröffentlicht, weitergeben und/oder ändern, entweder gemäß Version 3 der '
+        'Lizenz oder (nach deiner Wahl) jeder späteren Version. Es wird OHNE JEDE GEWÄHRLEISTUNG verbreitet; '
+        'Einzelheiten stehen in der Lizenz.',
     'Underrail is a game by Stygian Software; this editor is an unofficial fan project and not affiliated with '
     'them. Built with Python, PySide6 (Qt) and Pillow.':
         'Underrail ist ein Spiel von Stygian Software; dieser Editor ist ein inoffizielles Fanprojekt und steht in '

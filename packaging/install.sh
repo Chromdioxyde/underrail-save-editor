@@ -31,6 +31,7 @@ rm -f "$APP_DIR"/*.py
 install -m 644 ./*.py "$APP_DIR/"
 chmod 755 "$APP_DIR/underrail_gui.py" "$APP_DIR/underrail_spec.py"
 install -m 644 assets/underrail-save-editor.svg "$APP_DIR/assets/"
+install -m 644 LICENSE "$APP_DIR/"
 mkdir -p "$APP_DIR/data"
 rm -f "$APP_DIR"/data/*.json
 install -m 644 data/*.json "$APP_DIR/data/"

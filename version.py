@@ -6,6 +6,8 @@ VERSION = '1.0.0'
 # the underrail.exe the extracted data (data/*.json) and the formulas read from its IL come from
 TARGET_GAME_VERSION = '1.3.1.2'
 AUTHOR = 'Chromdioxyde'
+LICENSE = 'GNU GPL v3 or later'  # full text in LICENSE
+LICENSE_URL = 'https://www.gnu.org/licenses/gpl-3.0.html'
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 

@@ -55,6 +55,7 @@ rm -rf "$SP/PySide6/Qt/translations" "$SP/PySide6/Qt/qml" "$SP/PySide6/include" 
 mkdir -p "$APPDIR/usr/app/assets"
 cp ./*.py "$APPDIR/usr/app/"
 cp assets/underrail-save-editor.svg "$APPDIR/usr/app/assets/"
+cp LICENSE "$APPDIR/usr/app/"
 cp -r data "$APPDIR/usr/app/"
 git rev-parse --short HEAD > "$APPDIR/usr/app/commit.txt" 2>/dev/null || true  # shown in Help → About
 cp assets/underrail-save-editor.svg "$APPDIR/underrail-save-editor.svg"

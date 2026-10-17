@@ -51,7 +51,7 @@ always appear as the game names them.
   *View → Save list* and Ctrl+L; it slides in and out. By default it closes once you pick a save (*View* or
   *Settings → Close the save list after picking a save*).
 - **Help → About:** editor version (and build commit), the game version it was made for (1.3.1.2, the
-  `underrail.exe` the extracted data comes from) and the game version that wrote the open save, credits.
+  `underrail.exe` the extracted data comes from), the game version that wrote the open save, license, credits.
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
   attributes, XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)
@@ -262,3 +262,14 @@ Feat and specialization descriptions contain .NET `{0}`… placeholders that the
 `data/feat_descriptions.json` (all 221 feats and 208 specializations with placeholders resolve; none of the
 values depends on the character). The *Specializations* tab adds the total for the character's points to
 "… for each specialization point" descriptions.
+
+## License
+
+Copyright (C) Chromdioxyde. This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software Foundation, either version 3
+of the License, or (at your option) any later version (GPL-3.0-or-later). It is distributed WITHOUT ANY
+WARRANTY; see [LICENSE](LICENSE) for the full text.
+
+The AppImage and the Windows build bundle Python (PSF license), PySide6/Qt (LGPL-3.0) and Pillow (MIT-CMU
+license) under their own licenses. Underrail and its data (names and values read from the game's files)
+belong to Stygian Software; this is an unofficial fan project, not affiliated with them.

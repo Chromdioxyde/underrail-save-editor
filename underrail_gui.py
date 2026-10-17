@@ -3791,17 +3791,25 @@ class Main(QMainWindow):
         esc = html_escape
         commit = version.commit()
         rows = [(tr('Editor version'), version.VERSION + (f' ({commit})' if commit else '')),
-                (tr('Made for game version'), version.TARGET_GAME_VERSION)]
+                (tr('Made for game version'), version.TARGET_GAME_VERSION),
+                (tr('License'), version.LICENSE)]
         saved = self.save.game_version() if self.save else None
         if saved:
             note = '' if saved == version.TARGET_GAME_VERSION else ' ⚠ ' + tr('differs – some values may not match')
             rows.append((tr('Game version of the open save'), saved + note))
         table = ''.join(f'<tr><td style="padding-right: 12px">{esc(k)}</td><td><b>{esc(v)}</b></td></tr>'
                         for k, v in rows)
-        QMessageBox.about(self, tr('About Underrail Save Editor'), (
+        box = QMessageBox(QMessageBox.NoIcon, tr('About Underrail Save Editor'), (
             f'<h3>Underrail Save Editor</h3><table>{table}</table>'
             f'<p>{esc(tr("Created by {author}.", author=version.AUTHOR))}</p>'
-            f'<p><small>{esc(tr("Underrail is a game by Stygian Software; this editor is an unofficial fan project and not affiliated with them. Built with Python, PySide6 (Qt) and Pillow."))}</small></p>'))
+            f'<p><small>{esc(tr("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. It is distributed WITHOUT ANY WARRANTY; see the license for details."))} '
+            f'<a href="{version.LICENSE_URL}">{esc(version.LICENSE_URL)}</a></small></p>'
+            f'<p><small>{esc(tr("Underrail is a game by Stygian Software; this editor is an unofficial fan project and not affiliated with them. Built with Python, PySide6 (Qt) and Pillow."))}</small></p>'),
+            QMessageBox.Ok, self)
+        box.setTextFormat(Qt.RichText)
+        for label in box.findChildren(QLabel):
+            label.setOpenExternalLinks(True)  # the license link opens in the browser
+        box.exec()
 
     def set_language(self, code):
         i18n.choose(code)

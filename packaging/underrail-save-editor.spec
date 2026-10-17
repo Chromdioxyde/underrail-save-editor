@@ -16,7 +16,8 @@ a = Analysis(
     [os.path.join(ROOT, 'underrail_gui.py')],
     pathex=[ROOT],
     datas=[(os.path.join(ROOT, 'assets', 'underrail-save-editor.svg'), 'assets'),
-           (os.path.join(ROOT, 'data', '*.json'), 'data')] +
+           (os.path.join(ROOT, 'data', '*.json'), 'data'),
+           (os.path.join(ROOT, 'LICENSE'), '.')] +
           ([(COMMIT, '.')] if os.path.exists(COMMIT) and os.path.getsize(COMMIT) else []),
     hiddenimports=['PySide6.QtSvg'],  # SVG icon rendering
     excludes=['tkinter', 'unittest', 'PySide6.QtWebEngineCore', 'PySide6.QtQml', 'PySide6.QtQuick'],
