@@ -3188,10 +3188,6 @@ class Main(QMainWindow):
         refresh.setToolTip(tr('Reload the save list (F5). The list also updates by itself when the game saves.'))
         refresh.clicked.connect(self.refresh_list)
         head.addWidget(refresh)
-        world = QPushButton(QIcon.fromTheme('map-flat', QIcon.fromTheme('applications-education-geography')), tr('World map'))
-        world.setToolTip(tr('Open the game\'s world map (Ctrl+M)'))
-        world.clicked.connect(self.open_world_map)
-        head.addWidget(world)
         lv.addLayout(head)
         lv.addWidget(self.saves, 1)
 
@@ -3211,7 +3207,14 @@ class Main(QMainWindow):
         right = QWidget()
         rv = QVBoxLayout(right)
         rv.setContentsMargins(0, 0, 0, 0)
-        rv.addWidget(self.title)
+        # the world map doesn't depend on the save list, so its button stays visible with the list closed
+        world = QPushButton(QIcon.fromTheme('map-flat', QIcon.fromTheme('applications-education-geography')), tr('World map'))
+        world.setToolTip(tr('Open the game\'s world map (Ctrl+M)'))
+        world.clicked.connect(self.open_world_map)
+        title_row = QHBoxLayout()
+        title_row.addWidget(self.title, 1)
+        title_row.addWidget(world)
+        rv.addLayout(title_row)
         rv.addWidget(self.tabs, 1)
         rv.addLayout(bar)
 
