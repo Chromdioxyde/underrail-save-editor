@@ -3295,9 +3295,9 @@ class Main(QMainWindow):
         self.title.setFont(f)
         self.tabs = QTabWidget()
         self.status = QLabel()
-        self.btn_save = QPushButton(tr('Save'))
+        self.btn_save = QPushButton(tr('Save'), enabled=False)  # enabled (and highlighted) by update_status
         self.btn_save.clicked.connect(self.write)
-        self.btn_revert = QPushButton(tr('Revert'))
+        self.btn_revert = QPushButton(tr('Revert'), enabled=False)
         self.btn_revert.clicked.connect(self.reload)
         bar = QHBoxLayout()
         bar.addWidget(self.status, 1)
@@ -3645,7 +3645,6 @@ class Main(QMainWindow):
         fixed = s.g.repaired + (s.info.repaired if s.info else 0)
         if fixed:
             # not a user edit: no "discard changes?" prompt, but saving is possible and recommended
-            self.btn_save.setEnabled(True)
             self.status.setText(tr('This save had {n} broken object id(s) from an older editor version; '
                                    'they were repaired – save to fix the file.', n=fixed))
         self.fetch_icons()
@@ -3685,7 +3684,14 @@ class Main(QMainWindow):
         self.update_status()
 
     def update_status(self):
-        self.btn_save.setEnabled(self.dirty or self.needs_fix())
+        pending = bool(self.dirty or self.needs_fix())
+        self.btn_save.setEnabled(pending)
+        # with something to save the button stands out in the accent colour; otherwise it stays visible, greyed out
+        self.btn_save.setStyleSheet(
+            'QPushButton { background: palette(highlight); color: palette(highlighted-text); font-weight: bold;'
+            ' border: 1px solid palette(highlight); border-radius: 4px; padding: 4px 16px; }'
+            ' QPushButton:hover { background: palette(highlight); border-color: palette(highlighted-text); }'
+            if pending else '')
         self.btn_revert.setEnabled(self.dirty)
         self.act_repair.setEnabled(bool(self.broken))
         self.status.setText(tr('Unsaved changes') if self.dirty else tr('No changes'))
