@@ -12,15 +12,16 @@ features and file formats; this file is the working state.
 - After every change: `./packaging/install.sh` (installs to `~/.local/share/underrail-save-editor/app`),
   then commit. Commit messages end with the Co-Authored-By / Claude-Session lines given by the harness.
 - AppImage on request: `./packaging/build-appimage.sh` -> `build/Underrail_Save_Editor-<commit>-x86_64.AppImage`;
-  user wants it copied to `$APPIMAGE_COPY_DIR/` (replace the older one there).
+  it copies the result to `$APPIMAGE_COPY_DIR` (replacing the older one) when set in `.env.local`.
 - The user tests in-game and reports back. Never touch the saves listed in `PROTECTED_SAVES` (`.env.local`).
   Test structural edits on a copy (e.g. `cp -r quicksave zz<name>`, delete it afterwards).
 - Prefers data extracted from the game over invented/schematic visuals.
 - Running-game warning applies only to quicksave/autosave (the game only rewrites those).
 
 ## Paths
-- Repo `the repository`; game `$UNDERRAIL_GAME_DIR`; saves
-  `$UNDERRAIL_SAVES_DIR`.
+- Machine-specific paths live in `.env.local` (not in git; template `.env.example`): `UNDERRAIL_GAME_DIR`,
+  `UNDERRAIL_SAVES_DIR`, `APPIMAGE_COPY_DIR`. Read them with `. ./.env.local` before analysing game files/saves.
+  Never write local paths or the user's real name into tracked files or commits.
 - Cache `~/.cache/underrail-save-editor/` (items-v6, map_index_v5, worldmap_v7, worldmap_*.png, maptex/,
   zone_links_v1.json, icons/, thumbs/, savedetails.json); invalidated by game file mtimes.
 - Backups of written saves: `paths.BACKUP_DIR` (outside the save folder, so Steam Cloud ignores them).

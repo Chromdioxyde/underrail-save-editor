@@ -7,6 +7,8 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 ROOT="$PWD"
+# machine-specific settings (not in git), e.g. APPIMAGE_COPY_DIR; see .env.example
+[ -f "$ROOT/.env.local" ] && . "$ROOT/.env.local"
 BUILD="$ROOT/build"
 PY_VERSION="${PY_VERSION:-3.12}"
 APPDIR="$BUILD/AppDir"
@@ -70,3 +72,9 @@ chmod +x "$APPDIR/AppRun"
 echo "Packing $OUT..."
 ARCH=x86_64 "$TOOL" --appimage-extract-and-run --no-appstream "$APPDIR" "$OUT" >/dev/null
 echo "Built $OUT ($(du -h "$OUT" | cut -f1))"
+if [ -n "${APPIMAGE_COPY_DIR:-}" ]; then
+    # replace the older build there
+    rm -f "$APPIMAGE_COPY_DIR"/Underrail_Save_Editor-*-x86_64.AppImage
+    cp "$OUT" "$APPIMAGE_COPY_DIR/"
+    echo "Copied to $APPIMAGE_COPY_DIR"
+fi

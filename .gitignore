@@ -3,3 +3,5 @@ __pycache__/
 /backups/
 /build/
 /commit.txt
+# machine-specific paths (see .env.example)
+/.env.local
