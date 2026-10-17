@@ -77,7 +77,10 @@ Choose from every portrait in the game and from any custom portraits you have in
 into a custom portrait in one step: it crops it to a square and writes the three sizes the game expects
 into its `CustomPortraits` folder. Restart Underrail afterwards; custom portraits are loaded at startup.
 
-![Portraits](docs/screenshots/portraits.png)
+![Portrait picker: three custom portraits first (custom1, custom2, jcd), then the game's own](docs/screenshots/portraits.png)
+
+*The first three are custom portraits – a silhouette with a transparent background and two imported
+pictures – followed by the game's own.*
 
 What makes a good portrait, following the
 [official wiki](https://stygiansoftware.com/wiki/index.php?title=Character_creation#Custom_portraits):
