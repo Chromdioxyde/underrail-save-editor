@@ -129,6 +129,7 @@ always appear as the game names them.
   green; click a row to find it on the map, click a zone to find its rows)
 
 Test structural changes (feats, specializations, blueprints, items, name, portrait) on a copy first.
+
 ## Screenshots
 
 Taken with the first save of a playthrough (South Gate Station, level 1).
@@ -174,7 +175,6 @@ Taken with the first save of a playthrough (South Gate Station, level 1).
 
 **Help → About**
 ![About](docs/screenshots/about.png)
-
 
 ## Custom portraits
 
