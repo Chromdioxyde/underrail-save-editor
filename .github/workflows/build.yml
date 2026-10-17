@@ -31,7 +31,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: appimage
-          path: build/*.AppImage
+          path: build/Underrail_Save_Editor-*.AppImage  # not the cached appimagetool next to it
           if-no-files-found: error
           retention-days: 14
 
