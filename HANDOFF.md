@@ -20,7 +20,8 @@ features and file formats; this file is the working state.
 
 ## Paths
 - Machine-specific paths live in `.env.local` (not in git; template `.env.example`): `UNDERRAIL_GAME_DIR`,
-  `UNDERRAIL_SAVES_DIR`, `APPIMAGE_COPY_DIR`. Read them with `. ./.env.local` before analysing game files/saves.
+  `UNDERRAIL_SAVES_DIR`, `APPIMAGE_COPY_DIR`, `PROTECTED_SAVES`. Read them with `. ./.env.local` before
+  analysing game files/saves.
   Never write local paths or the user's real name into tracked files or commits.
 - Cache `~/.cache/underrail-save-editor/` (items-v6, map_index_v5, worldmap_v7, worldmap_*.png, maptex/,
   zone_links_v1.json, icons/, thumbs/, savedetails.json); invalidated by game file mtimes.
@@ -33,9 +34,8 @@ features and file formats; this file is the working state.
   from IL method `dyk::ym`, job `DCFAC` started by `dc_flo_mindreader.udlg`), editable inputs (game variables
   via `Save.var/set_var`, creates missing `P` entries), kill counters of other factions (pirates, Protectorate
   jet skis, exosoldiers + `tooManyKilled` flag at 12), faction relations editor (`FS1:D` byte blob, byte-identical
-  round trip) and personal overrides `C1:PA1`. Verified on a quicksave copy (edits re-read after writing).
-  With the Tchortist scouting job started the commander takes the spy
-  branch unless TC check passes) – the user should test the mindreading in-game.
+  round trip) and personal overrides `C1:PA1`. Verified on a quicksave copy (edits re-read after writing);
+  the mindreading itself still needs an in-game test.
 - Attitude enum names 1 (wary) and 3 (friendly) are inferred; 0 hostile / 2 neutral default / 4 allied are
   backed by the IL and data.
 - User report: after editing the score inputs the checkpoint guards still said "You may not pass" – the
