@@ -106,8 +106,8 @@ features and file formats; this file is the working state.
 game_running), `gamedata.py` (game data, item DB, icons, extracted JSON loaders), `underrail_save.py`
 (Save model and edits), `underrail_gui.py` (GUI), `i18n.py`, `hints.py` (map index, locations),
 `worldmap.py` (global map rendering), `builds.py`, `itemstats.py`, `factions.py`, `version.py`,
-`tools/extract_*.py` (exe -> `data/*.json`: feat requirements + ammo icons, crafted weapon icons, feat
-abilities, feat/spec description values), `packaging/*`.
+`tools/extract_*.py` (exe -> `data/*.json`: feat requirements + ammo icons, crafted weapon/armor/shield
+emitter icons (`extract_crafted_icons.py`), feat abilities, feat/spec description values), `packaging/*`.
 
 ## Foundations (verified earlier)
 - `nrbf.py`: byte-identical round trip for all save files and all 1463 `.item` files; writer drops

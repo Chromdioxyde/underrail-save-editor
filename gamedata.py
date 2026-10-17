@@ -462,8 +462,9 @@ def extract_icons(vms=None, progress=None):
     vms = sorted(v for v in vms if v)
     iconset = _iconset()
     try:
-        # crafted weapons' composite visuals, registered by the game at runtime (data/weapon_icons.json)
-        with open(os.path.join(DATA_DIR, 'weapon_icons.json')) as f:
+        # crafted weapons' and armors' composite visuals (incl. shield emitters), registered by the game at
+        # runtime (data/crafted_icons.json)
+        with open(os.path.join(DATA_DIR, 'crafted_icons.json')) as f:
             for vm, parts in json.load(f)['icons'].items():
                 iconset.setdefault(vm, [tuple(p) for p in parts])
     except (OSError, ValueError, KeyError):

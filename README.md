@@ -140,10 +140,11 @@ cached in `~/.cache/underrail-save-editor/icons/`). An item's visual id (`I:VM`)
 `icons.iconset` (grid cell(s) per sheet; multi-part icons are layers with their own opacity) or
 `<Sheet>.<n>` = cell n of a 10-column grid. Bullets are registered by the game at runtime from the
 `AmmoType` enum (value v → column `v % 100 − 1`, row `v // 100 − 1` on the Ammo sheet); that mapping
-is extracted into `data/ammo_icons.json`. Crafted weapons have composite visuals (`sledgehammer.2`,
-`sniper.4.frame`, `knife.1.2.m1`) that each weapon recipe class registers at startup in loops over grid
-cells; `tools/extract_weapon_icons.py` runs those methods in a small IL interpreter and writes the
-~9700 definitions (layers of sheet, cell, opacity) to `data/weapon_icons.json`. Cells are 33 px on a
+is extracted into `data/ammo_icons.json`. Crafted weapons and armor have composite visuals (`sledgehammer.2`,
+`sniper.4.frame`, `knife.1.2.m1`, `shieldEmitter.p2.s1.e1`, riot gear, tabi boots) that each recipe class
+registers at startup in loops over grid cells; `tools/extract_crafted_icons.py` runs those methods in a small
+IL interpreter and writes the ~9900 definitions (layers of sheet, cell, opacity) to `data/crafted_icons.json`.
+Cells are 33 px on a
 34 px pitch. Items still without an icon get a faded placeholder: the icon of a typical item of the
 same category, item class and weapon type, or the game's generic weapon icon.
 

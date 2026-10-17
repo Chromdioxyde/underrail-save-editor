@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Extracts the icons of crafted weapons from underrail.exe into data/weapon_icons.json.
+"""Extracts the icons of crafted weapons and shield emitters from underrail.exe into data/crafted_icons.json.
 
-Crafted weapons get composite visual ids ("sledgehammer.2", "smg.3.frame", "knife.1.2.m1"). The game
-registers their icons at startup in one method per weapon recipe class: loops that build an icon
-definition per id with layers (sheet name, grid cell, opacity). Those methods are plain arithmetic,
-string formatting and list building, so a tiny IL interpreter runs them here instead of re-implementing
-each pattern.
+Crafted items get composite visual ids ("sledgehammer.2", "smg.3.frame", "knife.1.2.m1",
+"shieldEmitter.p2.s1.e1"). The game registers their icons at startup in one method per recipe class: loops
+that build an icon definition per id with layers (sheet name, grid cell, opacity) on the Weapons or Armors
+sheet. Those methods are plain arithmetic, string formatting and list building, so a tiny IL interpreter runs
+them here instead of re-implementing each pattern.
 
-Usage: python tools/extract_weapon_icons.py [path/to/underrail.exe]   (needs: pip install dnfile dncil)
+Usage: python tools/extract_crafted_icons.py [path/to/underrail.exe]   (needs: pip install dnfile dncil)
 """
 import json
 import os
@@ -259,8 +259,8 @@ class Interp:
 
 
 def icon_methods(it):
-    """Methods that register composite weapon icons: they name a weapon icon sheet and build layers
-    from grid points."""
+    """Methods that register composite icons of crafted items: they name the Weapons or Armors icon sheet
+    (shield emitters live on Armors) and build layers from grid points."""
     out = []
     for rid in range(1, len(it.md.MethodDef.rows) + 1):
         b = it.body(rid)
@@ -276,7 +276,7 @@ def icon_methods(it):
                         points += 1
                 except Exception:
                     pass
-        if points and any(s.endswith('Weapons') for s in strs) and any('{0}' in s for s in strs):
+        if points and any(s.endswith(('Weapons', 'Armors')) for s in strs) and any('{0}' in s for s in strs):
             out.append(rid)
     return out
 
@@ -315,7 +315,7 @@ if __name__ == '__main__':
     import gamedata
     exe = sys.argv[1] if len(sys.argv) > 1 else os.path.join(gamedata.GAME, 'underrail.exe')
     icons = extract(exe)
-    dst = os.path.join(ROOT, 'data', 'weapon_icons.json')
+    dst = os.path.join(ROOT, 'data', 'crafted_icons.json')
     with open(dst, 'w') as f:
         json.dump({'source': 'underrail.exe', 'icons': icons}, f, separators=(',', ':'))
-    print(f'{len(icons)} weapon icons -> {dst}')
+    print(f'{len(icons)} crafted item icons -> {dst}')
