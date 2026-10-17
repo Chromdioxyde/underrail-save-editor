@@ -1,0 +1,2812 @@
+{
+ "source": "underrail.exe",
+ "feats": {
+  "a": [
+   {
+    "text": "50"
+   }
+  ],
+  "advancedpsiempathy": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "ambush": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "0.3"
+   }
+  ],
+  "armorsloping": [
+   {
+    "text": "35"
+   }
+  ],
+  "as": [
+   {
+    "text": "3 turns"
+   }
+  ],
+  "ballistics": [
+   {
+    "text": "3"
+   }
+  ],
+  "barrelstare": [
+   {
+    "text": "20"
+   }
+  ],
+  "beastofburden": [
+   {
+    "text": "150"
+   }
+  ],
+  "beyondcold": [
+   {
+    "text": "40"
+   },
+   {
+    "text": "15"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "10 turns"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "blindsiding": [
+   {
+    "text": "15"
+   }
+  ],
+  "blitz": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "20"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "boardingup": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "bodybuilding": [
+   {
+    "text": "80"
+   }
+  ],
+  "bodyhorror": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "bodyweighttraining": [
+   {
+    "text": "10"
+   }
+  ],
+  "bonebreaker": [
+   {
+    "text": "4"
+   },
+   {
+    "text": "25"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "2"
+   }
+  ],
+  "bowyer": [
+   {
+    "text": "35"
+   }
+  ],
+  "brutality": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "bruteaim": [
+   {
+    "text": "3"
+   }
+  ],
+  "bullettime": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "bullettrance": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "burglar": [
+   {
+    "text": "75"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "capacitor": [],
+  "cheapshots": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "8"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "ci": [
+   {
+    "text": "1 turn"
+   },
+   {
+    "text": "50"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "clothier": [
+   {
+    "text": "20"
+   }
+  ],
+  "co": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "1"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "cohesivemucusglands": [],
+  "combo": [
+   {
+    "text": "100"
+   },
+   {
+    "text": "20"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "commando": [],
+  "concentratedfire": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "concussiveshots": [
+   {
+    "text": "40"
+   },
+   {
+    "text": "15"
+   },
+   {
+    "text": "30"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "continuumripple": [
+   {
+    "text": "25"
+   }
+  ],
+  "cookedshot": [
+   {
+    "text": "150"
+   },
+   {
+    "text": "2 turns"
+   }
+  ],
+  "corporealprojection": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "cripplingstrike": [
+   {
+    "text": "150"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "5 turns"
+   },
+   {
+    "text": "3"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "criticalpower": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "100"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "ct": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "cutthroat": [
+   {
+    "text": "800"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "15"
+   },
+   {
+    "text": "6 turns"
+   }
+  ],
+  "deadlysnares": [],
+  "decapitate": [
+   {
+    "text": "150"
+   },
+   {
+    "text": "50"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "decommissioner": [
+   {
+    "text": "15"
+   }
+  ],
+  "deflection": [
+   {
+    "text": "30"
+   }
+  ],
+  "demolitionman": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "dirtykick": [
+   {
+    "text": "1 turn"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "6 turns"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "disassemble": [
+   {
+    "text": "90"
+   }
+  ],
+  "doctor": [
+   {
+    "text": "25"
+   }
+  ],
+  "ds": [],
+  "echoingsoliloquy": [],
+  "elementalbolts": [
+   {
+    "text": "100"
+   }
+  ],
+  "empoweredinvocationmetathermics": [
+   {
+    "text": "Metathermics"
+   },
+   {
+    "text": "35"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "empoweredinvocationpsychokinesis": [
+   {
+    "text": "Psychokinesis"
+   },
+   {
+    "text": "35"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "empoweredinvocationtemporalmanipulation": [
+   {
+    "text": "Temporal Manipulation"
+   },
+   {
+    "text": "35"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "empoweredinvocationthoughtcontrol": [
+   {
+    "text": "Thought Control"
+   },
+   {
+    "text": "35"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "escapeartist": [
+   {
+    "text": "2 turns"
+   }
+  ],
+  "evasivemaneuvers": [
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "eviscerate": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "expandedpsicapacitance": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "expertise": [
+   {
+    "text": "20"
+   }
+  ],
+  "expertsprint": [
+   {
+    "text": "10"
+   }
+  ],
+  "expertunarmedcombat": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "exposeweakness": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "fancyfootwork": [
+   {
+    "text": "8"
+   }
+  ],
+  "fastmetabolism": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "25"
+   }
+  ],
+  "fatalthrow": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "18"
+   }
+  ],
+  "fend": [
+   {
+    "text": "150"
+   },
+   {
+    "text": "60"
+   },
+   {
+    "text": "2 turns"
+   }
+  ],
+  "fightresponse": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "finetuned": [
+   {
+    "text": "15"
+   }
+  ],
+  "firebranded": [
+   {
+    "text": "1 %"
+   }
+  ],
+  "fisherman": [],
+  "flightresponse": [
+   {
+    "text": "35"
+   },
+   {
+    "text": "25"
+   }
+  ],
+  "flurry": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "4"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "forcefullinnervation": [
+   {
+    "text": "10"
+   }
+  ],
+  "forceuser": [
+   {
+    "text": "100"
+   },
+   {
+    "text": "50"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "fragmentedchaos": [
+   {
+    "text": "250"
+   }
+  ],
+  "fullauto": [],
+  "futureorientation": [
+   {
+    "text": "1 turn"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "g": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "7"
+   }
+  ],
+  "grenadier": [
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "guard": [
+   {
+    "text": "35"
+   }
+  ],
+  "gunfu": [
+   {
+    "text": "40"
+   }
+  ],
+  "gunnershigh": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "65"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "gunnut": [
+   {
+    "text": "15"
+   }
+  ],
+  "h": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "24 turns"
+   }
+  ],
+  "heavymetal": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "50"
+   }
+  ],
+  "heavypunch": [
+   {
+    "text": "300"
+   },
+   {
+    "text": "150"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "heavyweight": [],
+  "hemopsychosis": [
+   {
+    "text": "5 turns"
+   }
+  ],
+  "hightechnicalities": [
+   {
+    "text": "8"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "hitandrun": [
+   {
+    "text": "25"
+   }
+  ],
+  "hunter": [
+   {
+    "text": "20"
+   }
+  ],
+  "hypertoxicity": [
+   {
+    "text": "100"
+   }
+  ],
+  "i": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "im": [
+   {
+    "text": "250"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "impale": [
+   {
+    "text": "3 turns"
+   }
+  ],
+  "improveddodging": [
+   {
+    "text": "5"
+   }
+  ],
+  "improvedevasion": [
+   {
+    "text": "5"
+   }
+  ],
+  "improvednavalcombat": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "improvedthrowing": [
+   {
+    "text": "10"
+   }
+  ],
+  "improvedunarmedcombat": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "increasedagility": [
+   {
+    "text": "Agility"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "agility"
+   }
+  ],
+  "increasedconstitution": [
+   {
+    "text": "Constitution"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "constitution"
+   }
+  ],
+  "increaseddexterity": [
+   {
+    "text": "Dexterity"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "dexterity"
+   }
+  ],
+  "increasedintelligence": [
+   {
+    "text": "Intelligence"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "intelligence"
+   }
+  ],
+  "increasedperception": [
+   {
+    "text": "Perception"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "perception"
+   }
+  ],
+  "increasedstrength": [
+   {
+    "text": "Strength"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "strength"
+   }
+  ],
+  "increasedwill": [
+   {
+    "text": "Will"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "will"
+   }
+  ],
+  "irongrip": [
+   {
+    "text": "15"
+   }
+  ],
+  "ironwill": [
+   {
+    "text": "50"
+   }
+  ],
+  "jetandjab": [
+   {
+    "text": "10"
+   }
+  ],
+  "juggernaut": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "50"
+   }
+  ],
+  "kcs": [
+   {
+    "text": "125"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "laststand": [
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "leadingshot": [
+   {
+    "text": "65"
+   }
+  ],
+  "lightningpunches": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "locusofcontrol": [
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "15 turns"
+   }
+  ],
+  "madchemist": [],
+  "magdump": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "0.5"
+   }
+  ],
+  "majorsupplier": [
+   {
+    "text": "2"
+   }
+  ],
+  "mantra": [
+   {
+    "text": "10"
+   }
+  ],
+  "meditation": [
+   {
+    "text": "25"
+   }
+  ],
+  "monsterslayer": [
+   {
+    "text": "15"
+   }
+  ],
+  "monstrousyell": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "motioner": [
+   {
+    "text": "1"
+   }
+  ],
+  "ms": [
+   {
+    "text": "75"
+   }
+  ],
+  "navalcombat": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "navaljousting": [
+   {
+    "text": "30"
+   }
+  ],
+  "neuraloverclocking": [
+   {
+    "text": "30"
+   }
+  ],
+  "neurology": [
+   {
+    "text": "15"
+   }
+  ],
+  "nimble": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "ninjalooter": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "25"
+   }
+  ],
+  "o": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "onslaught": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "outervisions": [
+   {
+    "text": "1"
+   }
+  ],
+  "packrathound": [
+   {
+    "text": "50"
+   }
+  ],
+  "paranoia": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "3"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "parry": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "3"
+   },
+   {
+    "text": "6"
+   }
+  ],
+  "pe": [
+   {
+    "text": "20"
+   }
+  ],
+  "pelletmayhem": [
+   {
+    "text": "3"
+   }
+  ],
+  "perfectscattering": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "2"
+   }
+  ],
+  "philosophy1": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "philosophy2": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "philosophy3": [
+   {
+    "text": "45"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "pinning": [
+   {
+    "text": "35"
+   }
+  ],
+  "pm": [
+   {
+    "text": "100"
+   },
+   {
+    "text": "3"
+   }
+  ],
+  "pointshot": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "polymath": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "powermanagement": [
+   {
+    "text": "35"
+   }
+  ],
+  "practicalphysicist": [
+   {
+    "text": "25"
+   }
+  ],
+  "practicedparabola": [
+   {
+    "text": "5"
+   }
+  ],
+  "premeditation": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "100"
+   },
+   {
+    "text": "3"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "psionicmania": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "psychokineticelasticity": [],
+  "psychoneuralflexibility": [],
+  "psychoneuraloptimization": [
+   {
+    "text": "10"
+   }
+  ],
+  "psychosis": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "psychostaticelectricity": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "psychotemporalacceleration": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "pummel": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "quickpockets": [
+   {
+    "text": "50"
+   }
+  ],
+  "quicktinkering": [
+   {
+    "text": "25"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "rapidfire": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "150"
+   },
+   {
+    "text": "2 turns"
+   }
+  ],
+  "recklessness": [
+   {
+    "text": "7"
+   },
+   {
+    "text": "3"
+   }
+  ],
+  "remotesurgeon": [
+   {
+    "text": "50"
+   }
+  ],
+  "riposte": [],
+  "ripper": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "s": [
+   {
+    "text": "225"
+   },
+   {
+    "text": "1"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "s2": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "salesman": [
+   {
+    "text": "1"
+   }
+  ],
+  "sap": [
+   {
+    "text": "5 turns"
+   },
+   {
+    "text": "6 turns"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "scrutinous": [
+   {
+    "text": "7"
+   }
+  ],
+  "seadog": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "serialkiller": [
+   {
+    "text": "10"
+   }
+  ],
+  "shellshock": [
+   {
+    "text": "4 %"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "shieldarm": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "shieldbash": [
+   {
+    "text": "75"
+   },
+   {
+    "text": "125"
+   },
+   {
+    "text": "1 turn"
+   },
+   {
+    "text": "2 turns"
+   }
+  ],
+  "shoemaker": [
+   {
+    "text": "10"
+   }
+  ],
+  "shootingspree": [
+   {
+    "text": "1 turn"
+   },
+   {
+    "text": "10 turns"
+   }
+  ],
+  "shroomhead": [
+   {
+    "text": "15"
+   }
+  ],
+  "sixthshell": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "100"
+   }
+  ],
+  "skinner": [
+   {
+    "text": "20"
+   }
+  ],
+  "snooping": [
+   {
+    "text": "3"
+   }
+  ],
+  "spearguardian": [
+   {
+    "text": "30"
+   }
+  ],
+  "spearthrow": [
+   {
+    "text": "125"
+   },
+   {
+    "text": "20"
+   },
+   {
+    "text": "25"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "specialist": [],
+  "specialtactics": [
+   {
+    "text": "30"
+   }
+  ],
+  "specops": [
+   {
+    "text": "300"
+   },
+   {
+    "text": "200"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "splitspare": [],
+  "ss": [
+   {
+    "text": "30"
+   }
+  ],
+  "steadfastaim": [
+   {
+    "text": "0.5"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "stoicism": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "4"
+   }
+  ],
+  "strafe": [
+   {
+    "text": "15"
+   }
+  ],
+  "strider": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "stuntman": [
+   {
+    "text": "20"
+   }
+  ],
+  "superslam": [
+   {
+    "text": "20"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "suppressivefire": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "surestep": [],
+  "survivalinstincts": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "sweep": [
+   {
+    "text": "70"
+   },
+   {
+    "text": "2 turns"
+   },
+   {
+    "text": "3 turns"
+   }
+  ],
+  "tasteforblood": [
+   {
+    "text": "5"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "tattooabomination": [
+   {
+    "text": "70"
+   }
+  ],
+  "tattooaegisincorporated": [
+   {
+    "text": "5"
+   }
+  ],
+  "tattooanarchy": [
+   {
+    "text": "1"
+   }
+  ],
+  "tattoobalorseye": [
+   {
+    "text": "10"
+   }
+  ],
+  "tattooblackcrawler": [
+   {
+    "text": "15"
+   }
+  ],
+  "tattoocoretech": [
+   {
+    "text": "7"
+   }
+  ],
+  "tattoodrifter": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "tattoofatso": [
+   {
+    "text": "10"
+   }
+  ],
+  "tattoojeteater": [
+   {
+    "text": "5"
+   }
+  ],
+  "tattoojkk": [
+   {
+    "text": "15"
+   }
+  ],
+  "tattoomagnarghost": [
+   {
+    "text": "10"
+   }
+  ],
+  "tattoopirate": [
+   {
+    "text": "10"
+   }
+  ],
+  "tattoopraetoriansecurity": [
+   {
+    "text": "2"
+   }
+  ],
+  "tattooprotectorate": [
+   {
+    "text": "8"
+   }
+  ],
+  "tattoosgs": [
+   {
+    "text": "2"
+   }
+  ],
+  "tattooshadowlith": [
+   {
+    "text": "2"
+   }
+  ],
+  "tattooskulljacked": [
+   {
+    "text": "2 %"
+   },
+   {
+    "text": "50 %"
+   }
+  ],
+  "tattootchort": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "tattootchortinstitute": [
+   {
+    "text": "7"
+   }
+  ],
+  "tattoothebeast": [
+   {
+    "text": "10"
+   }
+  ],
+  "tattoovoidbattle": [
+   {
+    "text": "50"
+   }
+  ],
+  "td": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "2 turns"
+   }
+  ],
+  "telekineticundulation": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "1 turn"
+   }
+  ],
+  "temperedacid": [
+   {
+    "text": "30"
+   }
+  ],
+  "temperedcold": [
+   {
+    "text": "30"
+   }
+  ],
+  "temperedelectricity": [
+   {
+    "text": "30"
+   }
+  ],
+  "temperedheat": [
+   {
+    "text": "30"
+   }
+  ],
+  "thickskull": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "threepointer": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "1.5"
+   },
+   {
+    "text": "50"
+   }
+  ],
+  "tranquility": [
+   {
+    "text": "5"
+   }
+  ],
+  "trapexpert": [
+   {
+    "text": "60"
+   },
+   {
+    "text": "25"
+   }
+  ],
+  "trickytrajectory": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "triggerhappy": [
+   {
+    "text": "7"
+   }
+  ],
+  "uncannydodge": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "30"
+   },
+   {
+    "text": "5 turns"
+   }
+  ],
+  "versatility": [
+   {
+    "text": "60"
+   }
+  ],
+  "vileweaponry": [
+   {
+    "text": "10"
+   },
+   {
+    "text": "25"
+   },
+   {
+    "text": "3"
+   }
+  ],
+  "weaponsmith": [
+   {
+    "text": "5"
+   }
+  ],
+  "wrestling": [
+   {
+    "text": "50"
+   },
+   {
+    "text": "8"
+   },
+   {
+    "text": "3"
+   },
+   {
+    "text": "7"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "yell": [
+   {
+    "text": "35"
+   },
+   {
+    "text": "3 turns"
+   },
+   {
+    "text": "10 turns"
+   }
+  ]
+ },
+ "specs": {
+  "AimedShotCritDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "AmbushCritChance": [
+   {
+    "text": "2"
+   }
+  ],
+  "ArmorSloping": [
+   {
+    "text": "2"
+   }
+  ],
+  "Ballistics": [
+   {
+    "text": "1"
+   }
+  ],
+  "BarrelStareDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "BeastOfBurdenCarryCapacity": [
+   {
+    "text": "15"
+   }
+  ],
+  "BlindsidingDamage": [
+   {
+    "text": "1"
+   }
+  ],
+  "BlitzCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "BlitzMaxAp": [
+   {
+    "text": "2"
+   }
+  ],
+  "BoardingUp": [
+   {
+    "text": "2"
+   }
+  ],
+  "BoneBreakerDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "BowyerCritDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "BrutalityFearChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "BulletTime": [
+   {
+    "text": "4"
+   }
+  ],
+  "BulletTranceDamage": [
+   {
+    "text": "1"
+   }
+  ],
+  "BulletTranceDuration": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "BulletTranceMaxStacks": [],
+  "BurglarSpeed": [
+   {
+    "text": "5"
+   }
+  ],
+  "BurglarStealth": [
+   {
+    "text": "5"
+   }
+  ],
+  "CerebralTraumaDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "CerebralTraumaPsiBurn": [
+   {
+    "text": "5"
+   }
+  ],
+  "CheapShotsCritDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "CheapShotsIncapacitationChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "Clothier": [
+   {
+    "text": "2"
+   }
+  ],
+  "ComboDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "ComboStunChance": [
+   {
+    "text": "2"
+   }
+  ],
+  "CommandoApGain": [
+   {
+    "text": "3"
+   }
+  ],
+  "ConcentratedFireDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "ConcussiveShotsDazeChance": [
+   {
+    "text": "4"
+   }
+  ],
+  "Conditioning": [
+   {
+    "text": "1"
+   }
+  ],
+  "ContinuumRippleJumpChance": [
+   {
+    "text": "2"
+   }
+  ],
+  "CookedShotApCostReduction": [
+   {
+    "text": "10"
+   }
+  ],
+  "CookedShotDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "CorporealProjectionDamage": [
+   {
+    "text": "0.5"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "CripplingStrikeDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "CriticalPowerCritDamage": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "CryogenicInductionBarrierHealth": [
+   {
+    "text": "7"
+   }
+  ],
+  "CryogenicInductionThreshold": [
+   {
+    "text": "5"
+   }
+  ],
+  "CutthroatCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "CutthroatDamage": [
+   {
+    "text": "40"
+   }
+  ],
+  "DeadlySnaresCritDamage": [
+   {
+    "text": "3"
+   }
+  ],
+  "DecapitateDamage": [
+   {
+    "text": "10"
+   }
+  ],
+  "DecapitateThreshold": [
+   {
+    "text": "3"
+   }
+  ],
+  "DeflectionDodge": [
+   {
+    "text": "2"
+   }
+  ],
+  "DemolitionManDamageBonus": [
+   {
+    "text": "1"
+   }
+  ],
+  "DemolitionManDuration": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "DemolitionManMaxStacks": [],
+  "DirtyKickDamage": [
+   {
+    "text": "10"
+   }
+  ],
+  "DisassembleQuality": [
+   {
+    "text": "2"
+   }
+  ],
+  "DoctorHealingBonus": [
+   {
+    "text": "2"
+   }
+  ],
+  "ElementalBoltsDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "EscapeBondsMpGain": [
+   {
+    "text": "10"
+   }
+  ],
+  "EvasiveManeuversConversion": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "EviscerateDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "ExecuteCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "ExecuteDamage": [
+   {
+    "text": "10"
+   }
+  ],
+  "ExpandedPsiCapacitance": [
+   {
+    "text": "10"
+   }
+  ],
+  "ExpertiseMaxBonus": [
+   {
+    "text": "1"
+   }
+  ],
+  "ExposeWeaknessDuration": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "ExposeWeaknessResistReduction": [
+   {
+    "text": "2"
+   }
+  ],
+  "FancyFootworkMovementPoints": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "FastMetabolismHealing": [
+   {
+    "text": "2"
+   }
+  ],
+  "FastMetabolismPsi": [
+   {
+    "text": "2"
+   }
+  ],
+  "FatalThrowActionPoints": [
+   {
+    "text": "3"
+   }
+  ],
+  "FatalThrowHealthThreshold": [
+   {
+    "text": "2"
+   }
+  ],
+  "FendApCost": [
+   {
+    "text": "8"
+   }
+  ],
+  "FendBlockAmount": [
+   {
+    "text": "10"
+   }
+  ],
+  "FlurryApCost": [
+   {
+    "text": "1"
+   }
+  ],
+  "FlurryCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "ForceUserDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "ForceUserForcefieldHealth": [
+   {
+    "text": "10"
+   }
+  ],
+  "FragmentedChaosCritDamage": [
+   {
+    "text": "10"
+   }
+  ],
+  "FullAutoDamage": [
+   {
+    "text": "3"
+   }
+  ],
+  "FullAutoShotgunDamage": [
+   {
+    "text": "3"
+   }
+  ],
+  "FutureOrientationAp": [
+   {
+    "text": "1"
+   }
+  ],
+  "GuardBlockAmount": [
+   {
+    "text": "0.2"
+   }
+  ],
+  "GuardBlockChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "GunFu": [
+   {
+    "text": "5"
+   }
+  ],
+  "GunNutDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "GunnersHighDuration": [],
+  "GunnersHighMaxStacks": [],
+  "GunnersHighThreshold": [
+   {
+    "text": "3"
+   }
+  ],
+  "GunslingerInitiative": [
+   {
+    "text": "1"
+   }
+  ],
+  "HeavyMetalDamageBonus": [
+   {
+    "text": "5"
+   }
+  ],
+  "HeavyMetalDamageReduction": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "HeavyPunchActionPoints": [
+   {
+    "text": "10"
+   }
+  ],
+  "HeavyPunchCritDamage": [
+   {
+    "text": "3"
+   }
+  ],
+  "HeavyPunchDamage": [
+   {
+    "text": "10"
+   }
+  ],
+  "HeavyweightCritDamage": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "HemopsychosisCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "HemopsychosisHealthCost": [
+   {
+    "text": "5"
+   }
+  ],
+  "HighTechnicalitiesDamage": [
+   {
+    "text": "0.4"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "HitAndRunMaxMp": [
+   {
+    "text": "3"
+   }
+  ],
+  "HypertoxicityDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "HypothermiaMaxStacks": [
+   {
+    "text": "1"
+   }
+  ],
+  "ImpaleCritDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "ImprovedUnarmedCombatDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "ImprovedUnarmedCombatDazeChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "InterloperMovement": [
+   {
+    "text": "1.5"
+   },
+   {
+    "text": "2"
+   }
+  ],
+  "IronGrip": [
+   {
+    "text": "1"
+   }
+  ],
+  "JuggernautHealth": [
+   {
+    "text": "2"
+   }
+  ],
+  "KneecapShotCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "KneecapShotDamage": [
+   {
+    "text": "20"
+   }
+  ],
+  "LastStandCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "LastStandDuration": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "LeadingShot": [
+   {
+    "text": "5"
+   }
+  ],
+  "LightningPunchesThreshold": [
+   {
+    "text": "1"
+   }
+  ],
+  "LocusOfControlCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "LocusOfControlDuration": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "MadChemistOnHit": [
+   {
+    "text": "7"
+   }
+  ],
+  "MagDumpLmg": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "MagDumpMinigun": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "MarksmanPrecision": [
+   {
+    "text": "1"
+   }
+  ],
+  "MeditationPsiPoints": [
+   {
+    "text": "1"
+   }
+  ],
+  "NeuralOverclockingCritDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "NeurologyPsiPoints": [
+   {
+    "text": "1"
+   }
+  ],
+  "NimbleDodgeAndEvasion": [
+   {
+    "text": "2"
+   }
+  ],
+  "NinjaLooterSpeed": [
+   {
+    "text": "8"
+   }
+  ],
+  "NinjaLooterSuspicion": [
+   {
+    "text": "3"
+   }
+  ],
+  "OnslaughtDamage": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "OpportunistDisabledTarget": [
+   {
+    "text": "3"
+   }
+  ],
+  "OpportunistSlowedTarget": [
+   {
+    "text": "3"
+   }
+  ],
+  "PackrathoundCarryCapacity": [
+   {
+    "text": "5"
+   }
+  ],
+  "ParanoiaCritChanceReduction": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "ParanoiaDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "ParanoiaDetectionBonus": [
+   {
+    "text": "2"
+   }
+  ],
+  "ParanoiaInitiative": [
+   {
+    "text": "1"
+   }
+  ],
+  "ParryBlockAmount": [
+   {
+    "text": "5"
+   }
+  ],
+  "ParryChance": [
+   {
+    "text": "2"
+   }
+  ],
+  "PelletMayhemDamage": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "PerfectScattering": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "PinningChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "PointShotApCost": [
+   {
+    "text": "2"
+   }
+  ],
+  "PowerManagementCapacity": [
+   {
+    "text": "2"
+   }
+  ],
+  "PracticalPhysicistCritDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "PracticedParabola": [
+   {
+    "text": "1"
+   }
+  ],
+  "PremeditationCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "PremeditationPsiCostReduction": [
+   {
+    "text": "5"
+   }
+  ],
+  "PsionicManiaCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "PsionicManiaHealthCostReduction": [
+   {
+    "text": "1"
+   }
+  ],
+  "PsychoNeuralOptimization": [
+   {
+    "text": "1"
+   }
+  ],
+  "PsychosisCritChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "PsychosisPsiCostReduction": [
+   {
+    "text": "1"
+   }
+  ],
+  "PsychostaticElectricityCritChance": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "PsychostaticElectricityDuration": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "PsychotemporalAccelerationActionPoints": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "PummelActionPoints": [
+   {
+    "text": "2"
+   }
+  ],
+  "PummelDamage": [
+   {
+    "text": "7"
+   }
+  ],
+  "PyromaniacDamage": [
+   {
+    "text": "5"
+   }
+  ],
+  "QuickPocketsApCost": [
+   {
+    "text": "5"
+   }
+  ],
+  "QuickTinkeringAp": [
+   {
+    "text": "5"
+   }
+  ],
+  "QuickTinkeringCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "RapidFireApCost": [
+   {
+    "text": "5"
+   }
+  ],
+  "RecklessnessCritChance": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "RemoteSurgeon": [
+   {
+    "text": "10"
+   }
+  ],
+  "RiposteCritChance": [
+   {
+    "text": "3"
+   }
+  ],
+  "RipperCritDamage": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "Salesman": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "SapCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "SapDamage": [
+   {
+    "text": "3"
+   }
+  ],
+  "SapDuration": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "SharpshooterCritDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "ShellShockDuration": [],
+  "ShellShockMaxStacks": [],
+  "ShellShockSkillReduction": [
+   {
+    "text": "0.5 %"
+   }
+  ],
+  "ShieldArmBlockAmount": [
+   {
+    "text": "2"
+   }
+  ],
+  "ShieldArmBlockChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "ShieldBashApCost": [
+   {
+    "text": "5"
+   }
+  ],
+  "ShieldBashCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "ShieldBashDamage": [
+   {
+    "text": "10"
+   }
+  ],
+  "ShootingSpreeCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "ShootingSpreeShots": [],
+  "SixthShellDamage": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "Skinner": [
+   {
+    "text": "2"
+   }
+  ],
+  "SnipeDamage": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "SnoopingPerception": [
+   {
+    "text": "1"
+   }
+  ],
+  "SpearGuardian": [
+   {
+    "text": "10"
+   }
+  ],
+  "SpearThrowApCost": [
+   {
+    "text": "3"
+   }
+  ],
+  "SpearThrowDamage": [
+   {
+    "text": "1"
+   }
+  ],
+  "SpearThrowRange": [
+   {
+    "text": "1"
+   }
+  ],
+  "SpecOpsFlashbangCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "SpecialTacticsCooldown": [
+   {
+    "text": "1 turn"
+   }
+  ],
+  "SplitSpareDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "SprintSpeed": [
+   {
+    "text": "3"
+   }
+  ],
+  "SteadfastAimCritChance": [
+   {
+    "text": "0.05"
+   }
+  ],
+  "Stoicism": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "Strafe": [
+   {
+    "text": "1"
+   }
+  ],
+  "SuperSlamDamage": [
+   {
+    "text": "2"
+   }
+  ],
+  "SuppressiveFireActionPoints": [
+   {
+    "text": "1"
+   }
+  ],
+  "SuppressiveFireHitChanceRed": [
+   {
+    "text": "2"
+   }
+  ],
+  "SuppressiveFireMovementPoints": [
+   {
+    "text": "2"
+   }
+  ],
+  "SureStepBearTrap": [
+   {
+    "text": "20"
+   }
+  ],
+  "SurvivalInstinctsCritChance": [
+   {
+    "text": "1"
+   }
+  ],
+  "SurvivalInstinctsHealthThreshold": [
+   {
+    "text": "2"
+   }
+  ],
+  "SweepCooldown": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "SweepDamage": [
+   {
+    "text": "4"
+   }
+  ],
+  "SweepDuration": [
+   {
+    "text": "0.5 turn"
+   }
+  ],
+  "TasteForBloodDamage": [
+   {
+    "text": "0.2"
+   }
+  ],
+  "TelekineticUndulationDazeChance": [
+   {
+    "text": "10"
+   }
+  ],
+  "ThermodynamicityActionPoints": [
+   {
+    "text": "3"
+   }
+  ],
+  "ThickSkull": [
+   {
+    "text": "15"
+   }
+  ],
+  "ThreePointerCritChance": [
+   {
+    "text": "0.1"
+   }
+  ],
+  "Tranquility": [
+   {
+    "text": "0.2"
+   }
+  ],
+  "TrapExpertDetection": [
+   {
+    "text": "3"
+   }
+  ],
+  "TrapExpertSpeed": [
+   {
+    "text": "3"
+   }
+  ],
+  "TrickyTrajectoryDamageBonus": [
+   {
+    "text": "2"
+   }
+  ],
+  "TrickyTrajectoryEvasionIgnore": [
+   {
+    "text": "2"
+   }
+  ],
+  "TriggerHappy": [
+   {
+    "text": "1"
+   }
+  ],
+  "UncannyDodge": [
+   {
+    "text": "1"
+   }
+  ],
+  "Versatility": [
+   {
+    "text": "2"
+   }
+  ],
+  "VileWeaponryDamage": [
+   {
+    "text": "1"
+   }
+  ],
+  "VileWeaponryHealingReduction": [
+   {
+    "text": "2.5"
+   }
+  ],
+  "WeaponsmithCritChance": [
+   {
+    "text": "0.5"
+   }
+  ],
+  "WrestlingApplyChance": [
+   {
+    "text": "10"
+   }
+  ],
+  "YellReduction": [
+   {
+    "text": "5"
+   }
+  ]
+ }
+}

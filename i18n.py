@@ -77,10 +77,6 @@ DE = {
     'Only owned': 'Nur vorhandene',
     'Learn all': 'Alle lernen',
     '{n} of {total} owned': '{n} von {total} vorhanden',
-    'Adding a feat only records it as learned. Feats that grant abilities may need other changes too – '
-    'test on a copy of the save first.':
-        'Ein hinzugefügter Feat wird nur als gelernt eingetragen. Feats, die Fähigkeiten freischalten, brauchen '
-        'eventuell weitere Änderungen – erst an einer Kopie des Spielstands testen.',
     'Known crafting blueprints. Blueprint items in the inventory are separate.':
         'Bekannte Baupläne. Bauplan-Items im Inventar sind davon unabhängig.',
     # specs
@@ -442,7 +438,10 @@ DE = {
         'Nicht beim Levelaufstieg wählbar (Charaktererstellung, Quests, Trainer oder Ereignisse)',
     'Hide entries whose requirements your character does not meet': 'Einträge ausblenden, deren Voraussetzungen der Charakter nicht erfüllt',
     'Requirements not met:': 'Voraussetzungen nicht erfüllt:',
-    'Requirements:': 'Voraussetzungen:',
+    'Requirements': 'Voraussetzungen',
+    'owned': 'vorhanden',
+    'Filter names and descriptions…': 'Namen und Beschreibungen filtern…',
+    'With your {n} point(s): {total}': 'Mit deinen {n} Punkt(en): {total}',
     'No requirements': 'Keine Voraussetzungen',
     'none': 'keine',
     'modified': 'effektiv',
@@ -456,9 +455,12 @@ DE = {
     'Only one "Empowered" invocation feat': 'Nur ein „Empowered“-Feat',
     'you have {n}': 'du hast {n}',
     'you have {names}': 'du hast {names}',
-    "Feats marked ⚠ don't meet the game's requirements (checked against base values, as the game does); they can still be added. Adding a feat only records it as learned.":
+    "Feats marked ⚠ don't meet the game's requirements (checked against base values, as the game does); they "
+    "can still be added. An added feat also gets its attack or ability, and its specializations show up on the "
+    "Specializations tab.":
         'Mit ⚠ markierte Feats erfüllen die Voraussetzungen des Spiels nicht (geprüft gegen Grundwerte, wie im '
-        'Spiel); hinzufügen lassen sie sich trotzdem. Ein hinzugefügter Feat wird nur als gelernt eingetragen.',
+        'Spiel); hinzufügen lassen sie sich trotzdem. Ein hinzugefügter Feat bekommt auch seinen Angriff bzw. seine '
+        'Fähigkeit, und seine Spezialisierungen erscheinen im Tab „Spezialisierungen“.',
     'no money': 'kein Geld',
     'Component quality. The game has no upper limit; above {n} the quality bonus curve stops rising, but higher values still scale the stats linearly.':
         'Komponenten-Qualität. Das Spiel hat keine Obergrenze; über {n} steigt die Bonuskurve nicht weiter, '

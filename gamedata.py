@@ -248,6 +248,48 @@ def feat_abilities():
     return _feat_abilities
 
 
+_feat_desc_args = None
+
+
+def feat_description_args():
+    """{'feats': feat id -> [arg, ...], 'specs': spec key -> [arg, ...]}: the values the game inserts
+    into the {n} placeholders of feat/specialization descriptions, extracted from underrail.exe by
+    tools/extract_feat_descriptions.py. An arg is {'text': str} or None (unresolved). All of them are
+    constants of the game data; none depends on the character."""
+    global _feat_desc_args
+    if _feat_desc_args is None:
+        try:
+            with open(os.path.join(DATA_DIR, 'feat_descriptions.json')) as f:
+                _feat_desc_args = json.load(f)
+        except (OSError, ValueError):
+            _feat_desc_args = {}
+    return _feat_desc_args
+
+
+def _fill(text, args):
+    """Fills .NET String.Format placeholders; unresolved ones stay as written."""
+    def sub(m):
+        if m.group(0) in ('{{', '}}'):
+            return m.group(0)[0]
+        i = int(m.group(1))
+        a = args[i] if args and i < len(args) else None
+        s = a.get('text') if a else None
+        return m.group(0) if s is None else s
+    return re.sub(r'\{\{|\}\}|\{(\d+)\}', sub, text)
+
+
+def feat_description(fid):
+    """Feat description with its {n} placeholders filled like the game does."""
+    f = feats().get(fid)
+    return _fill(f[1], feat_description_args().get('feats', {}).get(fid)) if f else ''
+
+
+def spec_description(key):
+    """Specialization description with its placeholders filled (see feat_description)."""
+    s = specs().get(key)
+    return _fill(s[1], feat_description_args().get('specs', {}).get(key)) if s else ''
+
+
 def spec_rules():
     """spec key -> {'feat': feat id it belongs to, 'name', 'max': max points or None}."""
     feat_requirements()
@@ -384,6 +426,31 @@ def icon_path(vm):
         return None
     f = icon_file(vm)
     return f if os.path.exists(f) else None
+
+
+_feat_icons = None
+
+
+def feat_icons():
+    """feat id -> icon name in icons.iconset ('Feat.<ClassName>'). The iconset names feat icons after the feat
+    class, which matches the feat's display name without spaces/punctuation (238 of 239 feats)."""
+    global _feat_icons
+    if _feat_icons is None:
+        try:
+            names = {_norm(k[5:]): k for k in _iconset() if k.startswith('Feat.')}
+        except (OSError, TypeError):
+            names = {}
+        _feat_icons = {}
+        for fid, (name, _) in feats().items():
+            k = names.get(_norm(name)) or names.get(_norm(fid))
+            if k:
+                _feat_icons[fid] = k
+    return _feat_icons
+
+
+def feat_icon(fid):
+    """Cached PNG of a feat's icon, or None (no icon / not extracted yet)."""
+    return icon_path(feat_icons().get(fid))
 
 
 def extract_icons(vms=None, progress=None):

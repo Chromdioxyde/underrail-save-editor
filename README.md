@@ -55,9 +55,10 @@ always appear as the game names them.
 - **Character:** name, level, portrait (gallery of all game portraits, import your own image as PNG),
   attributes, XP, unspent attribute/skill/feat/specialization points, current health
 - **Attributes / Skills:** base values (the saved effective value is shifted by the same delta)
-- **Feats:** all feats with descriptions, add/remove via checkbox; feats whose requirements your
-  character doesn't meet (or that can't be picked when leveling up) are marked with the reasons, and
-  *Only available* hides them
+- **Feats:** all feats with the game's icons and descriptions, add/remove via checkbox; the filter searches
+  names, ids and descriptions (all words must match); a card below shows icon, description and the
+  requirements with ✓/✗. Feats whose requirements your character doesn't meet (or that can't be picked
+  when leveling up) are marked with the reasons, and *Only available* hides them
 - **Specializations:** like the game's character screen, every specialization of the character's feats is
   listed (grouped by feat), so a newly added feat brings its specializations along; columns name, points,
   feat, maximum; full ones are green with ✓. The save only stores specializations with points: raising one
@@ -252,3 +253,10 @@ requirement method: attribute and skill minimums (compared against base values l
 required and excluded feats, character level, any psi skill, known psi abilities, and whether the
 level-up screen offers the feat at all. It also reads every specialization class: the feat it belongs
 to and its maximum points.
+
+Feat and specialization descriptions contain .NET `{0}`… placeholders that the game fills at runtime;
+`tools/extract_feat_descriptions.py` runs each description's argument method in a small IL interpreter
+(constructors, game helpers, knowledge texts such as "turns") and writes the inserted texts to
+`data/feat_descriptions.json` (all 221 feats and 208 specializations with placeholders resolve; none of the
+values depends on the character). The *Specializations* tab adds the total for the character's points to
+"… for each specialization point" descriptions.

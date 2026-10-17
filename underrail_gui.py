@@ -946,12 +946,14 @@ def requirement_line(met, kind, d):
 
 class ChecklistTab(QWidget):
     """Checkable list of everything in a game database; checked = present in the save. With `check`,
-    entries whose requirements aren't met are marked and explained."""
+    entries whose requirements aren't met are marked and explained. `icon(key)` gives an icon path,
+    `text(key)` the description to show (default: the database's)."""
 
-    def __init__(self, main, db, owned, add, remove, note, learn_all=False, check=None):
+    def __init__(self, main, db, owned, add, remove, note, learn_all=False, check=None, icon=None, text=None):
         super().__init__()
         self.main, self.db, self.owned, self.add, self.remove = main, db, owned, add, remove
-        self.check = check
+        self.check, self.icon = check, icon
+        self.text = text or (lambda k: self.db.get(k, (k, ''))[1])
         have = set(owned())
         self.count = QLabel()
         self.only = QCheckBox(tr('Only owned'))
@@ -959,7 +961,7 @@ class ChecklistTab(QWidget):
         self.available = QCheckBox(tr('Only available'))
         self.available.setToolTip(tr('Hide entries whose requirements your character does not meet'))
         self.available.toggled.connect(self.refilter)
-        self.search = filter_box(tr('Filter…'), self.refilter)
+        self.search = filter_box(tr('Filter names and descriptions…'), self.refilter)
         top = QHBoxLayout()
         top.addWidget(self.search, 1); top.addWidget(self.only)
         if check:
@@ -972,17 +974,22 @@ class ChecklistTab(QWidget):
             top.addWidget(btn)
         top.addWidget(self.count)
         self.list = QListWidget()
-        name = lambda k: db[k][0] if k in db else k
-        for key in sorted(set(db) | have, key=lambda k: name(k).lower()):
-            it = QListWidgetItem(f'{name(key)}   ({key})')
+        if icon:
+            self.list.setIconSize(QSize(33, 33))
+        self.name = lambda k: db[k][0] if k in db else k
+        self.haystack = {}  # key -> lower-case name, id and description for the filter
+        for key in sorted(set(db) | have, key=lambda k: self.name(k).lower()):
+            it = QListWidgetItem(self.name(key))
             it.setData(Qt.UserRole, key)
             it.setFlags(it.flags() | Qt.ItemIsUserCheckable)
             it.setCheckState(Qt.Checked if key in have else Qt.Unchecked)
             self.list.addItem(it)
+            self.haystack[key] = f'{self.name(key)} {key} {self.text(key) or ""}'.lower()
         self.list.itemChanged.connect(self.toggled)
         self.list.currentItemChanged.connect(self.describe)
         self.desc = QTextBrowser()
-        self.desc.setMaximumHeight(170)
+        self.desc.setMinimumHeight(150)
+        self.desc.setMaximumHeight(260)
         self.unmet = {}
         lay = QVBoxLayout(self)
         lay.addLayout(top); lay.addWidget(self.list, 1); lay.addWidget(self.desc)
@@ -990,8 +997,21 @@ class ChecklistTab(QWidget):
             lab = QLabel(tr(note))
             lab.setWordWrap(True)
             lay.addWidget(lab)
+        self.update_icons()
         self.update_count()
         self.update_marks()
+
+    def update_icons(self):
+        """Icons are extracted in the background; called again when they are ready."""
+        if not self.icon:
+            return
+        self.list.blockSignals(True)
+        for i in range(self.list.count()):
+            it = self.list.item(i)
+            path = self.icon(it.data(Qt.UserRole))
+            if path:
+                it.setIcon(QIcon(path))
+        self.list.blockSignals(False)
 
     def update_marks(self):
         """Grey out entries whose requirements aren't met and explain why in the tooltip."""
@@ -1006,14 +1026,13 @@ class ChecklistTab(QWidget):
             key = it.data(Qt.UserRole)
             res = self.check(key)
             missing = [requirement_line(*r) for r in res if not r[0]]
-            name = self.db[key][0] if key in self.db else key
             if missing:
                 self.unmet[key] = missing
-                it.setText(f'⚠ {name}   ({key})')
+                it.setText(f'⚠ {self.name(key)}')
                 it.setForeground(grey)
                 it.setToolTip(tr('Requirements not met:') + '\n' + '\n'.join(missing))
             else:
-                it.setText(f'{name}   ({key})')
+                it.setText(self.name(key))
                 it.setForeground(normal)
                 it.setToolTip('\n'.join(requirement_line(*r) for r in res) if res else tr('No requirements'))
         self.list.blockSignals(False)
@@ -1031,22 +1050,49 @@ class ChecklistTab(QWidget):
         self.count.setText(tr('{n} of {total} owned', n=len(self.owned()), total=len(self.db)))
 
     def refilter(self, *_):
-        q, only, avail = self.search.text().lower(), self.only.isChecked(), self.available.isChecked()
+        words = self.search.text().lower().split()
+        only, avail = self.only.isChecked(), self.available.isChecked()
         for i in range(self.list.count()):
             it = self.list.item(i)
-            unavailable = it.data(Qt.UserRole) in self.unmet and it.checkState() != Qt.Checked
+            key = it.data(Qt.UserRole)
+            unavailable = key in self.unmet and it.checkState() != Qt.Checked
+            hay = self.haystack.get(key, key)
             it.setHidden(bool((only and it.checkState() != Qt.Checked) or (avail and unavailable)
-                              or (q and q not in it.text().lower())))
+                              or any(w not in hay for w in words)))
 
     def describe(self, it, _):
-        if it is not None:
-            key = it.data(Qt.UserRole)
-            text = self.db.get(key, (key, ''))[1] or tr('(no description)')
-            if self.check:
-                res = self.check(key)
-                lines = [requirement_line(*r) for r in res]
-                text += '\n\n' + tr('Requirements:') + ('\n' + '\n'.join(lines) if lines else ' ' + tr('none'))
-            self.desc.setPlainText(text)
+        """Card: icon, name, id, description and the requirements with ✓/✗."""
+        if it is None:
+            return
+        esc = html_escape
+        key = it.data(Qt.UserRole)
+        pal = self.desc.palette()
+        text, base = pal.text().color(), pal.base().color()
+        muted = _mix(text, base, 0.45)
+        good, bad = QColor('#2e9e44'), QColor('#d64545')
+        if base.lightness() < 128:
+            good, bad = good.lighter(135), bad.lighter(125)
+        h = ['<table cellspacing="0" cellpadding="0"><tr>']
+        path = self.icon(key) if self.icon else None
+        if path:
+            h.append(f'<td valign="middle" style="padding-right: 12px"><img src="{esc(path)}" width="48" height="48"></td>')
+        owned = it.checkState() == Qt.Checked
+        h.append(f'<td valign="middle"><span style="font-size: 14pt; font-weight: 600">{esc(self.name(key))}</span><br>'
+                 f'<span style="color: {muted}">{esc(key)}{" · " + esc(tr("owned")) if owned else ""}</span></td>'
+                 '</tr></table>')
+        body = self.text(key) or tr('(no description)')
+        h.append('<p>' + esc(body).replace('\n', '<br>') + '</p>')
+        if self.check:
+            res = self.check(key)
+            h.append(f'<p style="color: {muted}; font-size: 9pt; font-weight: 600; margin-bottom: 2px">'
+                     f'{esc(tr("Requirements").upper())}</p>')
+            if res:
+                h.append('<p style="margin-top: 0">' + '<br>'.join(
+                    f'<span style="color: {(good if met else bad).name()}">{"✓" if met else "✗"}</span> '
+                    f'{esc(requirement_line(met, kind, d)[2:])}' for met, kind, d in res) + '</p>')
+            else:
+                h.append(f'<p style="margin-top: 0">{esc(tr("none"))}</p>')
+        self.desc.setHtml(''.join(h))
 
     def toggled(self, it):
         key = it.data(Qt.UserRole)
@@ -1075,8 +1121,10 @@ def feats_tab(main):
     s = main.save
     return ChecklistTab(main, gamedata.feats(), s.feats, s.add_feat, s.remove_feat,
                         'Feats marked ⚠ don\'t meet the game\'s requirements (checked against base values, '
-                        'as the game does); they can still be added. Adding a feat only records it as learned.',
-                        check=s.feat_check)
+                        'as the game does); they can still be added. An added feat also gets its attack or ability, '
+                        'and its specializations show up on the Specializations tab.',
+                        check=s.feat_check, icon=gamedata.feat_icon,
+                        text=lambda fid: gamedata.feat_description(fid) or gamedata.feats().get(fid, ('', ''))[1])
 
 
 def blueprints_tab(main):
@@ -1144,7 +1192,7 @@ class SpecsTab(QWidget):
             f = stored.get(key)
             it = QTableWidgetItem(name(key))
             if self.db.get(key):
-                it.setToolTip(self.db[key][1])
+                it.setToolTip(self.description(key))
             t.setItem(row, 0, it)
             mx = self.spec_max(key)
             sb = wheel_guarded(QSpinBox())
@@ -1206,8 +1254,11 @@ class SpecsTab(QWidget):
         elif f is not None:
             s.set(f, v)
         self.main.on_change()
-        self.mark(self.keys.index(key))
+        row = self.keys.index(key)
+        self.mark(row)
+        self.table.item(row, 0).setToolTip(self.description(key))
         self.update_total()
+        self.describe()
 
     def showEvent(self, e):
         # feats may have been added or removed on the feats tab
@@ -1220,10 +1271,28 @@ class SpecsTab(QWidget):
         self.total.setText(tr('{n} specializations, {points} points total, {full} full', n=len(self.keys),
                               points=sum(f.value for f in self.fields.values()), full=full))
 
+    def description(self, key):
+        """The game's text with its values filled in; for "X for each specialization point" also the total for
+        the character's points."""
+        text = gamedata.spec_description(key) or self.db.get(key, ('', ''))[1]
+        points = self.fields[key].value if key in self.fields else 0
+        args = gamedata.feat_description_args().get('specs', {}).get(key) or []
+        raw = self.db.get(key, ('', ''))[1]
+        if points and len(args) == 1 and (args[0] or {}).get('text') and raw.count('{0}') == 1 \
+                and 'for each specialization point' in raw:
+            m = re.match(r'(-?\d+(?:\.\d+)?)(.*)$', args[0]['text'])
+            if m:
+                after = raw[raw.index('{0}') + 3:]
+                unit = '%' if after.startswith('%') else ''
+                total = float(m.group(1)) * points
+                text += '\n' + tr('With your {n} point(s): {total}', n=points,
+                                  total=f'{total:g}{m.group(2)}{unit}')
+        return text
+
     def describe(self, *_):
         rows = self.table.selectionModel().selectedRows()
         key = self.keys[rows[0].row()] if rows else None
-        self.desc.setText(self.db.get(key, ('', ''))[1] if key else '')
+        self.desc.setText(self.description(key) if key else '')
 
 
 class SortItem(QTableWidgetItem):
@@ -3574,9 +3643,10 @@ class Main(QMainWindow):
         return True
 
     def fetch_icons(self):
-        """Extract missing item icons in the background (first run takes a few seconds)."""
+        """Extract missing item and feat icons in the background (first run takes a few seconds)."""
         vms = {i.get('vm') for i in gamedata.items().values()}
         vms |= {it.visual for it in self.save.inventory() + self.save.equipped()}
+        vms |= set(gamedata.feat_icons().values())
         missing = {v for v in vms if v and not gamedata.icon_path(v)} - getattr(self, 'icons_tried', set())
         if not missing:
             return
@@ -3586,10 +3656,12 @@ class Main(QMainWindow):
     def icons_done(self, kind, _):
         if kind != 'icons':
             return
-        inv = next((self.tabs.widget(i) for i in range(self.tabs.count())
-                    if isinstance(self.tabs.widget(i), InventoryTab)), None)
-        if inv is not None:
-            inv.build()
+        for i in range(self.tabs.count()):
+            tab = self.tabs.widget(i)
+            if isinstance(tab, InventoryTab):
+                tab.build()
+            elif isinstance(tab, ChecklistTab):
+                tab.update_icons()
 
     def update_title(self):
         s = self.save

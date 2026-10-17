@@ -63,6 +63,15 @@ features and file formats; this file is the working state.
   dc_flo_mindreader.udlg. The cutscene reads none of the edited variables; the hang is presumably the walk
   never finishing (cause unknown). Workaround: *Skip the mindreading*
   (`factions.skip_mindreading`, sets score + `MINDREADING_DONE` flags) – awaiting in-game test.
+- Save list slides (QVariantAnimation on the splitter, `Main.show_sidebar`); auto-close setting also in *View*.
+- Help → About (`version.py`: VERSION 1.0.0, TARGET_GAME_VERSION 1.3.1.2; commit from commit.txt written by
+  install.sh/AppImage/PyInstaller spec, else git); shows the open save's game version (info.dat `SGI:V`).
+- Feats tab: game icons (`gamedata.feat_icons()`, iconset 'Feat.<Class>' matched by display name, 238/239;
+  Capacitor has none), card with filled description + ✓/✗ requirements, filter over names/ids/descriptions.
+- Feat/spec descriptions: `tools/extract_feat_descriptions.py` -> `data/feat_descriptions.json` (all resolve,
+  no character-dependent values); `gamedata.feat_description/spec_description`.
+- Specs tab rewritten: lists every spec of owned feats (save stores only specs with points; game observed:
+  no 0-point entries), columns name/points/feat/max, full ones green ✓, per-point total in the description.
 
 ## Changes 2026-10-12
 1. Crash when the game saved while the editor had saves open (mostly the AppImage): Python's cyclic GC
@@ -95,8 +104,9 @@ features and file formats; this file is the working state.
 `nrbf.py` (.NET binary serialization reader/writer), `xnb.py` (textures), `paths.py` (folder detection,
 game_running), `gamedata.py` (game data, item DB, icons, extracted JSON loaders), `underrail_save.py`
 (Save model and edits), `underrail_gui.py` (GUI), `i18n.py`, `hints.py` (map index, locations),
-`worldmap.py` (global map rendering), `builds.py`, `itemstats.py`, `tools/extract_*.py` (exe ->
-`data/*.json`: feat requirements + ammo icons, crafted weapon icons, feat abilities), `packaging/*`.
+`worldmap.py` (global map rendering), `builds.py`, `itemstats.py`, `factions.py`, `version.py`,
+`tools/extract_*.py` (exe -> `data/*.json`: feat requirements + ammo icons, crafted weapon icons, feat
+abilities, feat/spec description values), `packaging/*`.
 
 ## Foundations (verified earlier)
 - `nrbf.py`: byte-identical round trip for all save files and all 1463 `.item` files; writer drops
