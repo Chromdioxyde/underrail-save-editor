@@ -14,8 +14,8 @@ installation, so what you see looks and reads like the game itself.
 
 ## Highlights
 
-- 🧬 **Rebuild your character** – attributes, skills, level, XP, unspent points, name and portrait
-  (including your own pictures).
+- 🧬 **Rebuild your character** – attributes, skills, level, XP, unspent points, name and portrait: pick
+  any of the game's ~370 portraits, a custom portrait pack, or import your own picture.
 - 🎯 **All 239 feats with the game's icons and descriptions** – add or remove any of them; the editor shows
   what each one requires and flags the ones your character wouldn't qualify for.
 - 🎒 **A real inventory manager** – add any of the ~1460 items in the game, change stack sizes, component
@@ -69,6 +69,32 @@ Or start it straight from the checkout with `./underrail_gui.py`.
 All your saves at a glance, with screenshot, location, play time and money. Pick one and edit the basics.
 
 ![Save list and character](docs/screenshots/save-list-character.png)
+
+### Portraits – including your own
+
+Choose from every portrait in the game and from any custom portraits you have installed.
+**Import PNG…** turns your own picture (PNG, JPG, WebP or BMP)
+into a custom portrait in one step: it crops it to a square and writes the three sizes the game expects
+into its `CustomPortraits` folder. Restart Underrail afterwards; custom portraits are loaded at startup.
+
+![Portraits](docs/screenshots/portraits.png)
+
+What makes a good portrait, following the
+[official wiki](https://stygiansoftware.com/wiki/index.php?title=Character_creation#Custom_portraits):
+
+- **Square, at least 200×200 pixels.** The game shows custom portraits at 200×200 (`_h`), 100×100 (`_l`)
+  and 50×50 (`_s`); the editor creates all three from one picture. Non-square pictures are cropped in the
+  middle, so keep the face centred.
+- **Head and shoulders**, like the game's own portraits – at 50×50 pixels a full-body picture is
+  unrecognisable.
+- **Transparency works:** a PNG with a transparent background gets the game's dynamic portrait background;
+  a picture without transparency is shown as it is.
+- Custom portraits are available to male and female characters alike.
+- Portrait packs made by players (sets of `<name>_h.png`, `<name>_l.png`, `<name>_s.png`) go into the same
+  folder: `Documents\My Games\Underrail\CustomPortraits` on Windows, or the Proton prefix on Linux and Steam
+  Deck (`…/steamapps/compatdata/250520/pfx/drive_c/users/steamuser/Documents/My Games/Underrail/CustomPortraits`).
+- Playing on more than one computer (e.g. PC and Steam Deck)? Copy your custom portraits to each of them, so
+  saves that use them load everywhere.
 
 ### Feats and specializations
 
