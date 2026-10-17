@@ -21,7 +21,10 @@ mkdir -p "$BUILD"
 PY_TGZ="$BUILD/python-$PY_VERSION.tar.gz"
 if [ ! -f "$PY_TGZ" ]; then
     echo "Fetching python-build-standalone $PY_VERSION..."
-    url=$(curl -fsSL https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest |
+    # authenticated in GitHub Actions: anonymous API calls from shared runners hit the rate limit
+    auth=()
+    [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
+    url=$(curl -fsSL "${auth[@]}" https://api.github.com/repos/astral-sh/python-build-standalone/releases/latest |
           grep -o "https://[^\"]*cpython-$PY_VERSION\.[0-9]*%2B[0-9]*-x86_64-unknown-linux-gnu-install_only_stripped\.tar\.gz" |
           head -1 || true)
     [ -n "$url" ] || { echo "No python-build-standalone download found for $PY_VERSION"; exit 1; }

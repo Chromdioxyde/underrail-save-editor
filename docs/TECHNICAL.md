@@ -171,5 +171,15 @@ python packaging/make_icon.py build
 pyinstaller --noconfirm --distpath build/dist --workpath build/work packaging/underrail-save-editor.spec
 ```
 
-`.github/workflows/build.yml` builds both on every push and attaches them to a GitHub release for
-`v*` tags.
+## Releases (GitHub Actions)
+
+`.github/workflows/build.yml` builds the AppImage (Ubuntu runner) and the Windows zip (Windows runner,
+PyInstaller) on every push to `main`, every pull request and on demand (*Actions → build → Run workflow*);
+the files are attached to the run as artifacts for 14 days. To publish a release:
+
+1. Set `VERSION` in `version.py` (e.g. `1.1.0`) and commit.
+2. Tag and push: `git tag v1.1.0 && git push origin v1.1.0`.
+
+The tag build then creates a GitHub release named after the tag with both files and generated release
+notes; it fails if the tag doesn't match `VERSION`. The file names carry `git describe --tags`, i.e. the
+tag for release builds and `<tag>-<n>-g<commit>` (or just the commit) otherwise.

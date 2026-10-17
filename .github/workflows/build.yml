@@ -1,11 +1,21 @@
 name: build
 
+# Every push and pull request builds the AppImage and the Windows zip (downloadable from the run's
+# artifacts). Pushing a tag vX.Y.Z (matching VERSION in version.py) also publishes both as a GitHub release.
+
 on:
   push:
     branches: [main]
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+permissions:
+  contents: read
 
 jobs:
   appimage:
@@ -15,11 +25,15 @@ jobs:
         with:
           fetch-depth: 0  # git describe for the version in the file name
       - name: Build AppImage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./packaging/build-appimage.sh
       - uses: actions/upload-artifact@v4
         with:
           name: appimage
           path: build/*.AppImage
+          if-no-files-found: error
+          retention-days: 14
 
   windows:
     runs-on: windows-latest
@@ -45,6 +59,8 @@ jobs:
         with:
           name: windows
           path: build/*.zip
+          if-no-files-found: error
+          retention-days: 14
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -53,6 +69,14 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+      - name: Check that the tag matches version.py
+        run: |
+          version=$(python3 -c 'import version; print(version.VERSION)')
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::tag $GITHUB_REF_NAME doesn't match VERSION = '$version' in version.py"
+            exit 1
+          fi
       - uses: actions/download-artifact@v4
         with:
           path: dist
