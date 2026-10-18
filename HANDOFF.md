@@ -31,6 +31,12 @@ the features for users, docs/TECHNICAL.md the file formats and game data; this f
 - exe analysis needs a venv with `dnfile` + `dncil` (not in the repo; recreate in the scratchpad:
   `python3 -m venv venv && venv/bin/pip install dnfile dncil`). System python3 has PySide6 for the app.
 
+## Latest changes (2026-10-17)
+- New *Puzzles* tab (`puzzles.py`, `PuzzlesTab`): note cipher, Mutagen Puzzle (IDA* solver), emergency
+  phones, L/S console; clues filled in from the save, or pasted from the game. Details in docs/TECHNICAL.md.
+  `Save.var` now also returns string variables. Verified against the wiki examples and three playthroughs'
+  saves; not yet tried in-game.
+
 ## Latest changes (2026-10-15) – awaiting in-game confirmation
 - New *Factions* tab (`factions.py`, `FactionsTab`): Faceless attitude score at Talos Outpost (game formula
   from IL method `dyk::ym`, job `DCFAC` started by `dc_flo_mindreader.udlg`), editable inputs (game variables
@@ -107,7 +113,7 @@ the features for users, docs/TECHNICAL.md the file formats and game data; this f
 `nrbf.py` (.NET binary serialization reader/writer), `xnb.py` (textures), `paths.py` (folder detection,
 game_running), `gamedata.py` (game data, item DB, icons, extracted JSON loaders), `underrail_save.py`
 (Save model and edits), `underrail_gui.py` (GUI), `i18n.py`, `hints.py` (map index, locations),
-`worldmap.py` (global map rendering), `builds.py`, `itemstats.py`, `factions.py`, `version.py`,
+`worldmap.py` (global map rendering), `builds.py`, `itemstats.py`, `factions.py`, `puzzles.py`, `version.py`,
 `tools/extract_*.py` (exe -> `data/*.json`: feat requirements + ammo icons, crafted weapon/armor/shield
 emitter icons (`extract_crafted_icons.py`), feat abilities, feat/spec description values), `packaging/*`.
 

@@ -685,6 +685,98 @@ DE = {
         'Friedlich wird eine Fraktion, wenn beide Richtungen (und die eigene Vorgabe) mindestens Neutral sind. '
         'Leute, mit denen du an einem Ort schon gekämpft hast, können ihren eigenen Groll behalten, der bei '
         'diesem Ort gespeichert ist. Fraktionen ohne gespeicherte Beziehung sind neutral.',
+    # puzzles
+    'Puzzles': 'Rätsel',
+    'Note cipher': 'Noten-Chiffre',
+    'Mutagen': 'Mutagen',
+    'Emergency phones': 'Notruftelefone',
+    'L/S console': 'L/S-Konsole',
+    'Solution in the wiki': 'Lösungsweg im Wiki',
+    'Solve': 'Lösen',
+    'Fill in from this save': 'Aus diesem Spielstand einsetzen',
+    "This save doesn't contain this puzzle yet; enter the clues from the game.":
+        'Dieser Spielstand enthält das Rätsel noch nicht; gib die Hinweise aus dem Spiel ein.',
+    "Mickey's text": 'Mickeys Text',
+    'Interval key': 'Intervallschlüssel',
+    'Octave keys': 'Oktavschlüssel',
+    "Nexus of Technology (Expedition): the tech vault opens with a code hidden in a musical cipher. Mickey "
+    "Johnson's computer (administration and IT floor) has the text, Allan McLane's computer (security "
+    "technology floor) the octave keys and the interval key; Ctrl+C in the game copies a dialog as text. "
+    "Paste them here, one line of notes per row and the octave keys in the same order.":
+        'Nexus of Technology (Expedition): Der Tech-Tresor öffnet sich mit einem Code, der in einer Noten-Chiffre '
+        'steckt. Mickey Johnsons Computer (Verwaltungs- und IT-Etage) hat den Text, Allan McLanes Computer '
+        '(Etage Sicherheitstechnik) die Oktavschlüssel und den Intervallschlüssel; Strg+C kopiert im Spiel einen '
+        'Dialog als Text. Füge sie hier ein, eine Notenzeile pro Zeile und die Oktavschlüssel in derselben '
+        'Reihenfolge.',
+    'Enter the interval key with its three intervals.': 'Gib den Intervallschlüssel mit seinen drei Intervallen ein.',
+    'Paste the lines of notes and their octave keys.': 'Füge die Notenzeilen und ihre Oktavschlüssel ein.',
+    '{lines} lines of notes but {keys} octave keys; they are paired in order.':
+        '{lines} Notenzeilen, aber {keys} Oktavschlüssel; sie werden der Reihe nach zugeordnet.',
+    'Vault code: {code}': 'Tresorcode: {code}',
+    'Enter it at the keypad of the tech vault in the Nexus of Technology.':
+        'Gib ihn am Tastenfeld des Tech-Tresors im Nexus of Technology ein.',
+    'Notes': 'Noten',
+    'Plain text': 'Klartext',
+    'Key table (octave × note):': 'Schlüsseltabelle (Oktave × Note):',
+    '* = character corrupted in the game text': '* = im Spieltext verfälschtes Zeichen',
+    'Exitus-1 sequence': 'Exitus-1-Sequenz',
+    'Reagents': 'Reagenzien',
+    "Deep Caverns: recreate the Exitus-1 sequence with the Mutagen Combinator in Mutagen Tanks B to destroy "
+    "four of Tchort's tentacles. Scan Exitus-1 and the other reagents with the Mutagen Scanner in a Hollow "
+    "Earth laboratory and paste the scanner output (Ctrl+C in the game copies it). A reagent adds its "
+    "atoms that aren't in the compound yet at the end and removes its negative atoms; the solver finds the "
+    "shortest order.":
+        'Deep Caverns: Bilde die Exitus-1-Sequenz mit dem Mutagen Combinator in Mutagen Tanks B nach, um vier '
+        'von Tchorts Tentakeln zu zerstören. Scanne Exitus-1 und die anderen Reagenzien mit dem Mutagen Scanner '
+        'in einem Labor in Hollow Earth und füge die Scanner-Ausgabe ein (Strg+C kopiert sie im Spiel). Ein '
+        'Reagenz hängt seine Atome, die noch nicht in der Verbindung sind, hinten an und entfernt seine negativen '
+        'Atome; der Löser findet die kürzeste Reihenfolge.',
+    'Enter the Exitus-1 sequence and the scanned reagents.':
+        'Gib die Exitus-1-Sequenz und die gescannten Reagenzien ein.',
+    "No order of these reagents gives the Exitus-1 sequence. Check the sequences; one reagent you haven't "
+    "scanned may be missing.":
+        'Keine Reihenfolge dieser Reagenzien ergibt die Exitus-1-Sequenz. Prüfe die Sequenzen; vielleicht fehlt '
+        'ein Reagenz, das du noch nicht gescannt hast.',
+    'Add the reagents in this order at the Mutagen Combinator, then combine them into a compound and inject it '
+    'into the tanks:':
+        'Gib die Reagenzien in dieser Reihenfolge in den Mutagen Combinator, verbinde sie dann zu einer '
+        'Verbindung und injiziere sie in die Tanks:',
+    'Reagent': 'Reagenz',
+    'Compound afterwards': 'Verbindung danach',
+    'In your inventory': 'Im Inventar',
+    'Red Cross': 'Rotes Kreuz',
+    'Red Rathound': 'Roter Rathound',
+    'Green Shield': 'Grüner Schild',
+    'Yellow Wrench': 'Gelber Schraubenschlüssel',
+    'Red Exclamation Mark': 'Rotes Ausrufezeichen',
+    'Blue Exclamation Mark': 'Blaues Ausrufezeichen',
+    'Sequence (numbers)': 'Sequenz (Zahlen)',
+    "Upper Underrail: Phreak's hideouts open when you repeat three sound sequences on an emergency phone "
+    "with the Orange Box. Each button plays a sound the game numbers at random once per playthrough; all "
+    "phones share it. With 12 Perception the dialog spells out a sequence as these numbers. Set which "
+    "number each button plays and enter the numbers to get the buttons to press.":
+        'Upper Underrail: Phreaks Verstecke öffnen sich, wenn du an einem Notruftelefon mit der Orange Box drei '
+        'Tonfolgen nachspielst. Jede Taste spielt einen Ton, den das Spiel einmal pro Durchgang zufällig '
+        'nummeriert; alle Telefone teilen sich das. Mit 12 Wahrnehmung nennt der Dialog eine Folge als diese '
+        'Zahlen. Stelle ein, welche Zahl jede Taste spielt, und gib die Zahlen ein, um die zu drückenden Tasten '
+        'zu erhalten.',
+    'Every button plays a different number; two buttons have the same one.':
+        'Jede Taste spielt eine andere Zahl; zwei Tasten haben dieselbe.',
+    'Sound {n}': 'Ton {n}',
+    'Press:': 'Drücken:',
+    'Hideout {n}: the phone asks for {seq}': 'Versteck {n}: Das Telefon verlangt {seq}',
+    'Core City Office Building: the console in the north-west storage room opens the north-east room after '
+    'the right series of 15 L and S. The maintenance robot in the basement beeps them, short and long, five '
+    'each in the west, east and south; the three blocks are always the same, only their order is random.':
+        'Core City Office Building: Die Konsole im nordwestlichen Lagerraum öffnet den nordöstlichen Raum nach '
+        'der richtigen Folge aus 15 L und S. Der Wartungsroboter im Keller piept sie vor, kurz und lang, je fünf '
+        'im Westen, Osten und Süden; die drei Blöcke sind immer gleich, nur ihre Reihenfolge ist zufällig.',
+    'Sequence: {seq}': 'Folge: {seq}',
+    'Press L or S in this order, then submit.': 'Drücke L oder S in dieser Reihenfolge und bestätige dann.',
+    "The game picks the order the first time you use the console; this save has none yet. It is one of these "
+    "three – the robot's first five beeps (west) tell which:":
+        'Das Spiel legt die Reihenfolge fest, wenn du die Konsole zum ersten Mal benutzt; dieser Spielstand hat '
+        'noch keine. Es ist eine dieser drei – die ersten fünf Pieptöne des Roboters (Westen) verraten, welche:',
 }
 
 # labels with a number in them, e.g. 'Quick slot 3'

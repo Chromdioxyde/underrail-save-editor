@@ -431,9 +431,10 @@ class Save:
         return self._vars
 
     def var(self, name, default=None):
+        """Value of a game variable (bool, int, string, …), `default` if unset."""
         o = self._var_objs().get(name)
-        v = o.get('P:V') if o is not None else None
-        return v.value if isinstance(v, nrbf.Prim) else default
+        v = self.val(o.get('P:V')) if o is not None else None
+        return default if v is None else v
 
     def set_var(self, name, value):
         """Sets a bool or int game variable; keeps the type of an existing one, creates missing ones

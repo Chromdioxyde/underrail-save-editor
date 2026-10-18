@@ -27,6 +27,10 @@ installation, so what you see looks and reads like the game itself.
 - 🧭 **Build advisor and item finder** – the best weapons for your build and skill, the best armor
   combinations your Strength can carry, and every merchant, container and creature that has what you need,
   marked on the game's own world map.
+- 🧩 **Puzzle solvers** – the puzzles the game generates anew for every playthrough: the Expedition's
+  musical note cipher, the Mutagen Puzzle in the Deep Caverns, Phreak's emergency phones and the L/S console
+  in the Core City Office Building. Solved the way the wiki describes, from the clues you see in the game –
+  or straight from your save.
 - 🛡 **Safe by default** – an automatic backup before every change, and saves stay byte-for-byte identical
   except for what you edited. The game can keep running while you edit. Saves where a location fails to
   load ("Failed to load locale") can be repaired.
@@ -149,6 +153,17 @@ and highlights them on the map.
 ![World map](docs/screenshots/world-map.png)
 
 ![Where to find an item](docs/screenshots/item-locations.png)
+
+### Puzzle solvers
+
+Some puzzles are generated anew for every playthrough, so no walkthrough can give you the answer. Paste the
+clues from the game (Ctrl+C in the game copies a dialog) and the editor solves them the way the wiki
+describes: it deciphers the note cipher and finds the vault code, works out the shortest order of
+reagents for the Mutagen Combinator, translates the emergency phones' sound numbers into buttons and tells
+you the L/S sequence for the office console. Where your save already holds the generated puzzle, the
+clues are filled in for you.
+
+![Puzzle solvers: Mutagen Puzzle](docs/screenshots/puzzles-mutagen.png)
 
 <details>
 <summary>More screenshots</summary>

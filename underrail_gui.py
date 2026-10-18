@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComb
                                QDialogButtonBox, QDoubleSpinBox, QFileDialog, QFormLayout, QGraphicsRectItem,
                                QGraphicsScene, QGraphicsSimpleTextItem, QGraphicsView, QGroupBox,
                                QHBoxLayout, QHeaderView, QInputDialog, QLabel, QLineEdit, QListWidget,
-                               QListWidgetItem, QMainWindow, QMessageBox, QPushButton,
+                               QListWidgetItem, QMainWindow, QMessageBox, QPlainTextEdit, QPushButton,
                                QSpinBox, QSplitter, QSplitterHandle, QTableWidget, QTableWidgetItem, QTabWidget,
                                QTextBrowser, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
@@ -23,6 +23,7 @@ import factions
 import gamedata
 import i18n
 import paths
+import puzzles
 import underrail_save as us
 from i18n import tr
 
@@ -3196,6 +3197,295 @@ class FactionsTab(QWidget):
             cb.blockSignals(False)
 
 
+def puzzle_intro(text, wiki_page):
+    link = f'<a href="{puzzles.WIKI}{wiki_page}">{html_escape(tr("Solution in the wiki"))}</a>'
+    lbl = QLabel(f'{html_escape(text)} {link}')
+    lbl.setWordWrap(True)
+    lbl.setTextFormat(Qt.RichText)
+    lbl.setOpenExternalLinks(True)
+    return lbl
+
+
+class PuzzlesTab(QWidget):
+    """Solvers for the puzzles the game generates anew for every playthrough (see puzzles.py), following the
+    wiki's solution methods. The clues are filled in from the save where it already holds them."""
+
+    def __init__(self, main):
+        super().__init__()
+        self.main = main
+        self.sub = QTabWidget()
+        self.sub.addTab(self.cipher_page(), tr('Note cipher'))
+        self.sub.addTab(self.mutagen_page(), tr('Mutagen'))
+        self.sub.addTab(self.phones_page(), tr('Emergency phones'))
+        self.sub.addTab(self.console_page(), tr('L/S console'))
+        QVBoxLayout(self).addWidget(self.sub)
+
+    @property
+    def save(self):
+        return self.main.save
+
+    @staticmethod
+    def page(intro, form, solve, fill, result):
+        w = QWidget()
+        lay = QVBoxLayout(w)
+        lay.addWidget(intro)
+        lay.addLayout(form)
+        row = QHBoxLayout()
+        btn = QPushButton(tr('Solve'))
+        btn.clicked.connect(solve)
+        row.addWidget(btn)
+        if fill is not None:
+            fb = QPushButton(tr('Fill in from this save'))
+            fb.clicked.connect(fill)
+            row.addWidget(fb)
+        row.addStretch()
+        lay.addLayout(row)
+        lay.addWidget(result, 1)
+        return w
+
+    @staticmethod
+    def result_view():
+        v = QTextBrowser()
+        v.setOpenExternalLinks(True)
+        return v
+
+    @staticmethod
+    def no_data(view):
+        view.setHtml(html_escape(tr("This save doesn't contain this puzzle yet; enter the clues from the game.")))
+
+    # --- Note cipher ------------------------------------------------------------------------
+    def cipher_page(self):
+        self.c_text = QPlainTextEdit()
+        self.c_text.setPlaceholderText('A#D#AC#BF BCDB FC#D#\nAD#A#BA#D# A#A#A#D BC#D#A#C# BGAGC#D#')
+        self.c_intervals = QLineEdit()
+        self.c_intervals.setPlaceholderText('Interval key: major seventh, perfect fourth, minor sixth.')
+        self.c_keys = QPlainTextEdit()
+        self.c_keys.setPlaceholderText('Key 1: 3607478377243744\nKey ?: 360747744771838474377444')
+        for e in (self.c_text, self.c_keys):
+            e.setMaximumHeight(110)
+        form = QFormLayout()
+        form.addRow(tr("Mickey's text"), self.c_text)
+        form.addRow(tr('Interval key'), self.c_intervals)
+        form.addRow(tr('Octave keys'), self.c_keys)
+        self.c_result = self.result_view()
+        intro = puzzle_intro(tr(
+            'Nexus of Technology (Expedition): the tech vault opens with a code hidden in a musical cipher. Mickey '
+            'Johnson\'s computer (administration and IT floor) has the text, Allan McLane\'s computer (security '
+            'technology floor) the octave keys and the interval key; Ctrl+C in the game copies a dialog as text. '
+            'Paste them here, one line of notes per row and the octave keys in the same order.'), 'Note_Cipher_Puzzle')
+        w = self.page(intro, form, self.solve_cipher, self.fill_cipher, self.c_result)
+        if self.save is not None and puzzles.cipher_from_save(self.save):
+            self.fill_cipher()
+        else:
+            self.no_data(self.c_result)
+        return w
+
+    def fill_cipher(self):
+        c = puzzles.cipher_from_save(self.save) if self.save is not None else None
+        if not c:
+            self.no_data(self.c_result)
+            return
+        lines, keys = list(c['lines']), list(c['keys'])
+        # the code gets its own line only on the easiest difficulty; otherwise its digits are inside the lines
+        if self.save.difficulty == 0 and c['keypad']:
+            lines.insert(0, c['keypad'])
+            keys.insert(0, c['keypad_key'])
+        self.c_text.setPlainText('\n'.join(lines))
+        self.c_intervals.setText(c['intervals'])
+        self.c_keys.setPlainText('\n'.join(f'Key {i + 1}: {k}' for i, k in enumerate(keys)))
+        self.solve_cipher()
+
+    def solve_cipher(self):
+        intervals = puzzles.parse_intervals(self.c_intervals.text())
+        lines = puzzles.parse_cipher_lines(self.c_text.toPlainText())
+        keys = puzzles.parse_octave_keys(self.c_keys.toPlainText())
+        if len(intervals) != 3:
+            self.c_result.setHtml(html_escape(tr('Enter the interval key with its three intervals.')))
+            return
+        if not lines or not keys:
+            self.c_result.setHtml(html_escape(tr('Paste the lines of notes and their octave keys.')))
+            return
+        out = []
+        if len(lines) != len(keys):
+            out.append(f'<p>{html_escape(tr("{lines} lines of notes but {keys} octave keys; they are paired in order.", lines=len(lines), keys=len(keys)))}</p>')
+        rows, code = [], []
+        for line, key in zip(lines, keys):
+            try:
+                plain = puzzles.decipher(line, key, intervals)
+            except ValueError:
+                plain = '¿'
+            code += puzzles.code_parts(plain)
+            rows.append(f'<tr><td><code>{html_escape(line)}</code></td><td><b>{html_escape(plain)}</b></td></tr>')
+        if code:
+            out.append(f'<h3>{html_escape(tr("Vault code: {code}", code="".join(code)))}</h3>'
+                       f'<p>{html_escape(tr("Enter it at the keypad of the tech vault in the Nexus of Technology."))}</p>')
+        out.append(f'<table cellpadding="3"><tr><th align="left">{html_escape(tr("Notes"))}</th>'
+                   f'<th align="left">{html_escape(tr("Plain text"))}</th></tr>{"".join(rows)}</table>')
+        # the key table as the wiki builds it: octave rows, note columns
+        table = puzzles.cipher_table([int(c) for c in keys[0][:3]], intervals) if keys[0][:3].isdigit() else {}
+        octaves = sorted({k // 12 for k in table})
+        names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        head = ''.join(f'<th>{n}</th>' for n in names)
+        body = ''.join(f'<tr><th>{o}</th>' + ''.join(f'<td align="center">{table.get(o * 12 + i, "")}</td>'
+                                                     for i in range(12)) + '</tr>' for o in octaves)
+        out.append(f'<p>{html_escape(tr("Key table (octave × note):"))}</p>'
+                   f'<table border="1" cellspacing="0" cellpadding="3"><tr><th></th>{head}</tr>{body}</table>'
+                   f'<p><i>{html_escape(tr("* = character corrupted in the game text"))}</i></p>')
+        self.c_result.setHtml(''.join(out))
+
+    # --- Mutagen ----------------------------------------------------------------------------
+    def mutagen_page(self):
+        self.m_target = QLineEdit()
+        self.m_target.setPlaceholderText('GG WQ GP L7 H2 S2 AZ AX CS CN AP W1')
+        self.m_reagents = QPlainTextEdit()
+        self.m_reagents.setPlaceholderText('Reagent name: Io-1\nSequence: GP S2 GG AP W1 -DW -PQ\n'
+                                           'Reagent name: Io-2\nSequence: L7 H2 WQ AX -CS -W1')
+        self.m_reagents.setMaximumHeight(160)
+        form = QFormLayout()
+        form.addRow(tr('Exitus-1 sequence'), self.m_target)
+        form.addRow(tr('Reagents'), self.m_reagents)
+        self.m_result = self.result_view()
+        intro = puzzle_intro(tr(
+            'Deep Caverns: recreate the Exitus-1 sequence with the Mutagen Combinator in Mutagen Tanks B to destroy '
+            'four of Tchort\'s tentacles. Scan Exitus-1 and the other reagents with the Mutagen Scanner in a Hollow '
+            'Earth laboratory and paste the scanner output (Ctrl+C in the game copies it). A reagent adds its '
+            'atoms that aren\'t in the compound yet at the end and removes its negative atoms; the solver finds the '
+            'shortest order.'), 'Mutagen_Puzzle')
+        w = self.page(intro, form, self.solve_mutagen, self.fill_mutagen, self.m_result)
+        if self.save is not None and puzzles.mutagen_from_save(self.save):
+            self.fill_mutagen()
+        else:
+            self.no_data(self.m_result)
+        return w
+
+    def fill_mutagen(self):
+        m = puzzles.mutagen_from_save(self.save) if self.save is not None else None
+        if not m:
+            self.no_data(self.m_result)
+            return
+        target, reagents = m
+        self.m_target.setText(' '.join(target))
+        self.m_reagents.setPlainText('\n'.join(f'{n}: {" ".join(a)}' for n, a in reagents))
+        self.solve_mutagen()
+
+    def solve_mutagen(self):
+        target = puzzles.parse_atoms(self.m_target.text())
+        reagents = puzzles.parse_reagents(self.m_reagents.toPlainText())
+        if not target or not reagents:
+            self.m_result.setHtml(html_escape(tr('Enter the Exitus-1 sequence and the scanned reagents.')))
+            return
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            steps = puzzles.solve_mutagen(target, reagents)
+        finally:
+            QApplication.restoreOverrideCursor()
+        if steps is None:
+            self.m_result.setHtml(html_escape(tr("No order of these reagents gives the Exitus-1 sequence. Check the "
+                                                 "sequences; one reagent you haven't scanned may be missing.")))
+            return
+        owned = set()
+        if self.save is not None:
+            for it in self.save.inventory():
+                if it.info and it.info['path'].lower().startswith('plot\\mutagenreagents\\'):
+                    owned.add(it.info['name'].replace('Mutagen Reagent ', '').lower())
+        rows = ''.join(
+            f'<tr><td>{i}</td><td><b>{html_escape(name)}</b></td><td><code>{html_escape(" ".join(state))}</code></td>'
+            f'<td align="center">{"✓" if name.lower() in owned else ""}</td></tr>'
+            for i, (name, state) in enumerate(steps, 1))
+        self.m_result.setHtml(
+            f'<p>{html_escape(tr("Add the reagents in this order at the Mutagen Combinator, then combine them into a compound and inject it into the tanks:"))}</p>'
+            f'<table cellpadding="3"><tr><th>#</th><th align="left">{html_escape(tr("Reagent"))}</th>'
+            f'<th align="left">{html_escape(tr("Compound afterwards"))}</th>'
+            f'<th>{html_escape(tr("In your inventory"))}</th></tr>{rows}</table>')
+
+    # --- Emergency phones -------------------------------------------------------------------
+    def phones_page(self):
+        self.p_spins = {}
+        grid = QFormLayout()
+        for key, label in puzzles.PHONE_BUTTONS:
+            sb = wheel_guarded(QSpinBox())
+            sb.setRange(1, 6)
+            sb.setMaximumWidth(80)
+            sb.valueChanged.connect(self.solve_phones)
+            self.p_spins[key] = sb
+            grid.addRow(tr(label), sb)
+        self.p_seq = QLineEdit()
+        self.p_seq.setPlaceholderText('3 1 4 1 5')
+        self.p_seq.textChanged.connect(self.solve_phones)
+        grid.addRow(tr('Sequence (numbers)'), self.p_seq)
+        self.p_result = self.result_view()
+        intro = puzzle_intro(tr(
+            'Upper Underrail: Phreak\'s hideouts open when you repeat three sound sequences on an emergency phone '
+            'with the Orange Box. Each button plays a sound the game numbers at random once per playthrough; all '
+            'phones share it. With 12 Perception the dialog spells out a sequence as these numbers. Set which '
+            'number each button plays and enter the numbers to get the buttons to press.'), 'Emergency_Phones')
+        w = self.page(intro, grid, self.solve_phones, self.fill_phones, self.p_result)
+        if self.save is not None and puzzles.phone_numbers_from_save(self.save):
+            self.fill_phones()
+        else:
+            self.no_data(self.p_result)
+        return w
+
+    def fill_phones(self):
+        nums = puzzles.phone_numbers_from_save(self.save) if self.save is not None else None
+        if not nums:
+            self.no_data(self.p_result)
+            return
+        for key, sb in self.p_spins.items():
+            sb.blockSignals(True)
+            sb.setValue(nums[key])
+            sb.blockSignals(False)
+        seqs = puzzles.phone_sequences_from_save(self.save)
+        if seqs:
+            self.p_seq.setText(seqs[0][1])
+        self.solve_phones()
+
+    def solve_phones(self, *_):
+        nums = {k: sb.value() for k, sb in self.p_spins.items()}
+        names = dict(puzzles.PHONE_BUTTONS)
+        out = []
+        if len(set(nums.values())) != len(nums):
+            out.append(f'<p>{html_escape(tr("Every button plays a different number; two buttons have the same one."))}</p>')
+        by_number = sorted((n, k) for k, n in nums.items())
+        out.append('<table cellpadding="3">' + ''.join(
+            f'<tr><td>{html_escape(tr("Sound {n}", n=n))}</td><td><b>{html_escape(tr(names[k]))}</b></td></tr>'
+            for n, k in by_number) + '</table>')
+        if self.p_seq.text().strip():
+            buttons = puzzles.phone_buttons(self.p_seq.text(), nums)
+            press = [html_escape(tr(names[b])) if b else '?' for b in buttons]
+            out.insert(0, f'<h3>{html_escape(tr("Press:"))}</h3><p>' + ' → '.join(press) + '</p>')
+        if self.save is not None:
+            for n, seq in puzzles.phone_sequences_from_save(self.save):
+                btns = puzzles.phone_buttons(seq, nums)
+                out.append(f'<p>{html_escape(tr("Hideout {n}: the phone asks for {seq}", n=n, seq=seq))} – '
+                           + ' → '.join(html_escape(tr(names[b])) if b else '?' for b in btns) + '</p>')
+        self.p_result.setHtml(''.join(out))
+
+    # --- L/S console ------------------------------------------------------------------------
+    def console_page(self):
+        self.k_result = self.result_view()
+        intro = puzzle_intro(tr(
+            'Core City Office Building: the console in the north-west storage room opens the north-east room after '
+            'the right series of 15 L and S. The maintenance robot in the basement beeps them, short and long, five '
+            'each in the west, east and south; the three blocks are always the same, only their order is random.'),
+            'Core_City_Office_Building')
+        w = self.page(intro, QFormLayout(), self.solve_console, None, self.k_result)
+        self.solve_console()
+        return w
+
+    def solve_console(self):
+        seq = puzzles.console_from_save(self.save) if self.save is not None else None
+        blocks = lambda s: ' '.join(s[i:i + 5] for i in range(0, len(s), 5))
+        if seq:
+            self.k_result.setHtml(f'<h3>{html_escape(tr("Sequence: {seq}", seq=blocks(seq)))}</h3>'
+                                  f'<p>{html_escape(tr("Press L or S in this order, then submit."))}</p>')
+            return
+        rows = ''.join(f'<li><b>{blocks(s)}</b></li>' for s in puzzles.CONSOLE_SEQUENCES)
+        note = tr("The game picks the order the first time you use the console; this save has none yet. It is "
+                  "one of these three – the robot's first five beeps (west) tell which:")
+        self.k_result.setHtml(f'<p>{html_escape(note)}</p><ul>{rows}</ul>')
+
+
 # --- main window --------------------------------------------------------------------------
 
 class SidebarHandle(QSplitterHandle):
@@ -3637,6 +3927,7 @@ class Main(QMainWindow):
             f.name.split('.', 1)[-1])), tr('Oddities'))
         self.tabs.addTab(FactionsTab(self), tr('Factions'))
         self.tabs.addTab(HintsTab(self), tr('Hints'))
+        self.tabs.addTab(PuzzlesTab(self), tr('Puzzles'))
         if 0 <= tab < self.tabs.count():
             self.tabs.setCurrentIndex(tab)
         self.broken = us.broken_locations(folder)

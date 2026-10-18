@@ -68,6 +68,32 @@ and `{target faction: attitude}`. Attitudes: 0 hostile, 2 neutral (the default w
   exosoldiers (`faction_xphw_exoBase_exosoldiers_killed`; at 12 the game sets `…_tooManyKilled`, the editor
   keeps it in sync).
 
+## Puzzles generated per playthrough (puzzles tab)
+
+`puzzles.py` implements the wiki's solution methods; the generated values come from the save (generators
+read from `underrail.exe`).
+
+- **Note Cipher Puzzle** (`e5t`): game variables `global_xpbl_encryptedString<n>` (+ `_key`),
+  `global_xpbl_encryptedKeypadCode` (+ `_key`) and `global_xpbl_encryptedText_intervalKey`. Three intervals
+  i1 < 12, i2 < 7, 7 ≤ i3 < 12; a–l, m–x and y–z 0–9 fill the octaves given by the first three key digits,
+  shifted by i1, i1+i2, i1+i3; every further key digit is the octave of one note (`?` = corrupted). The
+  4-digit code (1000–9999) has its own line on Easy; on higher difficulties one part (digit or number word)
+  is inserted into each line.
+- **Mutagen Puzzle** (`euk` = `MCX`, compound `agn` = `MCY`): `MCX:A` 20 atom names, `MCX:R:i` the 15
+  reagents (`MutagenReagentIndex` of the reagent items; negative = removing atom), `MCX:T` Exitus-1, built by
+  applying `MCX:C` (5–7) random reagents to an empty compound, so a solution of that length exists. Adding a
+  reagent appends its positive atoms not yet present and removes its negative ones. Solver: IDA* with the
+  lower bound "the kept atoms are a prefix of the target, the rest is appended in blocks, each in one
+  reagent's order".
+- **Emergency phones** (`c17`): `loc_up_emergencyPhoneNumber_{redCross,rat,security,wrench,hazard,info}` is a
+  random permutation of 1–6 made at the first phone; a pressed button appends its number. The Perception
+  text shows `loc_up_emergencyPhoneHideout{One,Two}CurrentSequenceString`.
+- **L/S console** (`c9s`): `loc_dun_ccResOffice_actualSequence`, one of `LLSLLSSSLSLSLSL`, `SSSLSLSLSLLLSLL`,
+  `LSLSLLLSLLSSSLS`, picked at the first use of the console.
+
+Not covered: the Gauntlet's chemical puzzle (re-rolled on every entry, not in the save; the wiki's
+elimination method needs no tool) and random locations (the Shard, the bone crank, Drag 'n' Drop).
+
 ## Item icons
 
 Icons are cut out of the game's sprite sheets (`data/icons/*.xnb`) on first start (a few seconds,
