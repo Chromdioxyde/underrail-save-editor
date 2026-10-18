@@ -1,5 +1,9 @@
 # Underrail Save Editor
 
+[![Latest release](https://img.shields.io/github/v/release/Chromdioxyde/underrail-save-editor)](../../releases/latest)
+[![Build](https://github.com/Chromdioxyde/underrail-save-editor/actions/workflows/build.yml/badge.svg)](../../actions/workflows/build.yml)
+[![License: GPL v3+](https://img.shields.io/badge/license-GPL--3.0--or--later-blue)](LICENSE)
+
 **Respec a build that went wrong, try out a feat before you commit to it, top up your crafting components,
 or unstick a quest – without starting a new run.**
 
@@ -11,6 +15,9 @@ installation, so what you see looks and reads like the game itself.
 
 > Unofficial fan project – not made, endorsed or supported by Stygian Software and not affiliated with
 > them. Underrail and its assets belong to Stygian Software.
+
+**New in 1.1:** puzzle solvers for the note cipher, the Mutagen Puzzle, Phreak's emergency phones and the
+L/S console – see [Puzzle solvers](#puzzle-solvers) and the [changelog](CHANGELOG.md).
 
 ## Highlights
 
@@ -187,7 +194,8 @@ clues are filled in for you.
 ## Under the hood
 
 Curious how the save format works, where the game data comes from, or how to build the AppImage and the
-Windows version? See [docs/TECHNICAL.md](docs/TECHNICAL.md).
+Windows version? See [docs/TECHNICAL.md](docs/TECHNICAL.md). What changed in each version is in the
+[changelog](CHANGELOG.md).
 
 ## License
 

@@ -154,7 +154,9 @@ not modelled.
 ## Packaging
 - `packaging/install.sh` (per-user Linux install), `build-appimage.sh` (portable AppImage, tested on
   Ubuntu 22.04/Debian 12 in Docker; Debian 11 is too old for PySide6's libstdc++), PyInstaller spec +
-  GitHub Actions workflow for Windows (Windows build not tested yet – no Windows machine, repo not on GitHub).
+  GitHub Actions workflow (builds on GitHub succeed; the Windows zip hasn't been run on Windows yet).
+- Releases: add a `## X.Y.Z – date` section to CHANGELOG.md (it becomes the release text), set `VERSION`,
+  tag `vX.Y.Z` and push the tag to `github`.
 - `paths.py` detects folders on Linux/Steam Deck/Windows; Windows detection is untested.
 
 ## Findings
